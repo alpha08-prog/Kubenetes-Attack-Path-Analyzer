@@ -4,8 +4,8 @@ Orchestrates cycle detection and critical node identification.
 Also produces the combined summary fed into the Claude narrator.
 """
 
-from backend.app.algorithm.dfs_cycles import detect_cycles, nodes_in_any_cycle
-from backend.app.algorithm.centrality import find_critical_nodes
+from app.algorithm.dfs_cycles import detect_cycles, nodes_in_any_cycle
+from app.algorithm.centrality import find_critical_nodes
 from app.core.graph_builder import get_graph
 from app.utils.helpers import timed
 from app.utils.logger import get_logger, log_algorithm_run
@@ -60,8 +60,8 @@ def get_full_analysis() -> dict:
     """
     G = get_graph()
 
-    from backend.app.algorithm.dijkstra import shortest_attack_path
-    from backend.app.algorithm.bfs import blast_radius
+    from app.algorithm.dijkstra import shortest_attack_path
+    from app.algorithm.bfs import blast_radius
     from app.core.graph_builder import find_entry_points, find_sensitive_targets
 
     # Auto-detect best source/target pair

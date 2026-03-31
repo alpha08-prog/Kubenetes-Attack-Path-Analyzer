@@ -4,28 +4,45 @@ All environment variables loaded from .env via pydantic-settings.
 Import `settings` anywhere in the app — never read os.environ directly.
 """
 
-from pydantic_settings import BaseSettings
-from pydantic import Field
+from pydantic import AliasChoices, Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        # Supports launching from:
+        # - backend/               (".env" or "app/.env")
+        # - repo root/             ("backend/app/.env")
+        env_file=(".env", "app/.env", "backend/app/.env"),
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+    )
 
     # ─── Gemini API ───────────────────────────────────────────────────────────
     GEMINI_API_KEY: str = Field(
-    default="",
-    description="Free API key from https://aistudio.google.com",
-)
+        default="",
+        validation_alias=AliasChoices("GEMINI_API_KEY", "Gemini_API_KEY"),
+        description="Free API key from https://aistudio.google.com",
+    )
     GEMINI_MODEL: str = Field(
-    default="gemini-2.0-flash",
-    description="Gemini model — gemini-2.0-flash is free tier",
-)
+        default="gemini-2.0-flash",
+        validation_alias=AliasChoices("GEMINI_MODEL", "Gemini_MODEL"),
+        description="Gemini model — gemini-2.0-flash is free tier",
+    )
 
-    # ─── App ──────────────────────────────────────────────────────────────────
-    APP_NAME:    str = Field(default="Attack Path Analyzer")
+    # ─── App ─────────────────────────────────────────────────────────────────
+    APP_NAME: str = Field(default="Attack Path Analyzer")
     APP_VERSION: str = Field(default="1.0.0")
-    DEBUG:       bool = Field(default=False)
+    DEBUG: bool = Field(default=False)
 
-    # ─── Mock Mode ────────────────────────────────────────────────────────────
+    # ─── Legacy / optional ───────────────────────────────────────────────────
+    # Kept to avoid startup crashes if older code logs this setting.
+    CLAUDE_MODEL: str = Field(
+        default="",
+        validation_alias=AliasChoices("CLAUDE_MODEL", "Claude_MODEL"),
+    )
+
+    # ─── Mock Mode ───────────────────────────────────────────────────────────
     MOCK_MODE: bool = Field(
         default=True,
         description=(
@@ -38,7 +55,7 @@ class Settings(BaseSettings):
         description="Path to the mock scenario file",
     )
 
-    # ─── Cluster ──────────────────────────────────────────────────────────────
+    # ─── Cluster ─────────────────────────────────────────────────────────────
     CLUSTER_NAME: str = Field(
         default="nokia-telecom-cluster",
         description="Display name shown in reports and the UI header",
@@ -48,22 +65,17 @@ class Settings(BaseSettings):
         description="Seconds before a kubectl command is considered failed",
     )
 
-    # ─── Algorithm defaults ───────────────────────────────────────────────────
-    BFS_MAX_HOPS:       int   = Field(default=3)
-    CENTRALITY_TOP_N:   int   = Field(default=10)
-    MAX_ATTACK_PATHS:   int   = Field(default=5)
+    # ─── Algorithm defaults ──────────────────────────────────────────────────
+    BFS_MAX_HOPS: int = Field(default=3)
+    CENTRALITY_TOP_N: int = Field(default=10)
+    MAX_ATTACK_PATHS: int = Field(default=5)
     RISK_HIGH_THRESHOLD: float = Field(default=7.0)
 
-    # ─── CORS ─────────────────────────────────────────────────────────────────
+    # ─── CORS ────────────────────────────────────────────────────────────────
     CORS_ORIGINS: list[str] = Field(
         default=["http://localhost:3000", "http://127.0.0.1:3000"],
         description="Allowed frontend origins",
     )
-
-    class Config:
-        env_file         = (".env", "app/.env")
-        env_file_encoding = "utf-8"
-        case_sensitive   = False
 
 
 # Single shared instance — import this everywhere

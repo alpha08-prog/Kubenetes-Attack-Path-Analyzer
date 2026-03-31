@@ -4,8 +4,8 @@ uvicorn[standard]==0.29.0
 python-multipart==0.0.9
 
 # Data Validation
-pydantic==2.7.1
-pydantic-settings==2.2.1
+pydantic==2.11.7
+pydantic-settings==2.10.1
 
 # ─── Graph Engine ─────────────────────────────────────────────────────────────
 networkx==3.3

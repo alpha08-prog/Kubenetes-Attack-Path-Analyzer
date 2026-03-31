@@ -4,7 +4,7 @@ Orchestrates BFS and enriches zones with severity labels
 and risk summaries for the frontend overlay.
 """
 
-from backend.app.algorithm.bfs import blast_radius, highest_risk_in_blast_radius
+from app.algorithm.bfs import blast_radius, highest_risk_in_blast_radius
 from app.core.graph_builder import get_graph
 from app.utils.helpers import severity_label, timed
 from app.utils.logger import get_logger, log_algorithm_run

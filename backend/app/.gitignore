@@ -1,1 +1,67 @@
+# ─── Environment & Secrets ───────────────────────────────────────────────────
 .env
+.env.*
+!.env.example
+
+# ─── Python ───────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*$py.class
+*.so
+
+# ─── Virtual Environments ─────────────────────────────────────────────────────
+venv/
+.venv/
+env/
+.env/
+ENV/
+virtualenv/
+
+# ─── Build & Distribution ─────────────────────────────────────────────────────
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+wheels/
+
+# ─── Testing & Coverage ───────────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+.tox/
+nosetests.xml
+test-results/
+
+# ─── Logs ─────────────────────────────────────────────────────────────────────
+logs/
+*.log
+*.log.*
+
+# ─── Data — raw & processed (can be regenerated) ─────────────────────────────
+data/raw/
+data/processed/
+
+# Keep scenarios (needed for mock mode) but ignore any local overrides
+!data/scenarios/
+data/scenarios/*.local.json
+
+# ─── IDE & Editor ─────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ─── Docker ───────────────────────────────────────────────────────────────────
+*.dockerignore
+
+# ─── Misc ─────────────────────────────────────────────────────────────────────
+*.bak
+*.tmp
+.cache/

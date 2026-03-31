@@ -4,8 +4,8 @@ Removes a node from the graph, reruns all algorithms,
 and returns a before/after delta with Claude narration.
 """
 
-from backend.app.algorithm.centrality import simulate_node_removal
-from backend.app.algorithm.dfs_cycles import detect_cycles
+from app.algorithm.centrality import simulate_node_removal
+from app.algorithm.dfs_cycles import detect_cycles
 from app.core.graph_builder import get_graph
 from app.utils.helpers import timed
 from app.utils.logger import get_logger, log_algorithm_run

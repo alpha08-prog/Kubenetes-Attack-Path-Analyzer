@@ -4,7 +4,7 @@ Orchestrates the Dijkstra algorithm and enriches the result
 with severity labels and frontend-ready formatting.
 """
 
-from backend.app.algorithm.dijkstra import shortest_attack_path, all_attack_paths
+from app.algorithm.dijkstra import shortest_attack_path, all_attack_paths
 from app.core.graph_builder import get_graph, find_entry_points, find_sensitive_targets
 from app.utils.helpers import severity_label, timed
 from app.utils.logger import get_logger, log_algorithm_run

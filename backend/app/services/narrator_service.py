@@ -134,3 +134,27 @@ def _call_gemini(user_prompt: str) -> list:
     except Exception as e:
         logger.error("Gemini API call failed: %s", e)
         return FALLBACK_FINDINGS
+
+
+def gemini_healthcheck() -> dict:
+    """
+    Minimal runtime check for Gemini configuration + auth.
+
+    Note: This performs a tiny Gemini request when a key is present.
+    Use this endpoint intentionally (e.g., /api/ai/health) rather than
+    on every startup.
+    """
+    configured = bool(settings.GEMINI_API_KEY)
+    base = {"provider": "gemini", "configured": configured, "model": settings.GEMINI_MODEL}
+
+    if not configured:
+        return {**base, "ok": False, "mode": "missing_key", "detail": "GEMINI_API_KEY not set"}
+
+    try:
+        model = _get_model()
+        response = model.generate_content("Reply with: OK")
+        text = (getattr(response, "text", "") or "").strip()
+        return {**base, "ok": True, "mode": "live", "detail": text[:64]}
+    except Exception as e:
+        logger.error("Gemini healthcheck failed: %s", e)
+        return {**base, "ok": False, "mode": "error", "detail": str(e)}
