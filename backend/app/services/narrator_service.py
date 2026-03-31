@@ -1,13 +1,15 @@
 """
-narrator_service.py — Claude API Narration  ★ KEY DIFFERENTIATOR ★
-Sends algorithm results to Claude and gets back structured,
-human-readable security findings with kill chains and fixes.
+narrator_service.py — Gemini API Narration  ★ KEY DIFFERENTIATOR ★
+Uses Google Gemini 2.0 Flash (free tier) to generate structured,
+human-readable security findings from algorithm results.
+
+Free API key: https://aistudio.google.com → Get API Key (no card needed)
 """
 
 import json
 from tenacity import retry, stop_after_attempt, wait_exponential
 
-import anthropic
+import google.generativeai as genai
 
 from app.config import settings
 from app.services.analysis_service import get_full_analysis
@@ -23,27 +25,31 @@ from app.utils.prompt_templates import (
 
 logger = get_logger(__name__)
 
-_client: anthropic.Anthropic | None = None
+_model = None
 
 
-def _get_client() -> anthropic.Anthropic:
-    global _client
-    if _client is None:
-        if not settings.ANTHROPIC_API_KEY:
-            raise RuntimeError("ANTHROPIC_API_KEY is not set in .env")
-        _client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
-    return _client
+def _get_model():
+    global _model
+    if _model is None:
+        if not settings.GEMINI_API_KEY:
+            raise RuntimeError(
+                "GEMINI_API_KEY is not set in .env\n"
+                "Get a free key at: https://aistudio.google.com"
+            )
+        genai.configure(api_key=settings.GEMINI_API_KEY)
+        _model = genai.GenerativeModel(
+            model_name   = settings.GEMINI_MODEL,
+            system_instruction = NARRATOR_SYSTEM_PROMPT,
+        )
+    return _model
 
 
 # ─── Main report generator ────────────────────────────────────────────────────
 
 def generate_report(cluster_name: str = "nokia-telecom-cluster") -> dict:
     """
-    Run all algorithms, send results to Claude, return structured report.
+    Run all algorithms, send results to Gemini, return structured report.
     Called by routes_report.py.
-
-    Returns:
-        Full ReportResponse-shaped dict with findings list.
     """
     logger.info("Generating AI security report for cluster: %s", cluster_name)
 
@@ -57,12 +63,11 @@ def generate_report(cluster_name: str = "nokia-telecom-cluster") -> dict:
         cluster_name   = cluster_name,
     )
 
-    findings = _call_claude(prompt)
+    findings  = _call_gemini(prompt)
     timestamp = utc_now()
-    header = build_report_header(cluster_name, len(findings), timestamp)
+    header    = build_report_header(cluster_name, len(findings), timestamp)
 
     logger.info("Report generated: %d findings", len(findings))
-
     return {**header, "findings": findings}
 
 
@@ -70,80 +75,62 @@ def generate_report(cluster_name: str = "nokia-telecom-cluster") -> dict:
 
 def narrate_simulation(simulation_result: dict) -> str:
     """
-    Ask Claude to explain the impact of a node removal simulation in 2-3 sentences.
-    Called by simulator_service.py after running the what-if analysis.
+    Ask Gemini to explain the impact of a node removal in 2-3 sentences.
+    Called by simulator_service.py.
     """
     prompt = build_simulation_prompt(simulation_result)
 
     try:
-        client = _get_client()
-        message = client.messages.create(
-            model      = settings.CLAUDE_MODEL,
-            max_tokens = 300,
-            messages   = [{"role": "user", "content": prompt}],
-        )
-        return message.content[0].text.strip()
+        model    = _get_model()
+        response = model.generate_content(prompt)
+        return response.text.strip()
     except Exception as e:
-        logger.error("Claude simulation narrative failed: %s", e)
+        logger.error("Gemini simulation narrative failed: %s", e)
         return (
             f"Removing '{simulation_result.get('node_label')}' breaks "
             f"{simulation_result.get('paths_broken', 0)} of "
             f"{simulation_result.get('paths_before', 0)} attack paths. "
-            "Check the Claude API key if you expected a detailed explanation."
+            "Check GEMINI_API_KEY in .env if you expected a detailed explanation."
         )
 
 
-# ─── Claude API call ──────────────────────────────────────────────────────────
+# ─── Gemini API call ──────────────────────────────────────────────────────────
 
 @retry(
-    stop=stop_after_attempt(3),
-    wait=wait_exponential(multiplier=1, min=2, max=10),
-    reraise=False,
+    stop = stop_after_attempt(3),
+    wait = wait_exponential(multiplier=1, min=2, max=10),
+    reraise = False,
 )
-def _call_claude(user_prompt: str) -> list:
+def _call_gemini(user_prompt: str) -> list:
     """
-    Call the Claude API and parse the JSON findings array.
+    Call the Gemini API and parse the JSON findings array.
     Retries up to 3 times with exponential backoff on transient failures.
     Falls back to FALLBACK_FINDINGS if all retries fail.
     """
     try:
-        client = _get_client()
+        model    = _get_model()
+        response = model.generate_content(user_prompt)
+        raw_text = response.text.strip()
 
-        message = client.messages.create(
-            model      = settings.CLAUDE_MODEL,
-            max_tokens = 1500,
-            system     = NARRATOR_SYSTEM_PROMPT,
-            messages   = [{"role": "user", "content": user_prompt}],
-        )
-
-        raw_text = message.content[0].text.strip()
-
-        # Strip markdown code fences if Claude wraps in ```json ... ```
+        # Strip markdown code fences if Gemini wraps output in ```json ... ```
         if raw_text.startswith("```"):
             raw_text = raw_text.split("```")[1]
             if raw_text.startswith("json"):
                 raw_text = raw_text[4:]
+            raw_text = raw_text.strip()
 
         findings = json.loads(raw_text)
 
         if not isinstance(findings, list):
-            raise ValueError("Claude returned non-list JSON")
+            raise ValueError("Gemini returned non-list JSON")
 
-        logger.info("Claude returned %d findings", len(findings))
+        logger.info("Gemini returned %d findings", len(findings))
         return findings
 
     except json.JSONDecodeError as e:
-        logger.error("Failed to parse Claude JSON response: %s", e)
+        logger.error("Failed to parse Gemini JSON response: %s", e)
         return FALLBACK_FINDINGS
-
-    except anthropic.AuthenticationError:
-        logger.error("Invalid ANTHROPIC_API_KEY — check your .env file")
-        return FALLBACK_FINDINGS
-
-    except anthropic.RateLimitError:
-        logger.warning("Claude rate limit hit — retrying...")
-        raise  # let tenacity retry
 
     except Exception as e:
-        logger.error("Claude API call failed: %s", e)
+        logger.error("Gemini API call failed: %s", e)
         return FALLBACK_FINDINGS

@@ -10,15 +10,15 @@ from pydantic import Field
 
 class Settings(BaseSettings):
 
-    # ─── Claude API ───────────────────────────────────────────────────────────
-    ANTHROPIC_API_KEY: str = Field(
-        default="",
-        description="Your Anthropic API key from console.anthropic.com",
-    )
-    CLAUDE_MODEL: str = Field(
-        default="claude-sonnet-4-20250514",
-        description="Claude model to use for narration",
-    )
+    # ─── Gemini API ───────────────────────────────────────────────────────────
+    GEMINI_API_KEY: str = Field(
+    default="",
+    description="Free API key from https://aistudio.google.com",
+)
+    GEMINI_MODEL: str = Field(
+    default="gemini-2.0-flash",
+    description="Gemini model — gemini-2.0-flash is free tier",
+)
 
     # ─── App ──────────────────────────────────────────────────────────────────
     APP_NAME:    str = Field(default="Attack Path Analyzer")
@@ -61,7 +61,7 @@ class Settings(BaseSettings):
     )
 
     class Config:
-        env_file         = ".env"
+        env_file         = (".env", "app/.env")
         env_file_encoding = "utf-8"
         case_sensitive   = False
 

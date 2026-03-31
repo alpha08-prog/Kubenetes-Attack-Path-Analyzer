@@ -11,7 +11,7 @@ pydantic-settings==2.2.1
 networkx==3.3
 
 # ─── AI Narration ─────────────────────────────────────────────────────────────
-anthropic==0.26.0
+google-generativeai==0.8.3
 
 # ─── HTTP Client (CVE enricher + external APIs) ───────────────────────────────
 httpx==0.27.0
