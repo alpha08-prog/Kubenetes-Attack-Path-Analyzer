@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt .
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir --prefix=/install -r requirements.txt
 
@@ -24,13 +24,11 @@ WORKDIR /app
 # Copy installed packages from builder
 COPY --from=builder /install /usr/local
 
-# Copy application source
-COPY app/      ./app/
-COPY data/     ./data/
-COPY scripts/  ./scripts/
+# Copy application source from repo root context
+COPY backend/app/ ./app/
 
-# Create logs directory
-RUN mkdir -p logs
+# Create runtime directories
+RUN mkdir -p data logs
 
 # Non-root user for security
 RUN adduser --disabled-password --gecos "" appuser \
