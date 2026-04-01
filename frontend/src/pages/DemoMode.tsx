@@ -32,6 +32,29 @@ function normalizeAttackPath(raw: any) {
   return raw;
 }
 
+function normalizeBlastRadius(raw: any) {
+  if (!raw) return raw;
+  return {
+    ...raw,
+    total_affected: raw.total_affected ?? raw.total_reachable ?? 0,
+  };
+}
+
+function normalizeSummary(rawSummary: any, rawGraph: any) {
+  const nodes = rawGraph?.nodes || [];
+  const criticalCount = nodes.filter((node: any) => {
+    const data = node?.data ?? node ?? {};
+    return Number(data.risk_score ?? data.risk ?? 0) >= 8;
+  }).length;
+
+  return {
+    total_nodes: Number(rawSummary?.total_nodes ?? nodes.length ?? 0),
+    total_edges: Number(rawSummary?.total_edges ?? (rawGraph?.edges || []).length ?? 0),
+    critical_findings: Number(rawSummary?.critical_findings ?? criticalCount),
+    cycles_detected: Number(rawSummary?.cycles_detected ?? rawSummary?.cycle_count ?? 0),
+  };
+}
+
 function formatCycleChain(cycle: any): string {
   if (typeof cycle?.chain_string === 'string' && cycle.chain_string.length > 0) {
     return cycle.chain_string;
@@ -62,14 +85,14 @@ export default function DemoMode() {
       switch (step) {
         case 0:
           const [g, s] = await Promise.all([api.getGraph(), api.getGraphSummary()]);
-          data = { graph: g.data, summary: s.data };
+          data = { graph: g.data, summary: normalizeSummary(s.data, g.data) };
           break;
         case 1:
           data = normalizeAttackPath((await api.getAutoAttackPath()).data);
           break;
         case 2:
           const src = stepData[1]?.path?.[0]?.from || 'pod:default:web-server';
-          data = (await api.getBlastRadius(src, 3)).data;
+          data = normalizeBlastRadius((await api.getBlastRadius(src, 3)).data);
           break;
         case 3:
           data = (await api.getCycles()).data;
@@ -190,7 +213,7 @@ export default function DemoMode() {
         {stepDone.has(2) && blastRadius && (
           <div className="animate-slide-in-right bg-card border border-border rounded-lg p-6">
             <h3 className="font-semibold mb-3">Blast Radius Analysis</h3>
-            <p className="text-2xl font-bold text-severity-high">{blastRadius.total_affected || '?'} nodes at risk</p>
+            <p className="text-2xl font-bold text-severity-high">{blastRadius.total_affected ?? 0} nodes at risk</p>
           </div>
         )}
 
