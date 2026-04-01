@@ -1,0 +1,82 @@
+version: "3.9"
+
+# ── Attack Path Analyzer — Docker Compose ─────────────────────────────────────
+# Usage:
+#   docker-compose up --build        # first run
+#   docker-compose up                # subsequent runs
+#   docker-compose down              # stop everything
+#   docker-compose logs -f backend   # tail backend logs
+#   docker-compose logs -f frontend  # tail frontend logs
+
+services:
+
+  # ── Backend — FastAPI ────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ../docker/backend.Dockerfile
+    container_name: attack-path-backend
+    restart: unless-stopped
+
+    environment:
+      # AI narration — get free key at aistudio.google.com
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+
+      # App config
+      MOCK_MODE:    ${MOCK_MODE:-true}
+      CLUSTER_NAME: ${CLUSTER_NAME:-nokia-telecom-cluster}
+      DEBUG:        ${DEBUG:-false}
+
+      # Algorithm defaults
+      BFS_MAX_HOPS:     3
+      CENTRALITY_TOP_N: 10
+
+      # Allow requests from nginx frontend container
+      CORS_ORIGINS: '["http://localhost:3000","http://frontend:3000"]'
+
+    volumes:
+      # Mount data directory so scenarios persist across rebuilds
+      - ./backend/data:/app/data
+
+    ports:
+      # Expose backend directly for Postman / Swagger testing
+      - "8000:8000"
+
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout:  5s
+      retries:  5
+      start_period: 15s
+
+    networks:
+      - attack-net
+
+
+  # ── Frontend — React + nginx ──────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ../docker/frontend.Dockerfile
+      args:
+        # During build, Vite bakes this URL into the JS bundle
+        # nginx proxy rewrites /api/* → backend:8000 at runtime
+        VITE_API_BASE_URL: http://localhost:8000
+    container_name: attack-path-frontend
+    restart: unless-stopped
+
+    ports:
+      - "3000:3000"
+
+    depends_on:
+      backend:
+        condition: service_healthy
+
+    networks:
+      - attack-net
+
+
+networks:
+  attack-net:
+    driver: bridge
