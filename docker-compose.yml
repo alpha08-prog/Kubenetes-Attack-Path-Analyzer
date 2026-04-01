@@ -34,7 +34,7 @@ services:
 
     volumes:
       # Mount data directory so scenarios persist across rebuilds
-      - ./backend/data:/app/data
+      - ./data:/app/data
 
     ports:
       # Expose backend directly for Postman / Swagger testing

@@ -9,17 +9,18 @@ This scenario has:
   - 1 privilege escalation cycle: backend-sa → admin-role → backend-sa
   - 3 high-centrality nodes for the critical node leaderboard
 
-Run from the backend/ directory:
+Run from the repo root:
     python scripts/generate_mock_data.py
 """
 
 import json
-import os
 from pathlib import Path
 
 # ─── Output path ──────────────────────────────────────────────────────────────
 
-OUTPUT_PATH = Path("data/scenarios/nokia_telecom.json")
+SCRIPT_DIR = Path(__file__).resolve().parent
+REPO_ROOT = SCRIPT_DIR.parent
+OUTPUT_PATH = REPO_ROOT / "data" / "scenarios" / "nokia_telecom.json"
 
 
 # ─── Nodes ────────────────────────────────────────────────────────────────────

@@ -1,0 +1,228 @@
+{
+  "meta": {
+    "source": "mock",
+    "count": 20
+  },
+  "relations": [
+    {
+      "source": "pod:default:web-server",
+      "source_label": "web-server",
+      "source_type": "pod",
+      "target": "service_account:default:backend-sa",
+      "target_label": "backend-sa",
+      "target_type": "service_account",
+      "relation": "uses",
+      "risk": 7.5,
+      "weight": 2.5
+    },
+    {
+      "source": "pod:default:api-server",
+      "source_label": "api-server",
+      "source_type": "pod",
+      "target": "service_account:default:backend-sa",
+      "target_label": "backend-sa",
+      "target_type": "service_account",
+      "relation": "uses",
+      "risk": 8.0,
+      "weight": 2.0
+    },
+    {
+      "source": "pod:default:metrics-collector",
+      "source_label": "metrics-collector",
+      "source_type": "pod",
+      "target": "service_account:default:metrics-sa",
+      "target_label": "metrics-sa",
+      "target_type": "service_account",
+      "relation": "uses",
+      "risk": 4.5,
+      "weight": 5.5
+    },
+    {
+      "source": "pod:kube-system:coredns",
+      "source_label": "coredns",
+      "source_type": "pod",
+      "target": "service_account:kube-system:coredns-sa",
+      "target_label": "coredns-sa",
+      "target_type": "service_account",
+      "relation": "uses",
+      "risk": 5.0,
+      "weight": 5.0
+    },
+    {
+      "source": "service_account:default:backend-sa",
+      "source_label": "backend-sa",
+      "source_type": "service_account",
+      "target": "role:default:admin-role",
+      "target_label": "admin-role",
+      "target_type": "role",
+      "relation": "bound-to",
+      "risk": 9.5,
+      "weight": 0.5
+    },
+    {
+      "source": "service_account:default:metrics-sa",
+      "source_label": "metrics-sa",
+      "source_type": "service_account",
+      "target": "role:default:metrics-role",
+      "target_label": "metrics-role",
+      "target_type": "role",
+      "relation": "bound-to",
+      "risk": 3.5,
+      "weight": 6.5
+    },
+    {
+      "source": "role:default:admin-role",
+      "source_label": "admin-role",
+      "source_type": "role",
+      "target": "secret:default:db-credentials",
+      "target_label": "db-credentials",
+      "target_type": "secret",
+      "relation": "can-read",
+      "risk": 9.0,
+      "weight": 1.0
+    },
+    {
+      "source": "role:default:admin-role",
+      "source_label": "admin-role",
+      "source_type": "role",
+      "target": "secret:default:api-token",
+      "target_label": "api-token",
+      "target_type": "secret",
+      "relation": "can-read",
+      "risk": 8.0,
+      "weight": 2.0
+    },
+    {
+      "source": "role:default:admin-role",
+      "source_label": "admin-role",
+      "source_type": "role",
+      "target": "secret:default:tls-cert",
+      "target_label": "tls-cert",
+      "target_type": "secret",
+      "relation": "can-read",
+      "risk": 5.5,
+      "weight": 4.5
+    },
+    {
+      "source": "role:default:secret-reader",
+      "source_label": "secret-reader",
+      "source_type": "role",
+      "target": "secret:default:db-credentials",
+      "target_label": "db-credentials",
+      "target_type": "secret",
+      "relation": "can-read",
+      "risk": 7.5,
+      "weight": 2.5
+    },
+    {
+      "source": "secret:default:db-credentials",
+      "source_label": "db-credentials",
+      "source_type": "secret",
+      "target": "database:default:billing-db",
+      "target_label": "billing-db",
+      "target_type": "database",
+      "relation": "unlocks",
+      "risk": 9.5,
+      "weight": 0.5
+    },
+    {
+      "source": "secret:default:db-credentials",
+      "source_label": "db-credentials",
+      "source_type": "secret",
+      "target": "database:default:analytics-db",
+      "target_label": "analytics-db",
+      "target_type": "database",
+      "relation": "unlocks",
+      "risk": 7.0,
+      "weight": 3.0
+    },
+    {
+      "source": "user:cluster:dev-1",
+      "source_label": "dev-1",
+      "source_type": "user",
+      "target": "role:default:secret-reader",
+      "target_label": "secret-reader",
+      "target_type": "role",
+      "relation": "bound-to",
+      "risk": 7.5,
+      "weight": 2.5
+    },
+    {
+      "source": "user:cluster:ci-bot",
+      "source_label": "ci-bot",
+      "source_type": "user",
+      "target": "role:cluster:cluster-admin",
+      "target_label": "cluster-admin",
+      "target_type": "role",
+      "relation": "bound-to",
+      "risk": 10.0,
+      "weight": 0.0
+    },
+    {
+      "source": "role:default:admin-role",
+      "source_label": "admin-role",
+      "source_type": "role",
+      "target": "service_account:default:backend-sa",
+      "target_label": "backend-sa",
+      "target_type": "service_account",
+      "relation": "can-impersonate",
+      "risk": 9.0,
+      "weight": 1.0
+    },
+    {
+      "source": "secret:default:api-token",
+      "source_label": "api-token",
+      "source_type": "secret",
+      "target": "service_account:default:backend-sa",
+      "target_label": "backend-sa",
+      "target_type": "service_account",
+      "relation": "authenticates-as",
+      "risk": 8.0,
+      "weight": 2.0
+    },
+    {
+      "source": "role:cluster:cluster-admin",
+      "source_label": "cluster-admin",
+      "source_type": "role",
+      "target": "secret:default:db-credentials",
+      "target_label": "db-credentials",
+      "target_type": "secret",
+      "relation": "can-read",
+      "risk": 10.0,
+      "weight": 0.0
+    },
+    {
+      "source": "role:cluster:cluster-admin",
+      "source_label": "cluster-admin",
+      "source_type": "role",
+      "target": "database:default:billing-db",
+      "target_label": "billing-db",
+      "target_type": "database",
+      "relation": "accesses",
+      "risk": 10.0,
+      "weight": 0.0
+    },
+    {
+      "source": "role:default:metrics-role",
+      "source_label": "metrics-role",
+      "source_type": "role",
+      "target": "pod:default:web-server",
+      "target_label": "web-server",
+      "target_type": "pod",
+      "relation": "can-read",
+      "risk": 4.0,
+      "weight": 6.0
+    },
+    {
+      "source": "role:default:metrics-role",
+      "source_label": "metrics-role",
+      "source_type": "role",
+      "target": "pod:default:api-server",
+      "target_label": "api-server",
+      "target_type": "pod",
+      "relation": "can-read",
+      "risk": 4.0,
+      "weight": 6.0
+    }
+  ]
+}

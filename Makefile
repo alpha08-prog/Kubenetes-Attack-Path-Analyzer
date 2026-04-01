@@ -8,15 +8,20 @@
 #   make logs      → tail all container logs
 #   make test      → run backend tests
 #   make mock      → regenerate nokia_telecom.json
+#   make seed      → generate data/processed artifacts from a scenario
+#   make fetch     → fetch presentation-filtered live cluster snapshots
+#   make fetch-full→ fetch full unfiltered cluster snapshots
 #   make clean     → remove containers, images, volumes
 
-.PHONY: demo dev build up down logs test mock fetch fetch-full clean
+.PHONY: demo dev build up down logs test mock seed fetch fetch-full clean
 
 # ── Docker commands ────────────────────────────────────────────────────────────
 
 demo:
 	@echo "Generating mock data..."
-	cd backend && python scripts/generate_mock_data.py
+	python scripts/generate_mock_data.py
+	@echo "Seeding processed artifacts..."
+	python scripts/seed_graph.py
 	@echo "Starting all services..."
 	docker-compose up --build
 
@@ -54,7 +59,10 @@ dev:
 # ── Data ──────────────────────────────────────────────────────────────────────
 
 mock:
-	cd backend && python scripts/generate_mock_data.py
+	python scripts/generate_mock_data.py
+
+seed:
+	python scripts/seed_graph.py
 
 fetch:
 	bash scripts/fetch_k8s_data.sh

@@ -1,0 +1,103 @@
+{
+  "meta": {
+    "name": "Vulnerable Cluster",
+    "description": "Intentionally vulnerable scenario with a clear attack path and privilege escalation cycle.",
+    "generated_by": "manual"
+  },
+  "nodes": [
+    {
+      "id": "pod:default:web-server",
+      "label": "web-server",
+      "type": "pod",
+      "risk": 7.5,
+      "namespace": "default",
+      "metadata": {
+        "phase": "Running"
+      }
+    },
+    {
+      "id": "service_account:default:backend-sa",
+      "label": "backend-sa",
+      "type": "service_account",
+      "risk": 8.5,
+      "namespace": "default",
+      "metadata": {}
+    },
+    {
+      "id": "role:default:admin-role",
+      "label": "admin-role",
+      "type": "role",
+      "risk": 9.5,
+      "namespace": "default",
+      "metadata": {
+        "has_wildcard": true,
+        "rules": [
+          {
+            "verbs": [
+              "*"
+            ],
+            "resources": [
+              "*"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "secret:default:db-credentials",
+      "label": "db-credentials",
+      "type": "secret",
+      "risk": 9.0,
+      "namespace": "default",
+      "metadata": {
+        "secret_type": "Opaque",
+        "is_db_creds": true
+      }
+    },
+    {
+      "id": "database:default:billing-db",
+      "label": "billing-db",
+      "type": "database",
+      "risk": 9.5,
+      "namespace": "default",
+      "metadata": {}
+    }
+  ],
+  "edges": [
+    {
+      "source": "pod:default:web-server",
+      "target": "service_account:default:backend-sa",
+      "relation": "uses",
+      "risk": 7.5,
+      "weight": 2.5
+    },
+    {
+      "source": "service_account:default:backend-sa",
+      "target": "role:default:admin-role",
+      "relation": "bound-to",
+      "risk": 9.5,
+      "weight": 0.5
+    },
+    {
+      "source": "role:default:admin-role",
+      "target": "secret:default:db-credentials",
+      "relation": "can-read",
+      "risk": 9.0,
+      "weight": 1.0
+    },
+    {
+      "source": "secret:default:db-credentials",
+      "target": "database:default:billing-db",
+      "relation": "unlocks",
+      "risk": 9.5,
+      "weight": 0.5
+    },
+    {
+      "source": "role:default:admin-role",
+      "target": "service_account:default:backend-sa",
+      "relation": "can-impersonate",
+      "risk": 9.0,
+      "weight": 1.0
+    }
+  ]
+}

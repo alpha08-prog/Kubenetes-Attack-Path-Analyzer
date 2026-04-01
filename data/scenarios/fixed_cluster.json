@@ -1,0 +1,83 @@
+{
+  "meta": {
+    "name": "Fixed Cluster",
+    "description": "Post-remediation scenario where broad role access was removed and attack path is broken.",
+    "generated_by": "manual"
+  },
+  "nodes": [
+    {
+      "id": "pod:default:web-server",
+      "label": "web-server",
+      "type": "pod",
+      "risk": 5.5,
+      "namespace": "default",
+      "metadata": {
+        "phase": "Running"
+      }
+    },
+    {
+      "id": "service_account:default:backend-sa",
+      "label": "backend-sa",
+      "type": "service_account",
+      "risk": 4.0,
+      "namespace": "default",
+      "metadata": {}
+    },
+    {
+      "id": "role:default:app-reader",
+      "label": "app-reader",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "default",
+      "metadata": {
+        "has_wildcard": false,
+        "rules": [
+          {
+            "verbs": [
+              "get",
+              "list"
+            ],
+            "resources": [
+              "configmaps"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "secret:default:db-credentials",
+      "label": "db-credentials",
+      "type": "secret",
+      "risk": 7.5,
+      "namespace": "default",
+      "metadata": {
+        "secret_type": "Opaque",
+        "is_db_creds": true
+      }
+    },
+    {
+      "id": "database:default:billing-db",
+      "label": "billing-db",
+      "type": "database",
+      "risk": 9.0,
+      "namespace": "default",
+      "metadata": {}
+    }
+  ],
+  "edges": [
+    {
+      "source": "pod:default:web-server",
+      "target": "service_account:default:backend-sa",
+      "relation": "uses",
+      "risk": 5.5,
+      "weight": 4.5
+    },
+    {
+      "source": "service_account:default:backend-sa",
+      "target": "role:default:app-reader",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    }
+  ]
+}

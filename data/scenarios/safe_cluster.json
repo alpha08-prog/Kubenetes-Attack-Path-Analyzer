@@ -1,0 +1,83 @@
+{
+  "meta": {
+    "name": "Safe Cluster",
+    "description": "Hardened baseline with least-privilege RBAC and no direct secret-to-database attack path.",
+    "generated_by": "manual"
+  },
+  "nodes": [
+    {
+      "id": "pod:default:web-app",
+      "label": "web-app",
+      "type": "pod",
+      "risk": 3.0,
+      "namespace": "default",
+      "metadata": {
+        "phase": "Running"
+      }
+    },
+    {
+      "id": "service_account:default:web-sa",
+      "label": "web-sa",
+      "type": "service_account",
+      "risk": 3.0,
+      "namespace": "default",
+      "metadata": {}
+    },
+    {
+      "id": "role:default:read-only-role",
+      "label": "read-only-role",
+      "type": "role",
+      "risk": 2.5,
+      "namespace": "default",
+      "metadata": {
+        "rules": [
+          {
+            "verbs": [
+              "get",
+              "list"
+            ],
+            "resources": [
+              "pods"
+            ]
+          }
+        ],
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "secret:default:tls-cert",
+      "label": "tls-cert",
+      "type": "secret",
+      "risk": 4.0,
+      "namespace": "default",
+      "metadata": {
+        "secret_type": "kubernetes.io/tls",
+        "is_db_creds": false
+      }
+    },
+    {
+      "id": "database:default:billing-db",
+      "label": "billing-db",
+      "type": "database",
+      "risk": 8.5,
+      "namespace": "default",
+      "metadata": {}
+    }
+  ],
+  "edges": [
+    {
+      "source": "pod:default:web-app",
+      "target": "service_account:default:web-sa",
+      "relation": "uses",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:default:web-sa",
+      "target": "role:default:read-only-role",
+      "relation": "bound-to",
+      "risk": 2.5,
+      "weight": 7.5
+    }
+  ]
+}

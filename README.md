@@ -102,6 +102,39 @@ attack-path-analyzer/
 
 ---
 
+## Data Layout
+
+```text
+data/
+├── raw/                      # kubectl output, untouched
+├── processed/                # parser output, ready for graph builder
+│   ├── graph_data.json
+│   └── relations.json
+└── scenarios/
+    ├── nokia_telecom.json    # hero demo
+    ├── safe_cluster.json     # baseline
+    ├── vulnerable_cluster.json
+    └── fixed_cluster.json    # post-remediation
+```
+
+---
+
+## Seeding Scenarios
+
+```bash
+# Seed default demo scenario into data/processed
+python scripts/seed_graph.py
+
+# Seed another scenario and ask running backend to reload graph
+python scripts/seed_graph.py --scenario vulnerable_cluster --reload-backend
+```
+
+When `MOCK_MODE=true`, backend startup uses `MOCK_SCENARIO`
+(default: `data/scenarios/nokia_telecom.json`).
+`seed_graph.py` is used to generate artifacts under `data/processed`.
+
+---
+
 ## Quick Start
 
 ### Option A — Docker (recommended)
@@ -131,12 +164,13 @@ Open `http://localhost:3000` — done.
 
 ```bash
 # Terminal 1 — Backend
+python scripts/generate_mock_data.py
+python scripts/seed_graph.py
 cd backend
 python -m venv venv
 venv\Scripts\activate          # Windows
 # source venv/bin/activate     # Mac/Linux
 pip install -r requirements.txt
-python scripts/generate_mock_data.py
 python -m uvicorn app.main:app --reload --port 8000
 
 # Terminal 2 — Frontend
@@ -241,7 +275,9 @@ make dev-backend   # run backend locally with hot reload
 make dev-frontend  # run frontend locally with hot reload
 make test          # run all backend tests
 make mock          # regenerate nokia_telecom.json
+make seed          # seed data/processed from scenario
 make fetch         # fetch live data from kubectl
+make fetch-full    # fetch full (unfiltered) cluster snapshots
 make logs          # tail all container logs
 make down          # stop all containers
 make clean         # remove containers, images, volumes
@@ -281,3 +317,4 @@ Built for the Nokia Hackathon 2024.
 ## License
 
 MIT
+
