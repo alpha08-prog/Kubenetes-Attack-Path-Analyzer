@@ -1,16 +1,15 @@
 """
-routes_ai.py — AI / LLM utility endpoints
-GET /api/ai/health → checks Gemini configuration/auth
+routes_ai.py - AI/LLM utility endpoints.
+GET /api/ai/health -> checks Groq configuration/auth.
 """
 
 from fastapi import APIRouter
 
-from app.services.narrator_service import gemini_healthcheck
+from app.services.narrator_service import groq_healthcheck
 
 router = APIRouter()
 
 
 @router.get("/health")
 def ai_health():
-    return gemini_healthcheck()
-
+    return groq_healthcheck()

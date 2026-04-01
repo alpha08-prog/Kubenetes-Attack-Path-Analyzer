@@ -77,7 +77,7 @@ def blast_radius(G: nx.DiGraph, source: str, max_hops: int = 3) -> dict:
 def blast_radius_summary(G: nx.DiGraph, source: str, max_hops: int = 3) -> str:
     """
     Human-readable summary of blast radius result.
-    Used by narrator_service to feed into Claude prompt.
+    Used by narrator_service to feed into AI prompt.
     """
     result = blast_radius(G, source, max_hops)
 

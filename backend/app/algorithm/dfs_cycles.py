@@ -123,7 +123,7 @@ def cycles_involving_node(G: nx.DiGraph, node_id: str) -> list:
 def cycles_summary(result: dict) -> str:
     """
     Human-readable summary of cycle detection.
-    Used by narrator_service to feed into Claude prompt.
+    Used by narrator_service to feed into AI prompt.
     """
     if result["cycle_count"] == 0:
         return "No privilege escalation loops detected."

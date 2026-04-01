@@ -1,7 +1,7 @@
 """
 simulator_service.py — Node Removal What-If Simulation  ★ WOW FACTOR ★
 Removes a node from the graph, reruns all algorithms,
-and returns a before/after delta with Claude narration.
+and returns a before/after delta with AI narration.
 """
 
 from app.algorithm.centrality import simulate_node_removal
@@ -19,7 +19,7 @@ def simulate_removal(node_id: str, source: str, target: str) -> dict:
     Remove node_id from the graph and measure impact on attack paths.
     Called by routes_simulate.py.
 
-    Returns a full before/after comparison with Claude narration.
+    Returns a full before/after comparison with AI narration.
     """
     G = get_graph()
 
@@ -49,7 +49,7 @@ def simulate_removal(node_id: str, source: str, target: str) -> dict:
         f"paths_broken={result['paths_broken']} impact={result['impact']}",
     )
 
-    # Attach Claude narration
+    # Attach AI narration
     try:
         from app.services.narrator_service import narrate_simulation
         result["narrative"] = narrate_simulation(result)

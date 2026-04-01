@@ -121,7 +121,7 @@ def all_attack_paths(G: nx.DiGraph, source: str, target: str, max_paths: int = 5
 def attack_path_summary(result: dict) -> str:
     """
     Human-readable summary of shortest attack path.
-    Used by narrator_service to feed into Claude prompt.
+    Used by narrator_service to feed into AI prompt.
     """
     if not result.get("found"):
         return f"No attack path found from '{result['source']}' to '{result['target']}'."

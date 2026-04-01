@@ -1,7 +1,7 @@
 """
 analysis_service.py — Combined Analysis Service
 Orchestrates cycle detection and critical node identification.
-Also produces the combined summary fed into the Claude narrator.
+Also produces the combined summary fed into the AI narrator.
 """
 
 from app.algorithm.dfs_cycles import detect_cycles, nodes_in_any_cycle
@@ -55,7 +55,7 @@ def get_critical_nodes(top_n: int = 10) -> dict:
 def get_full_analysis() -> dict:
     """
     Run all four algorithms in one call and return a combined report dict.
-    This is what narrator_service.py consumes to build the Claude prompt.
+    This is what narrator_service.py consumes to build the AI prompt.
     Called internally — not directly exposed as a route.
     """
     G = get_graph()

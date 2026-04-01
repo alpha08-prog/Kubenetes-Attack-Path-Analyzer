@@ -157,7 +157,7 @@ class CriticalNodesResponse(BaseModel):
 
 
 class Finding(BaseModel):
-    """One finding from the Claude narrator."""
+    """One finding from the AI narrator."""
     id:             str
     severity:       str
     category:       str

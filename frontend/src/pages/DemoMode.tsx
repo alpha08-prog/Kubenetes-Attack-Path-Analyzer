@@ -15,6 +15,39 @@ const STEPS = [
   'Generating AI security report...',
 ];
 
+function normalizeAttackPath(raw: any) {
+  if (!raw) return raw;
+  if (Array.isArray(raw.path) && raw.path.length > 0 && typeof raw.path[0] === 'string' && Array.isArray(raw.hops)) {
+    return {
+      ...raw,
+      path: raw.hops.map((hop: any) => ({
+        from: hop.from,
+        to: hop.to,
+        from_label: hop.from_label,
+        to_label: hop.to_label,
+        relation: hop.relation,
+      })),
+    };
+  }
+  return raw;
+}
+
+function formatCycleChain(cycle: any): string {
+  if (typeof cycle?.chain_string === 'string' && cycle.chain_string.length > 0) {
+    return cycle.chain_string;
+  }
+  if (typeof cycle?.chain === 'string' && cycle.chain.length > 0) {
+    return cycle.chain;
+  }
+  if (Array.isArray(cycle?.chain)) {
+    return cycle.chain.join(' -> ');
+  }
+  if (Array.isArray(cycle?.nodes)) {
+    return cycle.nodes.join(' -> ');
+  }
+  return '';
+}
+
 export default function DemoMode() {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
@@ -32,7 +65,7 @@ export default function DemoMode() {
           data = { graph: g.data, summary: s.data };
           break;
         case 1:
-          data = (await api.getAutoAttackPath()).data;
+          data = normalizeAttackPath((await api.getAutoAttackPath()).data);
           break;
         case 2:
           const src = stepData[1]?.path?.[0]?.from || 'pod:default:web-server';
@@ -169,7 +202,7 @@ export default function DemoMode() {
               (cycles.cycles).map((c: any, i: number) => (
                 <div key={i} className="flex items-center gap-2 mb-2">
                   <AlertTriangle className="w-4 h-4 text-severity-high" />
-                  <span className="text-sm font-mono">{c.chain_string || (c.chain || c.nodes || []).join(' → ')}</span>
+                  <span className="text-sm font-mono">{formatCycleChain(c)}</span>
                 </div>
               ))
             ) : (

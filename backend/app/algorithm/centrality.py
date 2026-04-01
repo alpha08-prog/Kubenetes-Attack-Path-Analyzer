@@ -195,7 +195,7 @@ def _generate_recommendation(node_id: str, node_data: dict, centrality: float) -
 def critical_nodes_summary(result: dict) -> str:
     """
     Human-readable summary of critical nodes.
-    Used by narrator_service to feed into Claude prompt.
+    Used by narrator_service to feed into AI prompt.
     """
     if not result["nodes"]:
         return "No critical nodes identified."

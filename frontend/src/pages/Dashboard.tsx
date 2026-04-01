@@ -43,8 +43,8 @@ export default function Dashboard() {
   const handleCriticalSimulate = async (nodeId: string) => {
     const src = simSource || 'pod:default:web-server';
     const tgt = simTarget || 'database:default:billing-db';
-    await analysis.runSimulation(nodeId, src, tgt);
-    setSimModal(analysis.simulation);
+    const result = await analysis.runSimulation(nodeId, src, tgt);
+    if (result) setSimModal(result);
   };
 
   const tabs: { key: Tab; label: string }[] = [

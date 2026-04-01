@@ -28,7 +28,7 @@ async def lifespan(app: FastAPI):
     logger.info("  %s v%s", settings.APP_NAME, settings.APP_VERSION)
     logger.info("  MOCK_MODE   : %s", settings.MOCK_MODE)
     logger.info("  CLUSTER     : %s", settings.CLUSTER_NAME)
-    logger.info("  CLAUDE MODEL: %s", settings.CLAUDE_MODEL)
+    logger.info("  GROQ MODEL  : %s", settings.GROQ_MODEL)
     logger.info("=" * 60)
 
     # Build graph on startup so first API call is instant

@@ -8,8 +8,26 @@ interface Props {
   onFetch: () => void;
 }
 
+function formatCycleChain(cycle: any): string {
+  if (typeof cycle?.chain_string === 'string' && cycle.chain_string.length > 0) {
+    return cycle.chain_string;
+  }
+  if (typeof cycle?.chain === 'string' && cycle.chain.length > 0) {
+    return cycle.chain;
+  }
+  if (Array.isArray(cycle?.chain)) {
+    return cycle.chain.join(' -> ');
+  }
+  if (Array.isArray(cycle?.nodes)) {
+    return cycle.nodes.join(' -> ');
+  }
+  return '';
+}
+
 export default function CyclesPanel({ cycles, loading, onFetch }: Props) {
-  useEffect(() => { onFetch(); }, []);
+  useEffect(() => {
+    onFetch();
+  }, []);
 
   if (loading) {
     return (
@@ -40,13 +58,13 @@ export default function CyclesPanel({ cycles, loading, onFetch }: Props) {
         <div key={i} className="bg-secondary rounded-lg p-3 space-y-2 border border-border">
           <div className="flex items-center gap-2">
             <SeverityBadge severity={cycle.severity || 'high'} />
-            <span className="text-xs text-muted-foreground">Length: {cycle.length || cycle.chain?.length || 0}</span>
+            <span className="text-xs text-muted-foreground">Length: {cycle.length || 0}</span>
             {cycle.max_risk != null && (
               <span className="text-xs text-muted-foreground ml-auto">Risk: {cycle.max_risk}</span>
             )}
           </div>
           <p className="text-sm font-mono text-foreground bg-background rounded px-2 py-1">
-            {cycle.chain_string || (cycle.chain || cycle.nodes || []).join(' → ')}
+            {formatCycleChain(cycle)}
           </p>
         </div>
       ))}

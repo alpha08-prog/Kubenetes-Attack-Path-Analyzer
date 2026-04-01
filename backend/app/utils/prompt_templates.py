@@ -1,12 +1,7 @@
 """
-prompt_templates.py — Claude API Prompt Templates
-System prompts and few-shot examples for narrator_service.py.
-Keeping prompts here (not hardcoded in the service) makes them
-easy to tune without touching business logic.
+prompt_templates.py - Groq prompt templates for report and simulation narration.
 """
 
-
-# ─── System Prompt ────────────────────────────────────────────────────────────
 
 NARRATOR_SYSTEM_PROMPT = """You are a senior Kubernetes security analyst at a Nokia infrastructure team.
 You analyze attack graph data from a Kubernetes cluster and generate clear, actionable security findings.
@@ -20,7 +15,7 @@ Each finding must follow this exact schema:
   "category": "attack_path" | "blast_radius" | "privilege_escalation" | "critical_node",
   "title": "Short title under 10 words",
   "description": "One sentence explaining what the risk is and why it matters.",
-  "kill_chain": "Node-A → relation → Node-B → relation → Node-C (if applicable, else null)",
+  "kill_chain": "Node-A -> relation -> Node-B -> relation -> Node-C (if applicable, else null)",
   "affected_nodes": ["node-id-1", "node-id-2"],
   "recommendation": "One specific, actionable fix. Name the exact resource to change.",
   "effort": "low" | "medium" | "high"
@@ -35,8 +30,6 @@ Rules:
 - Output ONLY the JSON array. No other text."""
 
 
-# ─── User Prompt Builder ──────────────────────────────────────────────────────
-
 def build_narrator_prompt(
     attack_path: dict | None,
     blast_radius: dict | None,
@@ -45,20 +38,11 @@ def build_narrator_prompt(
     cluster_name: str = "nokia-telecom-cluster",
 ) -> str:
     """
-    Build the user prompt for Claude by injecting algorithm results.
-    Each section is only included if data is available.
-
-    Usage in narrator_service.py:
-        prompt = build_narrator_prompt(
-            attack_path=path_result,
-            blast_radius=blast_result,
-            cycles=cycle_result,
-            critical_nodes=critical_result,
-        )
+    Build the user prompt for Groq by injecting algorithm results.
     """
     sections = [
         f"Cluster: {cluster_name}",
-        f"Analysis timestamp: see response metadata",
+        "Analysis timestamp: see response metadata",
         "",
     ]
 
@@ -82,8 +66,7 @@ def build_narrator_prompt(
         sections += [
             "## Blast Radius (BFS)",
             f"Compromised node: {blast_radius.get('source_label', blast_radius.get('source'))}",
-            f"Total reachable: {blast_radius.get('total_reachable')} nodes within "
-            f"{blast_radius.get('max_hops')} hops",
+            f"Total reachable: {blast_radius.get('total_reachable')} nodes within {blast_radius.get('max_hops')} hops",
         ]
         for hop_num, nodes in sorted(blast_radius.get("zones", {}).items()):
             names = [n["label"] for n in nodes]
@@ -91,9 +74,7 @@ def build_narrator_prompt(
         sections.append("")
 
     if cycles and cycles.get("cycle_count", 0) > 0:
-        sections += [
-            f"## Privilege Escalation Cycles (DFS) — {cycles['cycle_count']} detected",
-        ]
+        sections += [f"## Privilege Escalation Cycles (DFS) - {cycles['cycle_count']} detected"]
         for cycle in cycles.get("cycles", []):
             sections.append(
                 f"  [{cycle['severity'].upper()}] {cycle['chain']} "
@@ -108,7 +89,7 @@ def build_narrator_prompt(
         ]
         for node in critical_nodes["nodes"][:5]:
             sections.append(
-                f"  #{node['rank']} {node['label']} ({node['type']}) — "
+                f"  #{node['rank']} {node['label']} ({node['type']}) - "
                 f"centrality={node['centrality_score']}, risk={node['risk']}, "
                 f"combined={node['combined_score']}"
             )
@@ -118,52 +99,39 @@ def build_narrator_prompt(
         "Generate a JSON array of security findings based on the above data. "
         "Be specific, name actual nodes, and give concrete remediation steps."
     )
-
     return "\n".join(sections)
 
 
-# ─── Report Header Template ───────────────────────────────────────────────────
-
 def build_report_header(cluster_name: str, finding_count: int, timestamp: str) -> dict:
-    """
-    Metadata block prepended to every generated report.
-    """
     return {
         "report_title": "Attack Path Analysis Report",
         "cluster": cluster_name,
         "generated_at": timestamp,
-        "tool": "Attack Path Analyzer — Nokia Hackathon 2024",
+        "tool": "Attack Path Analyzer - Nokia Hackathon 2024",
         "total_findings": finding_count,
-        "model_used": "claude-sonnet-4-20250514",
+        "model_used": "groq",
     }
 
-
-# ─── Fallback Findings ────────────────────────────────────────────────────────
 
 FALLBACK_FINDINGS = [
     {
         "id": "finding_fallback_001",
         "severity": "high",
         "category": "attack_path",
-        "title": "Claude API unavailable — manual review required",
+        "title": "Groq API unavailable - manual review required",
         "description": (
             "The AI narration service could not be reached. "
             "Raw algorithm results are available in the analysis endpoints."
         ),
         "kill_chain": None,
         "affected_nodes": [],
-        "recommendation": "Check ANTHROPIC_API_KEY in .env and retry /api/report.",
+        "recommendation": "Check GROQ_API_KEY in .env and retry /api/report. You can also call /api/ai/health.",
         "effort": "low",
     }
 ]
 
 
-# ─── Simulation Prompt ────────────────────────────────────────────────────────
-
 def build_simulation_prompt(simulation_result: dict) -> str:
-    """
-    Prompt for explaining the impact of a node removal simulation.
-    """
     node = simulation_result.get("node_label", simulation_result.get("node_removed"))
     broken = simulation_result.get("paths_broken", 0)
     before = simulation_result.get("paths_before", 0)
