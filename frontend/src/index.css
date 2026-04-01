@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 228 15% 7%;
+    --foreground: 0 0% 100%;
+
+    --card: 230 18% 13%;
+    --card-foreground: 0 0% 100%;
+
+    --popover: 230 18% 13%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 210 70% 54%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 230 14% 20%;
+    --secondary-foreground: 228 10% 60%;
+
+    --muted: 230 14% 20%;
+    --muted-foreground: 228 10% 60%;
+
+    --accent: 160 67% 37%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 73% 59%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 230 14% 20%;
+    --input: 230 14% 20%;
+    --ring: 210 70% 54%;
+
+    --radius: 0.5rem;
+
+    --node-pod: 210 70% 54%;
+    --node-sa: 160 67% 37%;
+    --node-role: 249 55% 67%;
+    --node-secret: 36 78% 41%;
+    --node-db: 0 73% 59%;
+    --node-user: 16 67% 52%;
+
+    --severity-critical: 0 73% 59%;
+    --severity-high: 33 85% 55%;
+    --severity-medium: 210 70% 54%;
+    --severity-low: 160 67% 37%;
+
+    --surface: 230 18% 13%;
+    --surface-hover: 230 16% 17%;
+    --border-subtle: 230 14% 20%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes slide-in-right {
+  from { transform: translateX(40px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.4s ease-out forwards;
+}
+
+@keyframes typewriter {
+  from { width: 0; }
+  to { width: 100%; }
+}
