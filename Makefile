@@ -10,7 +10,7 @@
 #   make mock      → regenerate nokia_telecom.json
 #   make clean     → remove containers, images, volumes
 
-.PHONY: demo dev build up down logs test mock clean
+.PHONY: demo dev build up down logs test mock fetch fetch-full clean
 
 # ── Docker commands ────────────────────────────────────────────────────────────
 
@@ -57,7 +57,10 @@ mock:
 	cd backend && python scripts/generate_mock_data.py
 
 fetch:
-	cd backend && bash scripts/fetch_k8s_data.sh
+	bash scripts/fetch_k8s_data.sh
+
+fetch-full:
+	bash scripts/fetch_k8s_data.sh --mode full
 
 # ── Tests ─────────────────────────────────────────────────────────────────────
 

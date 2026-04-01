@@ -190,7 +190,10 @@ Full interactive docs at `http://localhost:8000/docs`
 minikube start
 
 # Fetch live cluster data
-bash backend/scripts/fetch_k8s_data.sh
+bash scripts/fetch_k8s_data.sh --context minikube
+# (default mode = presentation-friendly filtered graph)
+# For full unfiltered data: bash scripts/fetch_k8s_data.sh --context minikube --mode full
+# Raw snapshots are saved under: data/raw/
 
 # Set live mode in .env
 MOCK_MODE=false

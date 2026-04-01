@@ -18,7 +18,10 @@ logger = get_logger(__name__)
 BACKEND_DIR = Path(__file__).resolve().parents[2]
 REPO_ROOT = BACKEND_DIR.parent
 MOCK_SCENARIO_PATH = (REPO_ROOT / settings.MOCK_SCENARIO).resolve()
-RAW_DATA_DIR = (BACKEND_DIR / "data" / "raw").resolve()
+RAW_DATA_DIRS = [
+    (REPO_ROOT / "data" / "raw").resolve(),
+    (BACKEND_DIR / "data" / "raw").resolve(),  # Legacy fallback location.
+]
 
 
 def ingest_and_build() -> dict:
@@ -54,7 +57,7 @@ def ingest_and_build() -> dict:
 def _fetch_kubectl() -> dict:
     """
     Run kubectl commands and return raw JSON blobs.
-    Falls back to saved raw files in backend/data/raw if kubectl fails.
+    Falls back to saved raw files in data/raw if kubectl fails.
     """
     resources = {
         "pods": ["kubectl", "get", "pods", "-A", "-o", "json"],
@@ -84,12 +87,17 @@ def _fetch_kubectl() -> dict:
 
 
 def _load_raw_file(resource: str) -> dict:
-    """Load a previously saved kubectl output from backend/data/raw."""
-    path = RAW_DATA_DIR / f"{resource}.json"
-    if path.exists():
-        with open(path, encoding="utf-8") as file_handle:
-            return json.load(file_handle)
-    logger.warning("No raw file found for %s - returning empty", resource)
+    """Load a previously saved kubectl output from data/raw (repo root)."""
+    for raw_dir in RAW_DATA_DIRS:
+        path = raw_dir / f"{resource}.json"
+        if path.exists():
+            with open(path, encoding="utf-8") as file_handle:
+                return json.load(file_handle)
+    logger.warning(
+        "No raw file found for %s in: %s - returning empty",
+        resource,
+        ", ".join(str(p) for p in RAW_DATA_DIRS),
+    )
     return {"items": []}
 
 

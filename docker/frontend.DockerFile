@@ -2,9 +2,10 @@
 # Multi-stage: build React app, serve with nginx
 
 # Stage 1: build
-FROM node:20-alpine AS builder
+FROM node:20-alpine3.21 AS builder
 
 WORKDIR /app
+RUN apk upgrade --no-cache
 
 COPY frontend/package.json frontend/package-lock.json* ./
 RUN npm ci --silent
@@ -19,7 +20,9 @@ RUN npm run build
 
 
 # Stage 2: serve with nginx
-FROM nginx:alpine AS runtime
+FROM nginx:1.27-alpine AS runtime
+
+RUN apk upgrade --no-cache
 
 # Copy built assets
 COPY --from=builder /app/dist /usr/share/nginx/html
@@ -63,6 +66,9 @@ RUN { \
     echo '    gzip_min_length 1000;'; \
     echo '}'; \
 } > /etc/nginx/conf.d/default.conf
+
+RUN chown -R nginx:nginx /usr/share/nginx/html /var/cache/nginx /var/run /etc/nginx/conf.d
+USER nginx
 
 EXPOSE 3000
 
