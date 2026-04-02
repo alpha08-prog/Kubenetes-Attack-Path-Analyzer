@@ -127,6 +127,7 @@ from app.api.routes_simulate import router as simulate_router
 from app.api.routes_ai       import router as ai_router
 from app.api.routes_cve      import router as cve_router
 from app.api.routes_history import router as history_router
+from app.api.routes_slack import router as slack_router
 
 app.include_router(graph_router,    prefix="/api/graph",    tags=["Graph"])
 app.include_router(attack_router,   prefix="/api/attack",   tags=["Attack Path"])
@@ -138,6 +139,7 @@ app.include_router(simulate_router, prefix="/api/simulate", tags=["Simulation"])
 app.include_router(ai_router,       prefix="/api/ai",       tags=["AI"])
 app.include_router(cve_router, prefix = "/api/cves", tags = ["CVE Feed"])
 app.include_router(history_router, prefix="/api/history", tags=["History"])
+app.include_router(slack_router, prefix="/api/slack", tags=["Slack Alerts"])
 
 
 # ─── Health & info endpoints ───────────────────────────────────────────────────

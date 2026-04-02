@@ -13,6 +13,13 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         case_sensitive=False,
     )
+    SLACK_WEBHOOK_URL: str = Field(
+    default="",
+    description=(
+        "Slack Incoming Webhook URL. "
+        "Get one free at https://api.slack.com/apps → Incoming Webhooks"
+    ),
+)
 
     # Groq API
     GROQ_API_KEY: str = Field(

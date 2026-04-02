@@ -158,6 +158,9 @@ def generate_report(cluster_name: str = "nokia-telecom-cluster") -> dict:
     header = build_report_header(cluster_name, len(findings), timestamp)
 
     logger.info("Report generated: %d findings", len(findings))
+     
+    from app.services.slack_service import send_critical_alert
+    send_critical_alert(findings, cluster_name=cluster_name)
     return {**header, "findings": findings}
 
 
