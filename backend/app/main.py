@@ -115,6 +115,7 @@ from app.api.routes_critical import router as critical_router
 from app.api.routes_report   import router as report_router
 from app.api.routes_simulate import router as simulate_router
 from app.api.routes_ai       import router as ai_router
+from app.api.routes_cve      import router as cve_router
 
 app.include_router(graph_router,    prefix="/api/graph",    tags=["Graph"])
 app.include_router(attack_router,   prefix="/api/attack",   tags=["Attack Path"])
@@ -124,6 +125,7 @@ app.include_router(critical_router, prefix="/api/critical", tags=["Critical Node
 app.include_router(report_router,   prefix="/api/report",   tags=["AI Report"])
 app.include_router(simulate_router, prefix="/api/simulate", tags=["Simulation"])
 app.include_router(ai_router,       prefix="/api/ai",       tags=["AI"])
+app.include_router(cve_router, prefix = "/api/cves", tags = ["CVE Feed"])
 
 
 # ─── Health & info endpoints ───────────────────────────────────────────────────

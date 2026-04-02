@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Loader2, ChevronUp, ChevronDown, Download, FileText } from 'lucide-react';
 import FindingCard from './FindingCard';
 import { SEVERITY_ORDER } from '@/styles/nodeColors';
+import { getReportPdf } from '@/api/graphApi';
 
 interface Props {
   report: any;
@@ -11,20 +12,30 @@ interface Props {
 
 export default function NarratorPanel({ report, loading, onFetchReport }: Props) {
   const [expanded, setExpanded] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
   const findings = report?.findings || report || [];
   const sorted = [...(Array.isArray(findings) ? findings : [])].sort(
     (a, b) => SEVERITY_ORDER.indexOf(a.severity?.toLowerCase()) - SEVERITY_ORDER.indexOf(b.severity?.toLowerCase())
   );
 
-  const exportReport = () => {
-    const blob = new Blob([JSON.stringify(sorted, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'security-report.json';
-    a.click();
-    URL.revokeObjectURL(url);
+  const exportReport = async () => {
+    setDownloading(true);
+    try {
+      const response = await getReportPdf();
+      const contentDisposition = response.headers['content-disposition'] as string | undefined;
+      const fileNameMatch = contentDisposition?.match(/filename="?([^"]+)"?/i);
+      const fileName = fileNameMatch?.[1] || 'security-report.pdf';
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      a.click();
+      URL.revokeObjectURL(url);
+    } finally {
+      setDownloading(false);
+    }
   };
 
   return (
@@ -57,10 +68,11 @@ export default function NarratorPanel({ report, loading, onFetchReport }: Props)
               <div className="flex justify-end mb-4">
                 <button
                   onClick={exportReport}
+                  disabled={downloading}
                   className="flex items-center gap-2 text-xs bg-secondary text-foreground px-3 py-1.5 rounded hover:bg-surface-hover transition-colors"
                 >
-                  <Download className="w-3 h-3" />
-                  Export Report
+                  {downloading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
+                  Download PDF
                 </button>
               </div>
               <div className="space-y-4">

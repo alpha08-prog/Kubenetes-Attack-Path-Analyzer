@@ -20,6 +20,7 @@ python-dotenv==1.0.1
 
 # ─── Utilities ────────────────────────────────────────────────────────────────
 tenacity==8.3.0          # retry logic for Groq API + kubectl calls
+reportlab==4.2.2         # PDF export for report downloads
 
 # ─── Testing ──────────────────────────────────────────────────────────────────
 pytest==8.2.0

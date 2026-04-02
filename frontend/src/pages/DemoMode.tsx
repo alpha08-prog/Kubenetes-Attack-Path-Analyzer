@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Pause, Play, RotateCcw, Loader2, CheckCircle, AlertTriangle, Shield } from 'lucide-react';
+import { ArrowLeft, Pause, Play, RotateCcw, Loader2, CheckCircle, AlertTriangle, Shield, Download } from 'lucide-react';
 import * as api from '@/api/graphApi';
 import SeverityBadge from '@/components/SeverityBadge';
 import FindingCard from '@/components/FindingCard';
@@ -85,6 +85,7 @@ export default function DemoMode() {
   const [paused, setPaused] = useState(false);
   const [stepData, setStepData] = useState<Record<number, any>>({});
   const [stepDone, setStepDone] = useState<Set<number>>(new Set());
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
   const timerRef = useRef<any>(null);
 
   const runStep = useCallback(async (step: number) => {
@@ -135,6 +136,25 @@ export default function DemoMode() {
     setStepData({});
     setStepDone(new Set());
     setPaused(false);
+  };
+
+  const downloadPdf = async () => {
+    setDownloadingPdf(true);
+    try {
+      const response = await api.getReportPdf();
+      const contentDisposition = response.headers['content-disposition'] as string | undefined;
+      const fileNameMatch = contentDisposition?.match(/filename="?([^"]+)"?/i);
+      const fileName = fileNameMatch?.[1] || 'security-report.pdf';
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      a.click();
+      URL.revokeObjectURL(url);
+    } finally {
+      setDownloadingPdf(false);
+    }
   };
 
   const summary = stepData[0]?.summary;
@@ -260,7 +280,17 @@ export default function DemoMode() {
         {/* Step 5 - Report */}
         {stepDone.has(5) && (
           <div className="space-y-4">
-            <h3 className="font-semibold text-lg">AI Security Report</h3>
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="font-semibold text-lg">AI Security Report</h3>
+              <button
+                onClick={downloadPdf}
+                disabled={downloadingPdf}
+                className="flex items-center gap-2 bg-secondary text-foreground px-3 py-1.5 rounded-md text-sm hover:bg-surface-hover transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {downloadingPdf ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+                Download PDF
+              </button>
+            </div>
             {(report?.findings || report || []).map((f: any, i: number) => (
               <div key={i} className="animate-slide-in-right" style={{ animationDelay: `${i * 150}ms` }}>
                 <FindingCard finding={f} />

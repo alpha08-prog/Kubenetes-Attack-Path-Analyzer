@@ -23,3 +23,9 @@ export const getAutoSimulation = () => client.get('/api/simulate/auto');
 
 export const getReport = (clusterName = 'nokia-telecom-cluster') =>
   client.get('/api/report/', { params: { cluster_name: clusterName } });
+
+export const getReportPdf = (clusterName = 'nokia-telecom-cluster') =>
+  client.get('/api/report/pdf', {
+    params: { cluster_name: clusterName },
+    responseType: 'blob',
+  });

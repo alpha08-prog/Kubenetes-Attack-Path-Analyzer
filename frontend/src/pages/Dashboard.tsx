@@ -12,6 +12,7 @@ import CriticalNodeTable from '@/components/CriticalNodeTable';
 import SimulationPanel from '@/components/SimulationPanel';
 import SimulationModal from '@/components/SimulationModal';
 import NarratorPanel from '@/components/NarratorPanel';
+import LiveCveFeedPanel from '@/components/LiveCveFeedPanel';
 
 type OverlayMode = 'default' | 'attack' | 'blast' | 'cycle';
 type Tab = 'attack' | 'blast' | 'cycles' | 'simulation';
@@ -129,67 +130,72 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Right - Tabs */}
-        <div className="w-[40%] flex flex-col min-h-0 bg-card border border-border rounded-lg overflow-hidden">
-          <div className="flex border-b border-border">
-            {tabs.map(t => (
-              <button
-                key={t.key}
-                onClick={() => setActiveTab(t.key)}
-                className={`flex-1 text-xs py-2.5 font-medium transition-colors ${
-                  activeTab === t.key
-                    ? 'text-primary border-b-2 border-primary'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                {t.label}
-              </button>
-            ))}
-          </div>
-          <div className="flex-1 overflow-y-auto scrollbar-thin">
-            {activeTab === 'attack' && (
-              <AttackPathPanel
-                nodes={nodes}
-                attackPath={analysis.attackPath}
-                loading={analysis.loading.attack}
-                onFindPath={analysis.findAttackPath}
-                onAutoDetect={analysis.autoAttackPath}
-                onShowOnGraph={() => setOverlayMode('attack')}
-              />
-            )}
-            {activeTab === 'blast' && (
-              <BlastRadiusPanel
-                nodes={nodes}
-                blastRadius={analysis.blastRadius}
-                loading={analysis.loading.blast}
-                onAnalyze={analysis.analyzeBlast}
-                onShowOnGraph={() => setOverlayMode('blast')}
-              />
-            )}
-            {activeTab === 'cycles' && (
-              <div className="divide-y divide-border">
-                <CyclesPanel
-                  cycles={analysis.cycles}
-                  loading={analysis.loading.cycles}
-                  onFetch={analysis.fetchCycles}
+        {/* Right - Sidebar */}
+        <div className="w-[40%] flex flex-col min-h-0 gap-4">
+          <div className="flex min-h-0 flex-[1.2] flex-col overflow-hidden rounded-lg border border-border bg-card">
+            <div className="flex border-b border-border">
+              {tabs.map(t => (
+                <button
+                  key={t.key}
+                  onClick={() => setActiveTab(t.key)}
+                  className={`flex-1 text-xs py-2.5 font-medium transition-colors ${
+                    activeTab === t.key
+                      ? 'text-primary border-b-2 border-primary'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+            <div className="flex-1 overflow-y-auto scrollbar-thin">
+              {activeTab === 'attack' && (
+                <AttackPathPanel
+                  nodes={nodes}
+                  attackPath={analysis.attackPath}
+                  loading={analysis.loading.attack}
+                  onFindPath={analysis.findAttackPath}
+                  onAutoDetect={analysis.autoAttackPath}
+                  onShowOnGraph={() => setOverlayMode('attack')}
                 />
-                <CriticalNodeTable
+              )}
+              {activeTab === 'blast' && (
+                <BlastRadiusPanel
+                  nodes={nodes}
+                  blastRadius={analysis.blastRadius}
+                  loading={analysis.loading.blast}
+                  onAnalyze={analysis.analyzeBlast}
+                  onShowOnGraph={() => setOverlayMode('blast')}
+                />
+              )}
+              {activeTab === 'cycles' && (
+                <div className="divide-y divide-border">
+                  <CyclesPanel
+                    cycles={analysis.cycles}
+                    loading={analysis.loading.cycles}
+                    onFetch={analysis.fetchCycles}
+                  />
+                  <CriticalNodeTable
+                    criticalNodes={analysis.criticalNodes}
+                    loading={analysis.loading.critical}
+                    onFetch={analysis.fetchCriticalNodes}
+                    onSimulate={handleCriticalSimulate}
+                  />
+                </div>
+              )}
+              {activeTab === 'simulation' && (
+                <SimulationPanel
+                  nodes={nodes}
                   criticalNodes={analysis.criticalNodes}
-                  loading={analysis.loading.critical}
-                  onFetch={analysis.fetchCriticalNodes}
-                  onSimulate={handleCriticalSimulate}
+                  simulation={analysis.simulation}
+                  loading={analysis.loading.simulation}
+                  onSimulate={analysis.runSimulation}
                 />
-              </div>
-            )}
-            {activeTab === 'simulation' && (
-              <SimulationPanel
-                nodes={nodes}
-                criticalNodes={analysis.criticalNodes}
-                simulation={analysis.simulation}
-                loading={analysis.loading.simulation}
-                onSimulate={analysis.runSimulation}
-              />
-            )}
+              )}
+            </div>
+          </div>
+          <div className="min-h-0 flex-1">
+            <LiveCveFeedPanel />
           </div>
         </div>
       </div>
