@@ -14,6 +14,14 @@ function normalizeAttackPath(raw: any) {
   if (!raw) return raw;
 
   if (Array.isArray(raw.path) && raw.path.length > 0 && typeof raw.path[0] === 'string' && Array.isArray(raw.hops)) {
+    if (raw.hops.length === 0) {
+      return {
+        ...raw,
+        path: [],
+        message: raw.message || 'Source and target resolved to the same node. Choose different nodes.',
+      };
+    }
+
     return {
       ...raw,
       path: raw.hops.map((hop: any) => ({

@@ -1,24 +1,28 @@
 #!/bin/bash
-# ─────────────────────────────────────────────────────────────────────────────
-# fetch_k8s_data.sh — Fetch live Kubernetes cluster data
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# fetch_k8s_data.sh â€” Fetch live Kubernetes cluster data
 # Saves all resources to data/raw/ as JSON files
 #
 # Usage (from backend/ directory):
 #   bash scripts/fetch_k8s_data.sh
 #   bash scripts/fetch_k8s_data.sh --context minikube
 #   bash scripts/fetch_k8s_data.sh --namespace default
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 set -e
 
-# ── Defaults ──────────────────────────────────────────────────────────────────
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+
+
+# â”€â”€ Defaults â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 CONTEXT=""
 NAMESPACE="--all-namespaces"
-OUTPUT_DIR="data/raw"
+OUTPUT_DIR="$REPO_ROOT/data/raw"
 TIMEOUT=30
 KUBECTL_BIN="${KUBECTL_BIN:-}"
 
-# ── Parse arguments ───────────────────────────────────────────────────────────
+# â”€â”€ Parse arguments â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         --context)   CONTEXT="--context $2";   shift ;;
@@ -29,26 +33,26 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
-# ── Colors for output ─────────────────────────────────────────────────────────
+# â”€â”€ Colors for output â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-print_ok()   { echo -e "${GREEN}  ✓${NC} $1"; }
-print_err()  { echo -e "${RED}  ✗${NC} $1"; }
-print_warn() { echo -e "${YELLOW}  ⚠${NC} $1"; }
-print_info() { echo -e "${BLUE}  →${NC} $1"; }
+print_ok()   { echo -e "${GREEN}  âœ“${NC} $1"; }
+print_err()  { echo -e "${RED}  âœ—${NC} $1"; }
+print_warn() { echo -e "${YELLOW}  âš ${NC} $1"; }
+print_info() { echo -e "${BLUE}  â†’${NC} $1"; }
 
-# ── Header ────────────────────────────────────────────────────────────────────
+# â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo ""
-echo -e "${BLUE}╔══════════════════════════════════════════╗${NC}"
-echo -e "${BLUE}║     Attack Path Analyzer — K8s Fetch    ║${NC}"
-echo -e "${BLUE}╚══════════════════════════════════════════╝${NC}"
+echo -e "${BLUE}â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—${NC}"
+echo -e "${BLUE}â•‘     Attack Path Analyzer â€” K8s Fetch    â•‘${NC}"
+echo -e "${BLUE}â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•${NC}"
 echo ""
 
-# ── Check kubectl is available ────────────────────────────────────────────────
+# â”€â”€ Check kubectl is available â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 if [[ -z "$KUBECTL_BIN" ]]; then
     # On Windows shells (Git Bash/WSL interop), kubectl.exe usually has the
     # right kubeconfig/cert path behavior for Minikube.
@@ -67,7 +71,7 @@ fi
 print_ok "kubectl found: $($KUBECTL_BIN version --client --short 2>/dev/null || echo 'installed')"
 print_info "Using kubectl binary: ${KUBECTL_BIN}"
 
-# ── Check cluster is reachable ────────────────────────────────────────────────
+# â”€â”€ Check cluster is reachable â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 print_info "Checking cluster connectivity..."
 if ! $KUBECTL_BIN $CONTEXT cluster-info &> /dev/null; then
     print_err "Cannot reach cluster. Is minikube running?"
@@ -80,12 +84,12 @@ fi
 CURRENT_CONTEXT=$($KUBECTL_BIN $CONTEXT config current-context 2>/dev/null || echo "unknown")
 print_ok "Connected to cluster: ${CURRENT_CONTEXT}"
 
-# ── Create output directory ───────────────────────────────────────────────────
+# â”€â”€ Create output directory â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 mkdir -p "$OUTPUT_DIR"
 print_ok "Output directory: $OUTPUT_DIR"
 echo ""
 
-# ── Fetch function ────────────────────────────────────────────────────────────
+# â”€â”€ Fetch function â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 fetch_resource() {
     local resource=$1
     local flags=$2
@@ -98,14 +102,14 @@ fetch_resource() {
         > "$outfile" 2>/dev/null; then
 
         COUNT=$(python3 -c "import json,sys; d=json.load(open('$outfile')); print(len(d.get('items',[])))" 2>/dev/null || echo "?")
-        print_ok "${COUNT} items → ${outfile}"
+        print_ok "${COUNT} items â†’ ${outfile}"
     else
-        print_warn "Failed — saving empty list to ${outfile}"
+        print_warn "Failed â€” saving empty list to ${outfile}"
         echo '{"apiVersion":"v1","items":[],"kind":"List"}' > "$outfile"
     fi
 }
 
-# ── Fetch all resources ───────────────────────────────────────────────────────
+# â”€â”€ Fetch all resources â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo -e "${BLUE}Fetching cluster resources...${NC}"
 echo ""
 
@@ -119,7 +123,7 @@ fetch_resource "clusterrolebindings" ""
 
 echo ""
 
-# ── Summary ───────────────────────────────────────────────────────────────────
+# â”€â”€ Summary â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo -e "${BLUE}Fetch complete. Summary:${NC}"
 echo ""
 TOTAL=0
@@ -132,7 +136,7 @@ done
 echo ""
 print_ok "Total resources fetched: ${TOTAL}"
 
-# ── Next step ─────────────────────────────────────────────────────────────────
+# â”€â”€ Next step â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo ""
 echo -e "${YELLOW}Next steps:${NC}"
 echo "  1. Set MOCK_MODE=false in your .env"

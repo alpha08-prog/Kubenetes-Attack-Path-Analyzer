@@ -1,5 +1,5 @@
 """
-graph_builder.py — NetworkX DiGraph Construction
+graph_builder.py â€” NetworkX DiGraph Construction
 Takes the cleaned node/edge list from parser.py and builds
 a NetworkX DiGraph that all algorithms operate on.
 
@@ -13,12 +13,12 @@ from app.utils.helpers import timed, utc_now
 
 logger = get_logger(__name__)
 
-# Module-level graph instance — rebuilt on each ingestion call
+# Module-level graph instance â€” rebuilt on each ingestion call
 _graph: nx.DiGraph = nx.DiGraph()
 _metadata: dict = {}
 
 
-# ─── Build ─────────────────────────────────────────────────────────────────────
+# â”€â”€â”€ Build â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @timed
 def build_graph(parsed_data: dict) -> nx.DiGraph:
@@ -61,7 +61,7 @@ def build_graph(parsed_data: dict) -> nx.DiGraph:
 
         # Only add edge if both nodes exist
         if src not in G.nodes or dst not in G.nodes:
-            logger.debug("Skipping edge %s → %s (node not in graph)", src, dst)
+            logger.debug("Skipping edge %s â†’ %s (node not in graph)", src, dst)
             skipped += 1
             continue
 
@@ -88,7 +88,7 @@ def build_graph(parsed_data: dict) -> nx.DiGraph:
     return G
 
 
-# ─── Get current graph ─────────────────────────────────────────────────────────
+# â”€â”€â”€ Get current graph â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def get_graph() -> nx.DiGraph:
     """
@@ -109,7 +109,7 @@ def get_metadata() -> dict:
     return _metadata
 
 
-# ─── Serialization for frontend ───────────────────────────────────────────────
+# â”€â”€â”€ Serialization for frontend â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def graph_to_cytoscape(G: nx.DiGraph) -> dict:
     """
@@ -150,7 +150,7 @@ def graph_to_cytoscape(G: nx.DiGraph) -> dict:
     return {"nodes": cy_nodes, "edges": cy_edges}
 
 
-# ─── Graph Query Helpers ───────────────────────────────────────────────────────
+# â”€â”€â”€ Graph Query Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def get_nodes_by_type(G: nx.DiGraph, node_type: str) -> list:
     """
@@ -186,19 +186,22 @@ def get_high_risk_nodes(G: nx.DiGraph, threshold: float = 7.0) -> list:
 
 def find_entry_points(G: nx.DiGraph) -> list:
     """
-    Find likely attacker entry points — nodes with no incoming edges
-    (i.e., publicly reachable) and high risk.
+    Find likely attacker entry points.
+    Restrict to attacker-controllable identities/workloads so we don't
+    pick isolated sensitive assets as both source and target.
     These are natural Dijkstra source nodes.
     """
+    entry_types = {"pod", "user", "service_account"}
     return [
         n for n in G.nodes
-        if G.in_degree(n) == 0 and G.nodes[n].get("risk", 0) >= 4.0
+        if G.in_degree(n) == 0
+        and G.nodes[n].get("type") in entry_types
+        and G.nodes[n].get("risk", 0) >= 3.0
     ]
-
 
 def find_sensitive_targets(G: nx.DiGraph) -> list:
     """
-    Find likely target nodes — databases and high-risk secrets
+    Find likely target nodes â€” databases and high-risk secrets
     with no outgoing edges (sinks in the graph).
     These are natural Dijkstra target nodes.
     """

@@ -1,5 +1,5 @@
 """
-attack_service.py — Shortest Attack Path Service
+attack_service.py â€” Shortest Attack Path Service
 Orchestrates the Dijkstra algorithm and enriches the result
 with severity labels and frontend-ready formatting.
 """
@@ -66,8 +66,8 @@ def get_all_attack_paths(source: str, target: str, max_paths: int = 5) -> dict:
 
 def get_auto_attack_path() -> dict:
     """
-    Auto-detect the most dangerous source → target pair and run Dijkstra.
-    Used by DemoMode.jsx — one click, no manual node selection needed.
+    Auto-detect the most dangerous source â†’ target pair and run Dijkstra.
+    Used by DemoMode.jsx â€” one click, no manual node selection needed.
     """
     G = get_graph()
     entries  = find_entry_points(G)
@@ -85,10 +85,12 @@ def get_auto_attack_path() -> dict:
 
     for source in entries_sorted:
         for target in targets_sorted:
+            if source == target:
+                continue
             result = shortest_attack_path(G, source, target)
-            if result.get("found"):
+            if result.get("found") and result.get("hop_count", 0) > 0:
                 result["auto_detected"] = True
-                logger.info("Auto-detected path: %s → %s", source, target)
+                logger.info("Auto-detected path: %s â†’ %s", source, target)
                 return result
 
     return {

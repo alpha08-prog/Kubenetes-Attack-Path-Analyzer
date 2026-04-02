@@ -5,6 +5,7 @@ Controlled by MOCK_MODE in config.py.
 """
 
 import json
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -81,29 +82,55 @@ def _fetch_kubectl() -> dict:
     Run kubectl commands and return raw JSON blobs.
     Falls back to saved raw files in data/raw if kubectl fails.
     """
+    kubectl_bin = shutil.which("kubectl.exe") or shutil.which("kubectl")
+    minikube_bin = shutil.which("minikube.exe") or shutil.which("minikube")
+
     resources = {
-        "pods": ["kubectl", "get", "pods", "-A", "-o", "json"],
-        "serviceaccounts": ["kubectl", "get", "serviceaccounts", "-A", "-o", "json"],
-        "roles": ["kubectl", "get", "roles", "-A", "-o", "json"],
-        "clusterroles": ["kubectl", "get", "clusterroles", "-o", "json"],
-        "rolebindings": ["kubectl", "get", "rolebindings", "-A", "-o", "json"],
-        "clusterrolebindings": ["kubectl", "get", "clusterrolebindings", "-o", "json"],
-        "secrets": ["kubectl", "get", "secrets", "-A", "-o", "json"],
+        "pods": ["get", "pods", "-A", "-o", "json"],
+        "serviceaccounts": ["get", "serviceaccounts", "-A", "-o", "json"],
+        "roles": ["get", "roles", "-A", "-o", "json"],
+        "clusterroles": ["get", "clusterroles", "-o", "json"],
+        "rolebindings": ["get", "rolebindings", "-A", "-o", "json"],
+        "clusterrolebindings": ["get", "clusterrolebindings", "-o", "json"],
+        "secrets": ["get", "secrets", "-A", "-o", "json"],
     }
 
-    raw = {}
-    for key, cmd in resources.items():
+    def _run_json(cmd: list[str]) -> tuple[dict | None, str]:
         try:
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
-            if result.returncode == 0:
-                raw[key] = json.loads(result.stdout)
-                logger.info("Fetched %s: %d items", key, len(raw[key].get("items", [])))
-            else:
-                logger.warning("kubectl failed for %s: %s", key, result.stderr.strip())
-                raw[key] = _load_raw_file(key)
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=settings.KUBECTL_TIMEOUT)
+            if result.returncode != 0:
+                return None, result.stderr.strip() or f"exit={result.returncode}"
+            return json.loads(result.stdout), ""
         except (subprocess.TimeoutExpired, FileNotFoundError, json.JSONDecodeError) as exc:
-            logger.error("Error fetching %s: %s - using saved raw file", key, exc)
-            raw[key] = _load_raw_file(key)
+            return None, str(exc)
+
+    raw = {}
+    for key, args in resources.items():
+        payload = None
+        error = ""
+
+        if kubectl_bin:
+            payload, error = _run_json([kubectl_bin, *args])
+            if payload is not None:
+                raw[key] = payload
+                logger.info("Fetched %s via %s: %d items", key, kubectl_bin, len(payload.get("items", [])))
+                continue
+            logger.warning("kubectl failed for %s: %s", key, error)
+
+        if minikube_bin:
+            payload, error = _run_json([minikube_bin, "kubectl", "--", *args])
+            if payload is not None:
+                raw[key] = payload
+                logger.info(
+                    "Fetched %s via minikube kubectl: %d items",
+                    key,
+                    len(payload.get("items", [])),
+                )
+                continue
+            logger.warning("minikube kubectl failed for %s: %s", key, error)
+
+        logger.error("Error fetching %s - using saved raw file", key)
+        raw[key] = _load_raw_file(key)
 
     return raw
 

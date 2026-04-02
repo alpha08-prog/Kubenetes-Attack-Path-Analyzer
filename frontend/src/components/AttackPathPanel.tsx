@@ -24,10 +24,20 @@ export default function AttackPathPanel({ nodes, attackPath, loading, onFindPath
   const [source, setSource] = useState('');
   const [target, setTarget] = useState('');
 
-  const sources = nodes.filter(n => ['pod', 'user'].includes(n.type));
+  const sources = nodes.filter(n => ['pod', 'user', 'service_account'].includes(n.type));
   const targets = nodes.filter(n => ['database', 'secret'].includes(n.type));
-  const sourceList = sources.length > 0 ? sources : FALLBACK_SOURCES.map(id => ({ id, label: id.split(':').pop()!, type: id.split(':')[0] } as GraphNode));
-  const targetList = targets.length > 0 ? targets : FALLBACK_TARGETS.map(id => ({ id, label: id.split(':').pop()!, type: id.split(':')[0] } as GraphNode));
+
+  const sourceList = sources.length > 0
+    ? sources
+    : nodes.length > 0
+      ? nodes
+      : FALLBACK_SOURCES.map(id => ({ id, label: id.split(':').pop()!, type: id.split(':')[0] } as GraphNode));
+
+  const targetList = targets.length > 0
+    ? targets
+    : nodes.length > 0
+      ? [...nodes].sort((a, b) => (b.risk_score ?? 0) - (a.risk_score ?? 0))
+      : FALLBACK_TARGETS.map(id => ({ id, label: id.split(':').pop()!, type: id.split(':')[0] } as GraphNode));
 
   return (
     <div className="space-y-4 p-4">

@@ -18,6 +18,14 @@ const STEPS = [
 function normalizeAttackPath(raw: any) {
   if (!raw) return raw;
   if (Array.isArray(raw.path) && raw.path.length > 0 && typeof raw.path[0] === 'string' && Array.isArray(raw.hops)) {
+    if (raw.hops.length === 0) {
+      return {
+        ...raw,
+        path: [],
+        message: raw.message || 'Source and target resolved to the same node.',
+      };
+    }
+
     return {
       ...raw,
       path: raw.hops.map((hop: any) => ({
@@ -197,7 +205,7 @@ export default function DemoMode() {
         )}
 
         {/* Step 1 - Attack path */}
-        {stepDone.has(1) && attackPath?.path && (
+        {stepDone.has(1) && Array.isArray(attackPath?.path) && attackPath.path.length > 0 && (
           <div className="animate-slide-in-right bg-card border border-border rounded-lg p-6">
             <h3 className="font-semibold mb-3 flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 text-destructive" />

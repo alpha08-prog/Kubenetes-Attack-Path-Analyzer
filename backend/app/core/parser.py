@@ -56,7 +56,7 @@ def parse_cluster_data(raw: dict) -> dict:
     _parse_serviceaccounts(raw.get("serviceaccounts", {}), nodes)
     _parse_roles(raw.get("roles", {}), nodes)
     _parse_roles(raw.get("clusterroles", {}), nodes, cluster_scoped=True)
-    _parse_secrets(raw.get("secrets", {}), nodes)
+    _parse_secrets(raw.get("secrets", {}), nodes, edges)
     _parse_rolebindings(raw.get("rolebindings", {}), nodes, edges)
     _parse_rolebindings(raw.get("clusterrolebindings", {}), nodes, edges, cluster_scoped=True)
 
@@ -103,7 +103,7 @@ def _parse_pods(data: dict, nodes: dict, edges: list) -> None:
         # Edge: pod → uses → service account
         sa_name = spec.get("serviceAccountName", "default")
         sa_id = _make_id(NodeType.SERVICE_ACCOUNT, sa_name, namespace)
-        edges.append(_make_edge(node_id, sa_id, "uses", risk=risk))
+        _add_edge(edges, node_id, sa_id, "uses", risk=risk)
 
 
 def _parse_serviceaccounts(data: dict, nodes: dict) -> None:
@@ -151,7 +151,7 @@ def _parse_roles(data: dict, nodes: dict, cluster_scoped: bool = False) -> None:
         })
 
 
-def _parse_secrets(data: dict, nodes: dict) -> None:
+def _parse_secrets(data: dict, nodes: dict, edges: list) -> None:
     for item in data.get("items", []):
         meta = item.get("metadata", {})
         name = meta.get("name", "unknown-secret")
@@ -186,6 +186,8 @@ def _parse_secrets(data: dict, nodes: dict) -> None:
                 "namespace": namespace,
                 "metadata":  {"inferred": True, "source_secret": name},
             })
+            # Secret -> exposes -> inferred database
+            _add_edge(edges, node_id, db_id, "exposes", risk=max(risk, 8.5))
 
 
 def _parse_rolebindings(
@@ -235,7 +237,7 @@ def _parse_rolebindings(
                     })
                 # SA → bound-to → Role
                 binding_risk = nodes[role_id]["risk"]
-                edges.append(_make_edge(sa_id, role_id, "bound-to", risk=binding_risk))
+                _add_edge(edges, sa_id, role_id, "bound-to", risk=binding_risk)
 
             elif subject_kind == "User":
                 user_id = _make_id(NodeType.USER, subject_name, subject_ns)
@@ -248,7 +250,23 @@ def _parse_rolebindings(
                         "namespace": subject_ns,
                         "metadata":  {},
                     })
-                edges.append(_make_edge(user_id, role_id, "bound-to", risk=4.0))
+                _add_edge(edges, user_id, role_id, "bound-to", risk=4.0)
+
+        # Infer Role -> can-read -> Secret edges when role rules allow secret access.
+        role_rules = nodes.get(role_id, {}).get("metadata", {}).get("rules", [])
+        if _can_read_secrets(role_rules) or _has_wildcard(role_rules):
+            for secret in nodes.values():
+                if secret.get("type") != NodeType.SECRET:
+                    continue
+                if not cluster_scoped and secret.get("namespace") != namespace:
+                    continue
+                _add_edge(
+                    edges,
+                    role_id,
+                    secret["id"],
+                    "can-read",
+                    risk=max(nodes[role_id].get("risk", 5.0), secret.get("risk", 5.0)),
+                )
 
 
 # ─── Risk Scoring Helpers ──────────────────────────────────────────────────────
@@ -350,3 +368,15 @@ def _add_node(nodes: dict, node_id: str, node_data: dict) -> None:
     """Add node only if not already present (deduplication)."""
     if node_id not in nodes:
         nodes[node_id] = node_data
+
+
+def _add_edge(edges: list, source: str, target: str, relation: str, risk: float = 5.0) -> None:
+    """Add edge only if an identical source-target-relation triple is not present."""
+    for edge in edges:
+        if (
+            edge.get("source") == source
+            and edge.get("target") == target
+            and edge.get("relation") == relation
+        ):
+            return
+    edges.append(_make_edge(source, target, relation, risk=risk))

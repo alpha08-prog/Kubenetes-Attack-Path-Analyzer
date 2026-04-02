@@ -77,8 +77,10 @@ def get_full_analysis() -> dict:
 
         for source in entries_sorted:
             for target in targets_sorted:
+                if source == target:
+                    continue
                 ap = shortest_attack_path(G, source, target)
-                if ap.get("found"):
+                if ap.get("found") and ap.get("hop_count", 0) > 0:
                     attack_path = ap
                     blast = blast_radius(G, source, max_hops=3)
                     break
