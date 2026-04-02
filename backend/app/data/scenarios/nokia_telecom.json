@@ -1,0 +1,398 @@
+{
+  "meta": {
+    "name": "Nokia Telecom Cluster",
+    "description": "Simulated Nokia telecom Kubernetes cluster with realistic misconfigurations",
+    "attack_path": "web-server \u2192 backend-sa \u2192 admin-role \u2192 db-credentials \u2192 billing-db (4 hops)",
+    "cycle": "backend-sa \u2192 admin-role \u2192 backend-sa (privilege escalation loop)",
+    "entry_points": [
+      "pod:default:web-server",
+      "user:cluster:dev-1",
+      "user:cluster:ci-bot"
+    ],
+    "targets": [
+      "database:default:billing-db",
+      "database:default:analytics-db"
+    ],
+    "generated_by": "scripts/generate_mock_data.py"
+  },
+  "nodes": [
+    {
+      "id": "pod:default:web-server",
+      "label": "web-server",
+      "type": "pod",
+      "risk": 7.5,
+      "namespace": "default",
+      "metadata": {
+        "image": [
+          "nginx:1.19"
+        ],
+        "host_network": false,
+        "privileged": false,
+        "phase": "Running",
+        "note": "Public-facing pod \u2014 attacker entry point"
+      }
+    },
+    {
+      "id": "pod:default:api-server",
+      "label": "api-server",
+      "type": "pod",
+      "risk": 8.0,
+      "namespace": "default",
+      "metadata": {
+        "image": [
+          "node:18-alpine"
+        ],
+        "privileged": false,
+        "phase": "Running",
+        "note": "Internal API pod with overbroad SA"
+      }
+    },
+    {
+      "id": "pod:default:metrics-collector",
+      "label": "metrics-collector",
+      "type": "pod",
+      "risk": 6.0,
+      "namespace": "default",
+      "metadata": {
+        "image": [
+          "prom/prometheus:v2.40.0"
+        ],
+        "privileged": false,
+        "phase": "Running"
+      }
+    },
+    {
+      "id": "pod:kube-system:coredns",
+      "label": "coredns",
+      "type": "pod",
+      "risk": 5.5,
+      "namespace": "kube-system",
+      "metadata": {
+        "image": [
+          "registry.k8s.io/coredns/coredns:v1.10.1"
+        ],
+        "phase": "Running"
+      }
+    },
+    {
+      "id": "service_account:default:backend-sa",
+      "label": "backend-sa",
+      "type": "service_account",
+      "risk": 8.5,
+      "namespace": "default",
+      "metadata": {
+        "note": "Overbroad SA \u2014 bound to admin-role"
+      }
+    },
+    {
+      "id": "service_account:default:metrics-sa",
+      "label": "metrics-sa",
+      "type": "service_account",
+      "risk": 4.5,
+      "namespace": "default",
+      "metadata": {}
+    },
+    {
+      "id": "service_account:kube-system:coredns-sa",
+      "label": "coredns-sa",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {}
+    },
+    {
+      "id": "role:default:admin-role",
+      "label": "admin-role",
+      "type": "role",
+      "risk": 9.5,
+      "namespace": "default",
+      "metadata": {
+        "has_wildcard": true,
+        "cluster_scoped": false,
+        "rules": [
+          {
+            "verbs": [
+              "*"
+            ],
+            "resources": [
+              "*"
+            ]
+          }
+        ],
+        "note": "Wildcard role \u2014 can read all secrets"
+      }
+    },
+    {
+      "id": "role:default:secret-reader",
+      "label": "secret-reader",
+      "type": "role",
+      "risk": 7.5,
+      "namespace": "default",
+      "metadata": {
+        "has_wildcard": false,
+        "rules": [
+          {
+            "verbs": [
+              "get",
+              "list"
+            ],
+            "resources": [
+              "secrets"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "role:default:metrics-role",
+      "label": "metrics-role",
+      "type": "role",
+      "risk": 3.5,
+      "namespace": "default",
+      "metadata": {
+        "rules": [
+          {
+            "verbs": [
+              "get"
+            ],
+            "resources": [
+              "pods",
+              "nodes"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "role:cluster:cluster-admin",
+      "label": "cluster-admin",
+      "type": "role",
+      "risk": 10.0,
+      "namespace": "cluster",
+      "metadata": {
+        "has_wildcard": true,
+        "cluster_scoped": true,
+        "note": "Full cluster access \u2014 maximum risk"
+      }
+    },
+    {
+      "id": "secret:default:db-credentials",
+      "label": "db-credentials",
+      "type": "secret",
+      "risk": 9.0,
+      "namespace": "default",
+      "metadata": {
+        "secret_type": "Opaque",
+        "is_db_creds": true,
+        "note": "Contains plaintext DB password \u2014 critical exposure"
+      }
+    },
+    {
+      "id": "secret:default:tls-cert",
+      "label": "tls-cert",
+      "type": "secret",
+      "risk": 5.5,
+      "namespace": "default",
+      "metadata": {
+        "secret_type": "kubernetes.io/tls",
+        "is_db_creds": false
+      }
+    },
+    {
+      "id": "secret:default:api-token",
+      "label": "api-token",
+      "type": "secret",
+      "risk": 8.0,
+      "namespace": "default",
+      "metadata": {
+        "secret_type": "kubernetes.io/service-account-token",
+        "is_db_creds": false,
+        "note": "SA token \u2014 can be used to impersonate backend-sa"
+      }
+    },
+    {
+      "id": "database:default:billing-db",
+      "label": "billing-db",
+      "type": "database",
+      "risk": 9.5,
+      "namespace": "default",
+      "metadata": {
+        "engine": "PostgreSQL",
+        "note": "Production billing database \u2014 primary target"
+      }
+    },
+    {
+      "id": "database:default:analytics-db",
+      "label": "analytics-db",
+      "type": "database",
+      "risk": 7.0,
+      "namespace": "default",
+      "metadata": {
+        "engine": "ClickHouse",
+        "note": "Telemetry analytics store"
+      }
+    },
+    {
+      "id": "user:cluster:dev-1",
+      "label": "dev-1",
+      "type": "user",
+      "risk": 6.5,
+      "namespace": "cluster",
+      "metadata": {
+        "note": "Developer with secret-reader binding \u2014 lateral move risk"
+      }
+    },
+    {
+      "id": "user:cluster:ci-bot",
+      "label": "ci-bot",
+      "type": "user",
+      "risk": 7.5,
+      "namespace": "cluster",
+      "metadata": {
+        "note": "CI/CD service user bound to cluster-admin \u2014 over-privileged"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "pod:default:web-server",
+      "target": "service_account:default:backend-sa",
+      "relation": "uses",
+      "risk": 7.5,
+      "weight": 2.5
+    },
+    {
+      "source": "pod:default:api-server",
+      "target": "service_account:default:backend-sa",
+      "relation": "uses",
+      "risk": 8.0,
+      "weight": 2.0
+    },
+    {
+      "source": "pod:default:metrics-collector",
+      "target": "service_account:default:metrics-sa",
+      "relation": "uses",
+      "risk": 4.5,
+      "weight": 5.5
+    },
+    {
+      "source": "pod:kube-system:coredns",
+      "target": "service_account:kube-system:coredns-sa",
+      "relation": "uses",
+      "risk": 5.0,
+      "weight": 5.0
+    },
+    {
+      "source": "service_account:default:backend-sa",
+      "target": "role:default:admin-role",
+      "relation": "bound-to",
+      "risk": 9.5,
+      "weight": 0.5
+    },
+    {
+      "source": "service_account:default:metrics-sa",
+      "target": "role:default:metrics-role",
+      "relation": "bound-to",
+      "risk": 3.5,
+      "weight": 6.5
+    },
+    {
+      "source": "role:default:admin-role",
+      "target": "secret:default:db-credentials",
+      "relation": "can-read",
+      "risk": 9.0,
+      "weight": 1.0
+    },
+    {
+      "source": "role:default:admin-role",
+      "target": "secret:default:api-token",
+      "relation": "can-read",
+      "risk": 8.0,
+      "weight": 2.0
+    },
+    {
+      "source": "role:default:admin-role",
+      "target": "secret:default:tls-cert",
+      "relation": "can-read",
+      "risk": 5.5,
+      "weight": 4.5
+    },
+    {
+      "source": "role:default:secret-reader",
+      "target": "secret:default:db-credentials",
+      "relation": "can-read",
+      "risk": 7.5,
+      "weight": 2.5
+    },
+    {
+      "source": "secret:default:db-credentials",
+      "target": "database:default:billing-db",
+      "relation": "unlocks",
+      "risk": 9.5,
+      "weight": 0.5
+    },
+    {
+      "source": "secret:default:db-credentials",
+      "target": "database:default:analytics-db",
+      "relation": "unlocks",
+      "risk": 7.0,
+      "weight": 3.0
+    },
+    {
+      "source": "user:cluster:dev-1",
+      "target": "role:default:secret-reader",
+      "relation": "bound-to",
+      "risk": 7.5,
+      "weight": 2.5
+    },
+    {
+      "source": "user:cluster:ci-bot",
+      "target": "role:cluster:cluster-admin",
+      "relation": "bound-to",
+      "risk": 10.0,
+      "weight": 0.0
+    },
+    {
+      "source": "role:default:admin-role",
+      "target": "service_account:default:backend-sa",
+      "relation": "can-impersonate",
+      "risk": 9.0,
+      "weight": 1.0
+    },
+    {
+      "source": "secret:default:api-token",
+      "target": "service_account:default:backend-sa",
+      "relation": "authenticates-as",
+      "risk": 8.0,
+      "weight": 2.0
+    },
+    {
+      "source": "role:cluster:cluster-admin",
+      "target": "secret:default:db-credentials",
+      "relation": "can-read",
+      "risk": 10.0,
+      "weight": 0.0
+    },
+    {
+      "source": "role:cluster:cluster-admin",
+      "target": "database:default:billing-db",
+      "relation": "accesses",
+      "risk": 10.0,
+      "weight": 0.0
+    },
+    {
+      "source": "role:default:metrics-role",
+      "target": "pod:default:web-server",
+      "relation": "can-read",
+      "risk": 4.0,
+      "weight": 6.0
+    },
+    {
+      "source": "role:default:metrics-role",
+      "target": "pod:default:api-server",
+      "relation": "can-read",
+      "risk": 4.0,
+      "weight": 6.0
+    }
+  ]
+}
