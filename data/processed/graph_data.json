@@ -1,19 +1,1090 @@
 {
   "meta": {
     "source": "kubectl",
-    "generated": "2026-04-02T09:06:14.876478Z",
-    "node_count": 13,
-    "edge_count": 1
+    "generated": "2026-04-02T17:14:05.919445Z",
+    "node_count": 163,
+    "edge_count": 104
   },
   "nodes": [
     {
-      "id": "role:cluster:cluster-admin",
-      "label": "cluster-admin",
-      "type": "role",
-      "risk": 9.5,
-      "namespace": "cluster",
+      "id": "pod:kube-system:coredns-7d764666f9",
+      "label": "coredns-7d764666f9",
+      "type": "pod",
+      "risk": 3.5,
+      "namespace": "kube-system",
       "metadata": {
-        "cluster_scoped": true,
+        "image": [
+          "registry.k8s.io/coredns/coredns:v1.13.1"
+        ],
+        "host_network": false,
+        "host_pid": false,
+        "phase": "Running",
+        "privileged": false,
+        "run_as_root": false
+      }
+    },
+    {
+      "id": "pod:kube-system:etcd-minikube",
+      "label": "etcd-minikube",
+      "type": "pod",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "image": [
+          "registry.k8s.io/etcd:3.6.6-0"
+        ],
+        "host_network": true,
+        "host_pid": false,
+        "phase": "Running",
+        "privileged": false,
+        "run_as_root": false
+      }
+    },
+    {
+      "id": "pod:kube-system:kube-apiserver-minikube",
+      "label": "kube-apiserver-minikube",
+      "type": "pod",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "image": [
+          "registry.k8s.io/kube-apiserver:v1.35.1"
+        ],
+        "host_network": true,
+        "host_pid": false,
+        "phase": "Running",
+        "privileged": false,
+        "run_as_root": false
+      }
+    },
+    {
+      "id": "pod:kube-system:kube-controller-manager-minikube",
+      "label": "kube-controller-manager-minikube",
+      "type": "pod",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "image": [
+          "registry.k8s.io/kube-controller-manager:v1.35.1"
+        ],
+        "host_network": true,
+        "host_pid": false,
+        "phase": "Running",
+        "privileged": false,
+        "run_as_root": false
+      }
+    },
+    {
+      "id": "pod:kube-system:kube-proxy",
+      "label": "kube-proxy",
+      "type": "pod",
+      "risk": 8.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "image": [
+          "registry.k8s.io/kube-proxy:v1.35.1"
+        ],
+        "host_network": true,
+        "host_pid": false,
+        "phase": "Running",
+        "privileged": true,
+        "run_as_root": false
+      }
+    },
+    {
+      "id": "pod:kube-system:kube-scheduler-minikube",
+      "label": "kube-scheduler-minikube",
+      "type": "pod",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "image": [
+          "registry.k8s.io/kube-scheduler:v1.35.1"
+        ],
+        "host_network": true,
+        "host_pid": false,
+        "phase": "Running",
+        "privileged": false,
+        "run_as_root": false
+      }
+    },
+    {
+      "id": "pod:kube-system:storage-provisioner",
+      "label": "storage-provisioner",
+      "type": "pod",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "image": [
+          "gcr.io/k8s-minikube/storage-provisioner:v5"
+        ],
+        "host_network": true,
+        "host_pid": false,
+        "phase": "Running",
+        "privileged": false,
+        "run_as_root": false
+      }
+    },
+    {
+      "id": "pod:nokia-demo:api-server",
+      "label": "api-server",
+      "type": "pod",
+      "risk": 3.5,
+      "namespace": "nokia-demo",
+      "metadata": {
+        "image": [
+          "node:18-alpine"
+        ],
+        "host_network": false,
+        "host_pid": false,
+        "phase": "Running",
+        "privileged": false,
+        "run_as_root": false
+      }
+    },
+    {
+      "id": "pod:nokia-demo:billing-db",
+      "label": "billing-db",
+      "type": "pod",
+      "risk": 3.5,
+      "namespace": "nokia-demo",
+      "metadata": {
+        "image": [
+          "postgres:14-alpine"
+        ],
+        "host_network": false,
+        "host_pid": false,
+        "phase": "Running",
+        "privileged": false,
+        "run_as_root": false
+      }
+    },
+    {
+      "id": "pod:nokia-demo:metrics-collector",
+      "label": "metrics-collector",
+      "type": "pod",
+      "risk": 3.5,
+      "namespace": "nokia-demo",
+      "metadata": {
+        "image": [
+          "busybox:1.35"
+        ],
+        "host_network": false,
+        "host_pid": false,
+        "phase": "Running",
+        "privileged": false,
+        "run_as_root": false
+      }
+    },
+    {
+      "id": "pod:nokia-demo:web-server",
+      "label": "web-server",
+      "type": "pod",
+      "risk": 3.5,
+      "namespace": "nokia-demo",
+      "metadata": {
+        "image": [
+          "nginx:1.19"
+        ],
+        "host_network": false,
+        "host_pid": false,
+        "phase": "Running",
+        "privileged": false,
+        "run_as_root": false
+      }
+    },
+    {
+      "id": "service_account:default:default",
+      "label": "default",
+      "type": "service_account",
+      "risk": 3.0,
+      "namespace": "default",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-node-lease:default",
+      "label": "default",
+      "type": "service_account",
+      "risk": 3.0,
+      "namespace": "kube-node-lease",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-public:default",
+      "label": "default",
+      "type": "service_account",
+      "risk": 3.0,
+      "namespace": "kube-public",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:attachdetach-controller",
+      "label": "attachdetach-controller",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:bootstrap-signer",
+      "label": "bootstrap-signer",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:certificate-controller",
+      "label": "certificate-controller",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:clusterrole-aggregation",
+      "label": "clusterrole-aggregation-controller",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:coredns",
+      "label": "coredns",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:cronjob-controller",
+      "label": "cronjob-controller",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:daemon-set",
+      "label": "daemon-set-controller",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:default",
+      "label": "default",
+      "type": "service_account",
+      "risk": 3.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:deployment-controller",
+      "label": "deployment-controller",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:disruption-controller",
+      "label": "disruption-controller",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:endpoint-controller",
+      "label": "endpoint-controller",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:endpointslice-controller",
+      "label": "endpointslice-controller",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:endpointslicemirroring-controller",
+      "label": "endpointslicemirroring-controller",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:ephemeral-volume",
+      "label": "ephemeral-volume-controller",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:expand-controller",
+      "label": "expand-controller",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:generic-garbage-collector",
+      "label": "generic-garbage-collector",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:horizontal-pod",
+      "label": "horizontal-pod-autoscaler",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:job-controller",
+      "label": "job-controller",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:kube-proxy",
+      "label": "kube-proxy",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:legacy-service-account-token-cleaner",
+      "label": "legacy-service-account-token-cleaner",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:namespace-controller",
+      "label": "namespace-controller",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:node-controller",
+      "label": "node-controller",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:persistent-volume-binder",
+      "label": "persistent-volume-binder",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:pod-garbage-collector",
+      "label": "pod-garbage-collector",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:pv-protection",
+      "label": "pv-protection-controller",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:pvc-protection",
+      "label": "pvc-protection-controller",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:replicaset-controller",
+      "label": "replicaset-controller",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:replication-controller",
+      "label": "replication-controller",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:resource-claim",
+      "label": "resource-claim-controller",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:resourcequota-controller",
+      "label": "resourcequota-controller",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:root-ca-cert-publisher",
+      "label": "root-ca-cert-publisher",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:service-account",
+      "label": "service-account-controller",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:service-cidrs",
+      "label": "service-cidrs-controller",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:statefulset-controller",
+      "label": "statefulset-controller",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:storage-provisioner",
+      "label": "storage-provisioner",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:token-cleaner",
+      "label": "token-cleaner",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:ttl-after-finished",
+      "label": "ttl-after-finished-controller",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:ttl-controller",
+      "label": "ttl-controller",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:validatingadmissionpolicy-status",
+      "label": "validatingadmissionpolicy-status-controller",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:kube-system:volumeattributesclass-protection",
+      "label": "volumeattributesclass-protection-controller",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:nokia-demo:backend-sa",
+      "label": "backend-sa",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "nokia-demo",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:nokia-demo:default",
+      "label": "default",
+      "type": "service_account",
+      "risk": 3.0,
+      "namespace": "nokia-demo",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "service_account:nokia-demo:metrics-sa",
+      "label": "metrics-sa",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "nokia-demo",
+      "metadata": {
+        "secrets": []
+      }
+    },
+    {
+      "id": "role:kube-public:kubeadm:bootstrap-signer-clusterinfo",
+      "label": "kubeadm:bootstrap-signer-clusterinfo",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "kube-public",
+      "metadata": {
+        "cluster_scoped": false,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resourceNames": [
+              "cluster-info"
+            ],
+            "resources": [
+              "configmaps"
+            ],
+            "verbs": [
+              "get"
+            ]
+          }
+        ],
+        "rule_count": 1,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:kube-public:system:controller:bootstrap-signer",
+      "label": "system:controller:bootstrap-signer",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "kube-public",
+      "metadata": {
+        "cluster_scoped": false,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "configmaps"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resourceNames": [
+              "cluster-info"
+            ],
+            "resources": [
+              "configmaps"
+            ],
+            "verbs": [
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          }
+        ],
+        "rule_count": 3,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:kube-system:extension-apiserver-authentication-reader",
+      "label": "extension-apiserver-authentication-reader",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "cluster_scoped": false,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resourceNames": [
+              "extension-apiserver-authentication"
+            ],
+            "resources": [
+              "configmaps"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          }
+        ],
+        "rule_count": 1,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:kube-system:kube-proxy",
+      "label": "kube-proxy",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "cluster_scoped": false,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resourceNames": [
+              "kube-proxy"
+            ],
+            "resources": [
+              "configmaps"
+            ],
+            "verbs": [
+              "get"
+            ]
+          }
+        ],
+        "rule_count": 1,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:kube-system:kubeadm:kubelet-config",
+      "label": "kubeadm:kubelet-config",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "cluster_scoped": false,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resourceNames": [
+              "kubelet-config"
+            ],
+            "resources": [
+              "configmaps"
+            ],
+            "verbs": [
+              "get"
+            ]
+          }
+        ],
+        "rule_count": 1,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:kube-system:kubeadm:nodes-kubeadm-config",
+      "label": "kubeadm:nodes-kubeadm-config",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "cluster_scoped": false,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resourceNames": [
+              "kubeadm-config"
+            ],
+            "resources": [
+              "configmaps"
+            ],
+            "verbs": [
+              "get"
+            ]
+          }
+        ],
+        "rule_count": 1,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:kube-system:system::leader-locking-kube-controller-manager",
+      "label": "system::leader-locking-kube-controller-manager",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "cluster_scoped": false,
+        "rules": [
+          {
+            "apiGroups": [
+              "coordination.k8s.io"
+            ],
+            "resources": [
+              "leases"
+            ],
+            "verbs": [
+              "create",
+              "get",
+              "list",
+              "update",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "coordination.k8s.io"
+            ],
+            "resources": [
+              "leasecandidates"
+            ],
+            "verbs": [
+              "create",
+              "get",
+              "list",
+              "update",
+              "watch"
+            ]
+          }
+        ],
+        "rule_count": 2,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:kube-system:system::leader-locking-kube-scheduler",
+      "label": "system::leader-locking-kube-scheduler",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "cluster_scoped": false,
+        "rules": [
+          {
+            "apiGroups": [
+              "coordination.k8s.io"
+            ],
+            "resources": [
+              "leases"
+            ],
+            "verbs": [
+              "create",
+              "get",
+              "list",
+              "update",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "coordination.k8s.io"
+            ],
+            "resources": [
+              "leasecandidates"
+            ],
+            "verbs": [
+              "create",
+              "get",
+              "list",
+              "update",
+              "watch"
+            ]
+          }
+        ],
+        "rule_count": 2,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:kube-system:system:controller:bootstrap-signer",
+      "label": "system:controller:bootstrap-signer",
+      "type": "role",
+      "risk": 4.5,
+      "namespace": "kube-system",
+      "metadata": {
+        "cluster_scoped": false,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "secrets"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          }
+        ],
+        "rule_count": 1,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:kube-system:system:controller:cloud-provider",
+      "label": "system:controller:cloud-provider",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "cluster_scoped": false,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "configmaps"
+            ],
+            "verbs": [
+              "create",
+              "get",
+              "list",
+              "watch"
+            ]
+          }
+        ],
+        "rule_count": 1,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:kube-system:system:controller:token-cleaner",
+      "label": "system:controller:token-cleaner",
+      "type": "role",
+      "risk": 4.5,
+      "namespace": "kube-system",
+      "metadata": {
+        "cluster_scoped": false,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "secrets"
+            ],
+            "verbs": [
+              "delete",
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          }
+        ],
+        "rule_count": 2,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:kube-system:system:persistent-volume-provisioner",
+      "label": "system:persistent-volume-provisioner",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "cluster_scoped": false,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "endpoints"
+            ],
+            "verbs": [
+              "watch",
+              "create"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resourceNames": [
+              "k8s.io-minikube-hostpath"
+            ],
+            "resources": [
+              "endpoints"
+            ],
+            "verbs": [
+              "get",
+              "update",
+              "create"
+            ]
+          }
+        ],
+        "rule_count": 2,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:nokia-demo:admin-role",
+      "label": "admin-role",
+      "type": "role",
+      "risk": 7.0,
+      "namespace": "nokia-demo",
+      "metadata": {
+        "cluster_scoped": false,
         "rules": [
           {
             "apiGroups": [
@@ -25,18 +1096,64 @@
             "verbs": [
               "*"
             ]
-          },
+          }
+        ],
+        "rule_count": 1,
+        "has_wildcard": true
+      }
+    },
+    {
+      "id": "role:nokia-demo:metrics-role",
+      "label": "metrics-role",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "nokia-demo",
+      "metadata": {
+        "cluster_scoped": false,
+        "rules": [
           {
-            "nonResourceURLs": [
-              "*"
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "pods",
+              "nodes"
             ],
             "verbs": [
-              "*"
+              "get",
+              "list"
             ]
           }
         ],
-        "rule_count": 2,
-        "has_wildcard": true
+        "rule_count": 1,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:nokia-demo:secret-reader",
+      "label": "secret-reader",
+      "type": "role",
+      "risk": 4.5,
+      "namespace": "nokia-demo",
+      "metadata": {
+        "cluster_scoped": false,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "secrets"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          }
+        ],
+        "rule_count": 1,
+        "has_wildcard": false
       }
     },
     {
@@ -537,6 +1654,39 @@
       }
     },
     {
+      "id": "role:cluster:cluster-admin",
+      "label": "cluster-admin",
+      "type": "role",
+      "risk": 9.5,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              "*"
+            ],
+            "resources": [
+              "*"
+            ],
+            "verbs": [
+              "*"
+            ]
+          },
+          {
+            "nonResourceURLs": [
+              "*"
+            ],
+            "verbs": [
+              "*"
+            ]
+          }
+        ],
+        "rule_count": 2,
+        "has_wildcard": true
+      }
+    },
+    {
       "id": "role:cluster:edit",
       "label": "edit",
       "type": "role",
@@ -1004,10 +2154,10 @@
       }
     },
     {
-      "id": "role:cluster:view",
-      "label": "view",
+      "id": "role:cluster:kubeadm:get-nodes",
+      "label": "kubeadm:get-nodes",
       "type": "role",
-      "risk": 3.5,
+      "risk": 3.0,
       "namespace": "cluster",
       "metadata": {
         "cluster_scoped": true,
@@ -1017,207 +2167,83 @@
               ""
             ],
             "resources": [
-              "configmaps",
-              "endpoints",
-              "persistentvolumeclaims",
-              "persistentvolumeclaims/status",
-              "pods",
-              "replicationcontrollers",
-              "replicationcontrollers/scale",
-              "serviceaccounts",
-              "services",
-              "services/status"
+              "nodes"
             ],
             "verbs": [
-              "get",
-              "list",
-              "watch"
+              "get"
+            ]
+          }
+        ],
+        "rule_count": 1,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:nokia-demo-cluster",
+      "label": "nokia-demo-cluster-admin",
+      "type": "role",
+      "risk": 7.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              "*"
+            ],
+            "resources": [
+              "*"
+            ],
+            "verbs": [
+              "*"
+            ]
+          }
+        ],
+        "rule_count": 1,
+        "has_wildcard": true
+      }
+    },
+    {
+      "id": "role:cluster:system:aggregate-to",
+      "label": "system:aggregate-to-admin",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              "authorization.k8s.io"
+            ],
+            "resources": [
+              "localsubjectaccessreviews"
+            ],
+            "verbs": [
+              "create"
             ]
           },
           {
             "apiGroups": [
-              ""
+              "rbac.authorization.k8s.io"
             ],
             "resources": [
-              "bindings",
-              "limitranges",
-              "namespaces/status",
-              "pods/log",
-              "pods/status",
-              "replicationcontrollers/status",
-              "resourcequotas",
-              "resourcequotas/status"
+              "rolebindings",
+              "roles"
             ],
             "verbs": [
+              "create",
+              "delete",
+              "deletecollection",
               "get",
               "list",
-              "watch"
-            ]
-          },
-          {
-            "apiGroups": [
-              ""
-            ],
-            "resources": [
-              "namespaces"
-            ],
-            "verbs": [
-              "get",
-              "list",
-              "watch"
-            ]
-          },
-          {
-            "apiGroups": [
-              "",
-              "events.k8s.io"
-            ],
-            "resources": [
-              "events"
-            ],
-            "verbs": [
-              "get",
-              "list",
-              "watch"
-            ]
-          },
-          {
-            "apiGroups": [
-              "discovery.k8s.io"
-            ],
-            "resources": [
-              "endpointslices"
-            ],
-            "verbs": [
-              "get",
-              "list",
-              "watch"
-            ]
-          },
-          {
-            "apiGroups": [
-              "apps"
-            ],
-            "resources": [
-              "controllerrevisions",
-              "daemonsets",
-              "daemonsets/status",
-              "deployments",
-              "deployments/scale",
-              "deployments/status",
-              "replicasets",
-              "replicasets/scale",
-              "replicasets/status",
-              "statefulsets",
-              "statefulsets/scale",
-              "statefulsets/status"
-            ],
-            "verbs": [
-              "get",
-              "list",
-              "watch"
-            ]
-          },
-          {
-            "apiGroups": [
-              "autoscaling"
-            ],
-            "resources": [
-              "horizontalpodautoscalers",
-              "horizontalpodautoscalers/status"
-            ],
-            "verbs": [
-              "get",
-              "list",
-              "watch"
-            ]
-          },
-          {
-            "apiGroups": [
-              "batch"
-            ],
-            "resources": [
-              "cronjobs",
-              "cronjobs/status",
-              "jobs",
-              "jobs/status"
-            ],
-            "verbs": [
-              "get",
-              "list",
-              "watch"
-            ]
-          },
-          {
-            "apiGroups": [
-              "extensions"
-            ],
-            "resources": [
-              "daemonsets",
-              "daemonsets/status",
-              "deployments",
-              "deployments/scale",
-              "deployments/status",
-              "ingresses",
-              "ingresses/status",
-              "networkpolicies",
-              "replicasets",
-              "replicasets/scale",
-              "replicasets/status",
-              "replicationcontrollers/scale"
-            ],
-            "verbs": [
-              "get",
-              "list",
-              "watch"
-            ]
-          },
-          {
-            "apiGroups": [
-              "policy"
-            ],
-            "resources": [
-              "poddisruptionbudgets",
-              "poddisruptionbudgets/status"
-            ],
-            "verbs": [
-              "get",
-              "list",
-              "watch"
-            ]
-          },
-          {
-            "apiGroups": [
-              "networking.k8s.io"
-            ],
-            "resources": [
-              "ingresses",
-              "ingresses/status",
-              "networkpolicies"
-            ],
-            "verbs": [
-              "get",
-              "list",
-              "watch"
-            ]
-          },
-          {
-            "apiGroups": [
-              "resource.k8s.io"
-            ],
-            "resources": [
-              "resourceclaims",
-              "resourceclaims/status",
-              "resourceclaimtemplates"
-            ],
-            "verbs": [
-              "get",
-              "list",
+              "patch",
+              "update",
               "watch"
             ]
           }
         ],
-        "rule_count": 12,
+        "rule_count": 2,
         "has_wildcard": false
       }
     },
@@ -1485,6 +2511,1511 @@
       }
     },
     {
+      "id": "role:cluster:system:aggregate-to-view",
+      "label": "system:aggregate-to-view",
+      "type": "role",
+      "risk": 3.5,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "configmaps",
+              "endpoints",
+              "persistentvolumeclaims",
+              "persistentvolumeclaims/status",
+              "pods",
+              "replicationcontrollers",
+              "replicationcontrollers/scale",
+              "serviceaccounts",
+              "services",
+              "services/status"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "bindings",
+              "limitranges",
+              "namespaces/status",
+              "pods/log",
+              "pods/status",
+              "replicationcontrollers/status",
+              "resourcequotas",
+              "resourcequotas/status"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "namespaces"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "discovery.k8s.io"
+            ],
+            "resources": [
+              "endpointslices"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "apps"
+            ],
+            "resources": [
+              "controllerrevisions",
+              "daemonsets",
+              "daemonsets/status",
+              "deployments",
+              "deployments/scale",
+              "deployments/status",
+              "replicasets",
+              "replicasets/scale",
+              "replicasets/status",
+              "statefulsets",
+              "statefulsets/scale",
+              "statefulsets/status"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "autoscaling"
+            ],
+            "resources": [
+              "horizontalpodautoscalers",
+              "horizontalpodautoscalers/status"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "batch"
+            ],
+            "resources": [
+              "cronjobs",
+              "cronjobs/status",
+              "jobs",
+              "jobs/status"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "extensions"
+            ],
+            "resources": [
+              "daemonsets",
+              "daemonsets/status",
+              "deployments",
+              "deployments/scale",
+              "deployments/status",
+              "ingresses",
+              "ingresses/status",
+              "networkpolicies",
+              "replicasets",
+              "replicasets/scale",
+              "replicasets/status",
+              "replicationcontrollers/scale"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "policy"
+            ],
+            "resources": [
+              "poddisruptionbudgets",
+              "poddisruptionbudgets/status"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "networking.k8s.io"
+            ],
+            "resources": [
+              "ingresses",
+              "ingresses/status",
+              "networkpolicies"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "resource.k8s.io"
+            ],
+            "resources": [
+              "resourceclaims",
+              "resourceclaims/status",
+              "resourceclaimtemplates"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          }
+        ],
+        "rule_count": 12,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:auth-delegator",
+      "label": "system:auth-delegator",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              "authentication.k8s.io"
+            ],
+            "resources": [
+              "tokenreviews"
+            ],
+            "verbs": [
+              "create"
+            ]
+          },
+          {
+            "apiGroups": [
+              "authorization.k8s.io"
+            ],
+            "resources": [
+              "subjectaccessreviews"
+            ],
+            "verbs": [
+              "create"
+            ]
+          }
+        ],
+        "rule_count": 2,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:basic-user",
+      "label": "system:basic-user",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              "authorization.k8s.io"
+            ],
+            "resources": [
+              "selfsubjectaccessreviews",
+              "selfsubjectrulesreviews"
+            ],
+            "verbs": [
+              "create"
+            ]
+          },
+          {
+            "apiGroups": [
+              "authentication.k8s.io"
+            ],
+            "resources": [
+              "selfsubjectreviews"
+            ],
+            "verbs": [
+              "create"
+            ]
+          }
+        ],
+        "rule_count": 2,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:certificates.k8s.io:certificatesigningrequests:nodeclient",
+      "label": "system:certificates.k8s.io:certificatesigningrequests:nodeclient",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              "certificates.k8s.io"
+            ],
+            "resources": [
+              "certificatesigningrequests/nodeclient"
+            ],
+            "verbs": [
+              "create"
+            ]
+          }
+        ],
+        "rule_count": 1,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:certificates.k8s.io:certificatesigningrequests:selfnodeclient",
+      "label": "system:certificates.k8s.io:certificatesigningrequests:selfnodeclient",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              "certificates.k8s.io"
+            ],
+            "resources": [
+              "certificatesigningrequests/selfnodeclient"
+            ],
+            "verbs": [
+              "create"
+            ]
+          }
+        ],
+        "rule_count": 1,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:certificates.k8s.io:kube-apiserver-client-approver",
+      "label": "system:certificates.k8s.io:kube-apiserver-client-approver",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              "certificates.k8s.io"
+            ],
+            "resourceNames": [
+              "kubernetes.io/kube-apiserver-client"
+            ],
+            "resources": [
+              "signers"
+            ],
+            "verbs": [
+              "approve"
+            ]
+          }
+        ],
+        "rule_count": 1,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:certificates.k8s.io:kube-apiserver-client-kubelet-approver",
+      "label": "system:certificates.k8s.io:kube-apiserver-client-kubelet-approver",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              "certificates.k8s.io"
+            ],
+            "resourceNames": [
+              "kubernetes.io/kube-apiserver-client-kubelet"
+            ],
+            "resources": [
+              "signers"
+            ],
+            "verbs": [
+              "approve"
+            ]
+          }
+        ],
+        "rule_count": 1,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:certificates.k8s.io:kubelet-serving-approver",
+      "label": "system:certificates.k8s.io:kubelet-serving-approver",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              "certificates.k8s.io"
+            ],
+            "resourceNames": [
+              "kubernetes.io/kubelet-serving"
+            ],
+            "resources": [
+              "signers"
+            ],
+            "verbs": [
+              "approve"
+            ]
+          }
+        ],
+        "rule_count": 1,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:certificates.k8s.io:legacy-unknown-approver",
+      "label": "system:certificates.k8s.io:legacy-unknown-approver",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              "certificates.k8s.io"
+            ],
+            "resourceNames": [
+              "kubernetes.io/legacy-unknown"
+            ],
+            "resources": [
+              "signers"
+            ],
+            "verbs": [
+              "approve"
+            ]
+          }
+        ],
+        "rule_count": 1,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:controller:attachdetach-controller",
+      "label": "system:controller:attachdetach-controller",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "persistentvolumeclaims",
+              "persistentvolumes"
+            ],
+            "verbs": [
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "nodes"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "nodes/status"
+            ],
+            "verbs": [
+              "patch",
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "pods"
+            ],
+            "verbs": [
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              "storage.k8s.io"
+            ],
+            "resources": [
+              "volumeattachments"
+            ],
+            "verbs": [
+              "create",
+              "delete",
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "storage.k8s.io"
+            ],
+            "resources": [
+              "csidrivers"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "storage.k8s.io"
+            ],
+            "resources": [
+              "csinodes"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          }
+        ],
+        "rule_count": 8,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:controller:certificate-controller",
+      "label": "system:controller:certificate-controller",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              "certificates.k8s.io"
+            ],
+            "resources": [
+              "certificatesigningrequests"
+            ],
+            "verbs": [
+              "delete",
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "certificates.k8s.io"
+            ],
+            "resources": [
+              "certificatesigningrequests/approval",
+              "certificatesigningrequests/status"
+            ],
+            "verbs": [
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              "certificates.k8s.io"
+            ],
+            "resourceNames": [
+              "kubernetes.io/kube-apiserver-client-kubelet"
+            ],
+            "resources": [
+              "signers"
+            ],
+            "verbs": [
+              "approve"
+            ]
+          },
+          {
+            "apiGroups": [
+              "certificates.k8s.io"
+            ],
+            "resourceNames": [
+              "kubernetes.io/kube-apiserver-client",
+              "kubernetes.io/kube-apiserver-client-kubelet",
+              "kubernetes.io/kubelet-serving",
+              "kubernetes.io/legacy-unknown"
+            ],
+            "resources": [
+              "signers"
+            ],
+            "verbs": [
+              "sign"
+            ]
+          },
+          {
+            "apiGroups": [
+              "authorization.k8s.io"
+            ],
+            "resources": [
+              "subjectaccessreviews"
+            ],
+            "verbs": [
+              "create"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          }
+        ],
+        "rule_count": 6,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:controller:clusterrole-aggregation",
+      "label": "system:controller:clusterrole-aggregation-controller",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              "rbac.authorization.k8s.io"
+            ],
+            "resources": [
+              "clusterroles"
+            ],
+            "verbs": [
+              "escalate",
+              "get",
+              "list",
+              "patch",
+              "update",
+              "watch"
+            ]
+          }
+        ],
+        "rule_count": 1,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:controller:cronjob-controller",
+      "label": "system:controller:cronjob-controller",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              "batch"
+            ],
+            "resources": [
+              "cronjobs"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "update",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "batch"
+            ],
+            "resources": [
+              "jobs"
+            ],
+            "verbs": [
+              "create",
+              "delete",
+              "get",
+              "list",
+              "patch",
+              "update",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "batch"
+            ],
+            "resources": [
+              "cronjobs/status"
+            ],
+            "verbs": [
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              "batch"
+            ],
+            "resources": [
+              "cronjobs/finalizers"
+            ],
+            "verbs": [
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "pods"
+            ],
+            "verbs": [
+              "delete",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          }
+        ],
+        "rule_count": 6,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:controller:daemon-set",
+      "label": "system:controller:daemon-set-controller",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              "apps",
+              "extensions"
+            ],
+            "resources": [
+              "daemonsets"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "apps",
+              "extensions"
+            ],
+            "resources": [
+              "daemonsets/status"
+            ],
+            "verbs": [
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              "apps",
+              "extensions"
+            ],
+            "resources": [
+              "daemonsets/finalizers"
+            ],
+            "verbs": [
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "nodes"
+            ],
+            "verbs": [
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "pods"
+            ],
+            "verbs": [
+              "create",
+              "delete",
+              "list",
+              "patch",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "pods/binding"
+            ],
+            "verbs": [
+              "create"
+            ]
+          },
+          {
+            "apiGroups": [
+              "apps"
+            ],
+            "resources": [
+              "controllerrevisions"
+            ],
+            "verbs": [
+              "create",
+              "delete",
+              "get",
+              "list",
+              "patch",
+              "update",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          }
+        ],
+        "rule_count": 8,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:controller:deployment-controller",
+      "label": "system:controller:deployment-controller",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              "apps",
+              "extensions"
+            ],
+            "resources": [
+              "deployments"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "update",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "apps",
+              "extensions"
+            ],
+            "resources": [
+              "deployments/status"
+            ],
+            "verbs": [
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              "apps",
+              "extensions"
+            ],
+            "resources": [
+              "deployments/finalizers"
+            ],
+            "verbs": [
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              "apps",
+              "extensions"
+            ],
+            "resources": [
+              "replicasets"
+            ],
+            "verbs": [
+              "create",
+              "delete",
+              "get",
+              "list",
+              "patch",
+              "update",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "pods"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "update",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          }
+        ],
+        "rule_count": 6,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:controller:disruption-controller",
+      "label": "system:controller:disruption-controller",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              "apps",
+              "extensions"
+            ],
+            "resources": [
+              "deployments"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "apps",
+              "extensions"
+            ],
+            "resources": [
+              "replicasets"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "replicationcontrollers"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "policy"
+            ],
+            "resources": [
+              "poddisruptionbudgets"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "apps"
+            ],
+            "resources": [
+              "statefulsets"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "policy"
+            ],
+            "resources": [
+              "poddisruptionbudgets/status"
+            ],
+            "verbs": [
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "pods/status"
+            ],
+            "verbs": [
+              "patch",
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              "*"
+            ],
+            "resources": [
+              "*/scale"
+            ],
+            "verbs": [
+              "get"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          }
+        ],
+        "rule_count": 9,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:controller:endpoint-controller",
+      "label": "system:controller:endpoint-controller",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "pods",
+              "services"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "endpoints"
+            ],
+            "verbs": [
+              "create",
+              "delete",
+              "get",
+              "list",
+              "update",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "endpoints/restricted"
+            ],
+            "verbs": [
+              "create"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          }
+        ],
+        "rule_count": 4,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:controller:endpointslice-controller",
+      "label": "system:controller:endpointslice-controller",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "nodes",
+              "pods",
+              "services"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "services/finalizers"
+            ],
+            "verbs": [
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              "discovery.k8s.io"
+            ],
+            "resources": [
+              "endpointslices"
+            ],
+            "verbs": [
+              "create",
+              "delete",
+              "get",
+              "list",
+              "update",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          }
+        ],
+        "rule_count": 4,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:controller:endpointslicemirroring-controller",
+      "label": "system:controller:endpointslicemirroring-controller",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "endpoints",
+              "services"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "services/finalizers"
+            ],
+            "verbs": [
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "endpoints/finalizers"
+            ],
+            "verbs": [
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              "discovery.k8s.io"
+            ],
+            "resources": [
+              "endpointslices"
+            ],
+            "verbs": [
+              "create",
+              "delete",
+              "get",
+              "list",
+              "update",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          }
+        ],
+        "rule_count": 5,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:controller:ephemeral-volume",
+      "label": "system:controller:ephemeral-volume-controller",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "pods"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "pods/finalizers"
+            ],
+            "verbs": [
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "persistentvolumeclaims"
+            ],
+            "verbs": [
+              "create",
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          }
+        ],
+        "rule_count": 4,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:controller:expand-controller",
+      "label": "system:controller:expand-controller",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "persistentvolumes"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "patch",
+              "update",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "persistentvolumeclaims/status"
+            ],
+            "verbs": [
+              "patch",
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "persistentvolumeclaims"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "services"
+            ],
+            "verbs": [
+              "get"
+            ]
+          }
+        ],
+        "rule_count": 5,
+        "has_wildcard": false
+      }
+    },
+    {
       "id": "role:cluster:system:controller:generic-garbage-collector",
       "label": "system:controller:generic-garbage-collector",
       "type": "role",
@@ -1643,6 +4174,126 @@
       }
     },
     {
+      "id": "role:cluster:system:controller:job-controller",
+      "label": "system:controller:job-controller",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              "batch"
+            ],
+            "resources": [
+              "jobs"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "patch",
+              "update",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "batch"
+            ],
+            "resources": [
+              "jobs/status"
+            ],
+            "verbs": [
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              "batch"
+            ],
+            "resources": [
+              "jobs/finalizers"
+            ],
+            "verbs": [
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "pods"
+            ],
+            "verbs": [
+              "create",
+              "delete",
+              "list",
+              "patch",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          }
+        ],
+        "rule_count": 5,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:controller:legacy-service-account-token-cleaner",
+      "label": "system:controller:legacy-service-account-token-cleaner",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resourceNames": [
+              "kube-apiserver-legacy-service-account-token-tracking"
+            ],
+            "resources": [
+              "configmaps"
+            ],
+            "verbs": [
+              "get"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "secrets"
+            ],
+            "verbs": [
+              "delete",
+              "patch"
+            ]
+          }
+        ],
+        "rule_count": 2,
+        "has_wildcard": false
+      }
+    },
+    {
       "id": "role:cluster:system:controller:namespace-controller",
       "label": "system:controller:namespace-controller",
       "type": "role",
@@ -1698,6 +4349,631 @@
       }
     },
     {
+      "id": "role:cluster:system:controller:node-controller",
+      "label": "system:controller:node-controller",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "nodes"
+            ],
+            "verbs": [
+              "delete",
+              "get",
+              "list",
+              "patch",
+              "update",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "nodes/status"
+            ],
+            "verbs": [
+              "patch",
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "pods/status"
+            ],
+            "verbs": [
+              "patch",
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "pods"
+            ],
+            "verbs": [
+              "delete",
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          }
+        ],
+        "rule_count": 5,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:controller:persistent-volume-binder",
+      "label": "system:controller:persistent-volume-binder",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "persistentvolumes"
+            ],
+            "verbs": [
+              "create",
+              "delete",
+              "get",
+              "list",
+              "update",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "persistentvolumes/status"
+            ],
+            "verbs": [
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "persistentvolumeclaims"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "update",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "persistentvolumeclaims/status"
+            ],
+            "verbs": [
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "pods"
+            ],
+            "verbs": [
+              "create",
+              "delete",
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "storage.k8s.io"
+            ],
+            "resources": [
+              "storageclasses"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "nodes"
+            ],
+            "verbs": [
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "services"
+            ],
+            "verbs": [
+              "get"
+            ]
+          }
+        ],
+        "rule_count": 10,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:controller:pod-garbage-collector",
+      "label": "system:controller:pod-garbage-collector",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "pods"
+            ],
+            "verbs": [
+              "delete",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "nodes"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "pods/status"
+            ],
+            "verbs": [
+              "patch"
+            ]
+          }
+        ],
+        "rule_count": 3,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:controller:pv-protection",
+      "label": "system:controller:pv-protection-controller",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "persistentvolumes"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "update",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          }
+        ],
+        "rule_count": 2,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:controller:pvc-protection",
+      "label": "system:controller:pvc-protection-controller",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "persistentvolumeclaims"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "update",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "pods"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          }
+        ],
+        "rule_count": 3,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:controller:replicaset-controller",
+      "label": "system:controller:replicaset-controller",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              "apps",
+              "extensions"
+            ],
+            "resources": [
+              "replicasets"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "update",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "apps",
+              "extensions"
+            ],
+            "resources": [
+              "replicasets/status"
+            ],
+            "verbs": [
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              "apps",
+              "extensions"
+            ],
+            "resources": [
+              "replicasets/finalizers"
+            ],
+            "verbs": [
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "pods"
+            ],
+            "verbs": [
+              "create",
+              "delete",
+              "list",
+              "patch",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          }
+        ],
+        "rule_count": 5,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:controller:replication-controller",
+      "label": "system:controller:replication-controller",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "replicationcontrollers"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "update",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "replicationcontrollers/status"
+            ],
+            "verbs": [
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "replicationcontrollers/finalizers"
+            ],
+            "verbs": [
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "pods"
+            ],
+            "verbs": [
+              "create",
+              "delete",
+              "list",
+              "patch",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          }
+        ],
+        "rule_count": 5,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:controller:resource-claim",
+      "label": "system:controller:resource-claim-controller",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "pods"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "pods/finalizers"
+            ],
+            "verbs": [
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              "resource.k8s.io"
+            ],
+            "resources": [
+              "resourceclaims"
+            ],
+            "verbs": [
+              "create",
+              "delete",
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "resource.k8s.io"
+            ],
+            "resources": [
+              "resourceclaims",
+              "resourceclaims/status"
+            ],
+            "verbs": [
+              "patch",
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "pods/status"
+            ],
+            "verbs": [
+              "patch",
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          }
+        ],
+        "rule_count": 6,
+        "has_wildcard": false
+      }
+    },
+    {
       "id": "role:cluster:system:controller:resourcequota-controller",
       "label": "system:controller:resourcequota-controller",
       "type": "role",
@@ -1746,6 +5022,855 @@
         ],
         "rule_count": 3,
         "has_wildcard": true
+      }
+    },
+    {
+      "id": "role:cluster:system:controller:root-ca-cert-publisher",
+      "label": "system:controller:root-ca-cert-publisher",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "configmaps"
+            ],
+            "verbs": [
+              "create",
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          }
+        ],
+        "rule_count": 2,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:controller:route-controller",
+      "label": "system:controller:route-controller",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "nodes"
+            ],
+            "verbs": [
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "nodes/status"
+            ],
+            "verbs": [
+              "patch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          }
+        ],
+        "rule_count": 3,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:controller:selinux-warning",
+      "label": "system:controller:selinux-warning-controller",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "persistentvolumes"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "persistentvolumeclaims"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "pods"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "storage.k8s.io"
+            ],
+            "resources": [
+              "csidrivers"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          }
+        ],
+        "rule_count": 5,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:controller:service-account",
+      "label": "system:controller:service-account-controller",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "serviceaccounts"
+            ],
+            "verbs": [
+              "create"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          }
+        ],
+        "rule_count": 2,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:controller:service-cidrs",
+      "label": "system:controller:service-cidrs-controller",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              "networking.k8s.io"
+            ],
+            "resources": [
+              "servicecidrs"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "patch",
+              "update",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "networking.k8s.io"
+            ],
+            "resources": [
+              "servicecidrs/finalizers"
+            ],
+            "verbs": [
+              "patch",
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              "networking.k8s.io"
+            ],
+            "resources": [
+              "servicecidrs/status"
+            ],
+            "verbs": [
+              "patch",
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              "networking.k8s.io"
+            ],
+            "resources": [
+              "ipaddresses"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          }
+        ],
+        "rule_count": 5,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:controller:service-controller",
+      "label": "system:controller:service-controller",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "services"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "services/status"
+            ],
+            "verbs": [
+              "patch",
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "nodes"
+            ],
+            "verbs": [
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          }
+        ],
+        "rule_count": 4,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:controller:statefulset-controller",
+      "label": "system:controller:statefulset-controller",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "pods"
+            ],
+            "verbs": [
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "apps"
+            ],
+            "resources": [
+              "statefulsets"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "apps"
+            ],
+            "resources": [
+              "statefulsets/status"
+            ],
+            "verbs": [
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              "apps"
+            ],
+            "resources": [
+              "statefulsets/finalizers"
+            ],
+            "verbs": [
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "pods"
+            ],
+            "verbs": [
+              "create",
+              "delete",
+              "get",
+              "patch",
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              "apps"
+            ],
+            "resources": [
+              "controllerrevisions"
+            ],
+            "verbs": [
+              "create",
+              "delete",
+              "get",
+              "list",
+              "patch",
+              "update",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "persistentvolumeclaims"
+            ],
+            "verbs": [
+              "create",
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "persistentvolumeclaims"
+            ],
+            "verbs": [
+              "delete",
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "pods/finalizers"
+            ],
+            "verbs": [
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          }
+        ],
+        "rule_count": 10,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:controller:ttl-after-finished",
+      "label": "system:controller:ttl-after-finished-controller",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              "batch"
+            ],
+            "resources": [
+              "jobs"
+            ],
+            "verbs": [
+              "delete",
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          }
+        ],
+        "rule_count": 2,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:controller:ttl-controller",
+      "label": "system:controller:ttl-controller",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "nodes"
+            ],
+            "verbs": [
+              "list",
+              "patch",
+              "update",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          }
+        ],
+        "rule_count": 2,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:controller:validatingadmissionpolicy-status",
+      "label": "system:controller:validatingadmissionpolicy-status-controller",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              "admissionregistration.k8s.io"
+            ],
+            "resources": [
+              "validatingadmissionpolicies"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "admissionregistration.k8s.io"
+            ],
+            "resources": [
+              "validatingadmissionpolicies/status"
+            ],
+            "verbs": [
+              "get",
+              "patch",
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          }
+        ],
+        "rule_count": 3,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:controller:volumeattributesclass-protection",
+      "label": "system:controller:volumeattributesclass-protection-controller",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "persistentvolumeclaims"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "persistentvolumes"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "storage.k8s.io"
+            ],
+            "resources": [
+              "volumeattributesclasses"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "update",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          }
+        ],
+        "rule_count": 4,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:coredns",
+      "label": "system:coredns",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "endpoints",
+              "services",
+              "pods",
+              "namespaces"
+            ],
+            "verbs": [
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "discovery.k8s.io"
+            ],
+            "resources": [
+              "endpointslices"
+            ],
+            "verbs": [
+              "list",
+              "watch"
+            ]
+          }
+        ],
+        "rule_count": 2,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:discovery",
+      "label": "system:discovery",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "nonResourceURLs": [
+              "/api",
+              "/api/*",
+              "/apis",
+              "/apis/*",
+              "/healthz",
+              "/livez",
+              "/openapi",
+              "/openapi/*",
+              "/readyz",
+              "/version",
+              "/version/"
+            ],
+            "verbs": [
+              "get"
+            ]
+          }
+        ],
+        "rule_count": 1,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:heapster",
+      "label": "system:heapster",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "events",
+              "namespaces",
+              "nodes",
+              "pods"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "extensions"
+            ],
+            "resources": [
+              "deployments"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          }
+        ],
+        "rule_count": 2,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:kube-aggregator",
+      "label": "system:kube-aggregator",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "endpoints",
+              "services"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          }
+        ],
+        "rule_count": 1,
+        "has_wildcard": false
       }
     },
     {
@@ -1897,6 +6022,380 @@
       }
     },
     {
+      "id": "role:cluster:system:kube-dns",
+      "label": "system:kube-dns",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "endpoints",
+              "services"
+            ],
+            "verbs": [
+              "list",
+              "watch"
+            ]
+          }
+        ],
+        "rule_count": 1,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:kube-scheduler",
+      "label": "system:kube-scheduler",
+      "type": "role",
+      "risk": 3.5,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              "coordination.k8s.io"
+            ],
+            "resources": [
+              "leases"
+            ],
+            "verbs": [
+              "create"
+            ]
+          },
+          {
+            "apiGroups": [
+              "coordination.k8s.io"
+            ],
+            "resourceNames": [
+              "kube-scheduler"
+            ],
+            "resources": [
+              "leases"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "update",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "coordination.k8s.io"
+            ],
+            "resources": [
+              "leasecandidates"
+            ],
+            "verbs": [
+              "create",
+              "delete",
+              "deletecollection",
+              "get",
+              "list",
+              "patch",
+              "update",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "nodes"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "pods"
+            ],
+            "verbs": [
+              "delete",
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "bindings",
+              "pods/binding"
+            ],
+            "verbs": [
+              "create"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "pods/status"
+            ],
+            "verbs": [
+              "patch",
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "replicationcontrollers",
+              "services"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "apps",
+              "extensions"
+            ],
+            "resources": [
+              "replicasets"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "apps"
+            ],
+            "resources": [
+              "statefulsets"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "policy"
+            ],
+            "resources": [
+              "poddisruptionbudgets"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "persistentvolumeclaims",
+              "persistentvolumes"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "authentication.k8s.io"
+            ],
+            "resources": [
+              "tokenreviews"
+            ],
+            "verbs": [
+              "create"
+            ]
+          },
+          {
+            "apiGroups": [
+              "authorization.k8s.io"
+            ],
+            "resources": [
+              "subjectaccessreviews"
+            ],
+            "verbs": [
+              "create"
+            ]
+          },
+          {
+            "apiGroups": [
+              "storage.k8s.io"
+            ],
+            "resources": [
+              "csinodes"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "storage.k8s.io"
+            ],
+            "resources": [
+              "volumeattachments"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "namespaces"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "storage.k8s.io"
+            ],
+            "resources": [
+              "csidrivers"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "storage.k8s.io"
+            ],
+            "resources": [
+              "csistoragecapacities"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "resource.k8s.io"
+            ],
+            "resources": [
+              "deviceclasses"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "resource.k8s.io"
+            ],
+            "resources": [
+              "resourceclaims"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "patch",
+              "update",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "resource.k8s.io"
+            ],
+            "resources": [
+              "resourceclaims/status"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "patch",
+              "update",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "pods/finalizers"
+            ],
+            "verbs": [
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              "resource.k8s.io"
+            ],
+            "resources": [
+              "resourceslices"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          }
+        ],
+        "rule_count": 25,
+        "has_wildcard": false
+      }
+    },
+    {
       "id": "role:cluster:system:kubelet-api",
       "label": "system:kubelet-api-admin",
       "type": "role",
@@ -1959,6 +6458,46 @@
         ],
         "rule_count": 4,
         "has_wildcard": true
+      }
+    },
+    {
+      "id": "role:cluster:system:monitoring",
+      "label": "system:monitoring",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "nonResourceURLs": [
+              "/healthz",
+              "/healthz/*",
+              "/livez",
+              "/livez/*",
+              "/metrics",
+              "/metrics/slis",
+              "/readyz",
+              "/readyz/*"
+            ],
+            "verbs": [
+              "get"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "nodes/metrics"
+            ],
+            "verbs": [
+              "get"
+            ]
+          }
+        ],
+        "rule_count": 2,
+        "has_wildcard": false
       }
     },
     {
@@ -2287,23 +6826,1491 @@
       }
     },
     {
-      "id": "service_account:kube-system:default",
-      "label": "default",
+      "id": "role:cluster:system:node-bootstrapper",
+      "label": "system:node-bootstrapper",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              "certificates.k8s.io"
+            ],
+            "resources": [
+              "certificatesigningrequests"
+            ],
+            "verbs": [
+              "create",
+              "get",
+              "list",
+              "watch"
+            ]
+          }
+        ],
+        "rule_count": 1,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:node-problem-detector",
+      "label": "system:node-problem-detector",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "nodes"
+            ],
+            "verbs": [
+              "get"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "nodes/status"
+            ],
+            "verbs": [
+              "patch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          }
+        ],
+        "rule_count": 3,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:node-proxier",
+      "label": "system:node-proxier",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "endpoints",
+              "services"
+            ],
+            "verbs": [
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "nodes"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          },
+          {
+            "apiGroups": [
+              "networking.k8s.io"
+            ],
+            "resources": [
+              "servicecidrs"
+            ],
+            "verbs": [
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "discovery.k8s.io"
+            ],
+            "resources": [
+              "endpointslices"
+            ],
+            "verbs": [
+              "list",
+              "watch"
+            ]
+          }
+        ],
+        "rule_count": 5,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:persistent-volume-provisioner",
+      "label": "system:persistent-volume-provisioner",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "persistentvolumes"
+            ],
+            "verbs": [
+              "create",
+              "delete",
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "persistentvolumeclaims"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "update",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "storage.k8s.io"
+            ],
+            "resources": [
+              "storageclasses"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "create",
+              "patch",
+              "update"
+            ]
+          }
+        ],
+        "rule_count": 5,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:public-info-viewer",
+      "label": "system:public-info-viewer",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "nonResourceURLs": [
+              "/healthz",
+              "/livez",
+              "/readyz",
+              "/version",
+              "/version/"
+            ],
+            "verbs": [
+              "get"
+            ]
+          }
+        ],
+        "rule_count": 1,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:service-account-issuer-discovery",
+      "label": "system:service-account-issuer-discovery",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "nonResourceURLs": [
+              "/.well-known/openid-configuration",
+              "/.well-known/openid-configuration/",
+              "/openid/v1/jwks",
+              "/openid/v1/jwks/"
+            ],
+            "verbs": [
+              "get"
+            ]
+          }
+        ],
+        "rule_count": 1,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:system:volume-scheduler",
+      "label": "system:volume-scheduler",
+      "type": "role",
+      "risk": 3.0,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "persistentvolumes"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "patch",
+              "update",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "storage.k8s.io"
+            ],
+            "resources": [
+              "storageclasses"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "persistentvolumeclaims"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "patch",
+              "update",
+              "watch"
+            ]
+          }
+        ],
+        "rule_count": 3,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "role:cluster:view",
+      "label": "view",
+      "type": "role",
+      "risk": 3.5,
+      "namespace": "cluster",
+      "metadata": {
+        "cluster_scoped": true,
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "configmaps",
+              "endpoints",
+              "persistentvolumeclaims",
+              "persistentvolumeclaims/status",
+              "pods",
+              "replicationcontrollers",
+              "replicationcontrollers/scale",
+              "serviceaccounts",
+              "services",
+              "services/status"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "bindings",
+              "limitranges",
+              "namespaces/status",
+              "pods/log",
+              "pods/status",
+              "replicationcontrollers/status",
+              "resourcequotas",
+              "resourcequotas/status"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "namespaces"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "",
+              "events.k8s.io"
+            ],
+            "resources": [
+              "events"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "discovery.k8s.io"
+            ],
+            "resources": [
+              "endpointslices"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "apps"
+            ],
+            "resources": [
+              "controllerrevisions",
+              "daemonsets",
+              "daemonsets/status",
+              "deployments",
+              "deployments/scale",
+              "deployments/status",
+              "replicasets",
+              "replicasets/scale",
+              "replicasets/status",
+              "statefulsets",
+              "statefulsets/scale",
+              "statefulsets/status"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "autoscaling"
+            ],
+            "resources": [
+              "horizontalpodautoscalers",
+              "horizontalpodautoscalers/status"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "batch"
+            ],
+            "resources": [
+              "cronjobs",
+              "cronjobs/status",
+              "jobs",
+              "jobs/status"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "extensions"
+            ],
+            "resources": [
+              "daemonsets",
+              "daemonsets/status",
+              "deployments",
+              "deployments/scale",
+              "deployments/status",
+              "ingresses",
+              "ingresses/status",
+              "networkpolicies",
+              "replicasets",
+              "replicasets/scale",
+              "replicasets/status",
+              "replicationcontrollers/scale"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "policy"
+            ],
+            "resources": [
+              "poddisruptionbudgets",
+              "poddisruptionbudgets/status"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "networking.k8s.io"
+            ],
+            "resources": [
+              "ingresses",
+              "ingresses/status",
+              "networkpolicies"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          },
+          {
+            "apiGroups": [
+              "resource.k8s.io"
+            ],
+            "resources": [
+              "resourceclaims",
+              "resourceclaims/status",
+              "resourceclaimtemplates"
+            ],
+            "verbs": [
+              "get",
+              "list",
+              "watch"
+            ]
+          }
+        ],
+        "rule_count": 12,
+        "has_wildcard": false
+      }
+    },
+    {
+      "id": "secret:kube-system:bootstrap-token-7zk80k",
+      "label": "bootstrap-token-7zk80k",
+      "type": "secret",
+      "risk": 4.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "secret_type": "bootstrap.kubernetes.io/token",
+        "is_db_creds": false,
+        "is_tls": false,
+        "is_token": false
+      }
+    },
+    {
+      "id": "secret:nokia-demo:api-token",
+      "label": "api-token",
+      "type": "secret",
+      "risk": 4.0,
+      "namespace": "nokia-demo",
+      "metadata": {
+        "secret_type": "Opaque",
+        "is_db_creds": false,
+        "is_tls": false,
+        "is_token": false
+      }
+    },
+    {
+      "id": "secret:nokia-demo:db-credentials",
+      "label": "db-credentials",
+      "type": "secret",
+      "risk": 7.5,
+      "namespace": "nokia-demo",
+      "metadata": {
+        "secret_type": "Opaque",
+        "is_db_creds": true,
+        "is_tls": false,
+        "is_token": false
+      }
+    },
+    {
+      "id": "database:nokia-demo:db-db-credentials",
+      "label": "db-inferred-from-db-credentials",
+      "type": "database",
+      "risk": 9.0,
+      "namespace": "nokia-demo",
+      "metadata": {
+        "inferred": true,
+        "source_secret": "db-credentials"
+      }
+    },
+    {
+      "id": "user:kube-public:system:anonymous",
+      "label": "system:anonymous",
+      "type": "user",
+      "risk": 4.0,
+      "namespace": "kube-public",
+      "metadata": {}
+    },
+    {
+      "id": "user:kube-system:system:kube-controller-manager",
+      "label": "system:kube-controller-manager",
+      "type": "user",
+      "risk": 4.0,
+      "namespace": "kube-system",
+      "metadata": {}
+    },
+    {
+      "id": "user:kube-system:system:kube-scheduler",
+      "label": "system:kube-scheduler",
+      "type": "user",
+      "risk": 4.0,
+      "namespace": "kube-system",
+      "metadata": {}
+    },
+    {
+      "id": "service_account:kube-system:kube-controller-manager",
+      "label": "kube-controller-manager",
       "type": "service_account",
       "risk": 5.0,
       "namespace": "kube-system",
       "metadata": {
         "inferred": true
       }
+    },
+    {
+      "id": "service_account:kube-system:leader-election",
+      "label": "leader-election-controller",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "inferred": true
+      }
+    },
+    {
+      "id": "service_account:kube-system:kube-scheduler",
+      "label": "kube-scheduler",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "inferred": true
+      }
+    },
+    {
+      "id": "service_account:kube-system:cloud-provider",
+      "label": "cloud-provider",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "inferred": true
+      }
+    },
+    {
+      "id": "user:nokia-demo:dev-1",
+      "label": "dev-1",
+      "type": "user",
+      "risk": 4.0,
+      "namespace": "nokia-demo",
+      "metadata": {}
+    },
+    {
+      "id": "user:cluster:ci-bot",
+      "label": "ci-bot",
+      "type": "user",
+      "risk": 4.0,
+      "namespace": "cluster",
+      "metadata": {}
+    },
+    {
+      "id": "service_account:kube-system:route-controller",
+      "label": "route-controller",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "inferred": true
+      }
+    },
+    {
+      "id": "service_account:kube-system:selinux-warning",
+      "label": "selinux-warning-controller",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "inferred": true
+      }
+    },
+    {
+      "id": "service_account:kube-system:service-controller",
+      "label": "service-controller",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "inferred": true
+      }
+    },
+    {
+      "id": "user:cluster:system:kube-controller-manager",
+      "label": "system:kube-controller-manager",
+      "type": "user",
+      "risk": 4.0,
+      "namespace": "cluster",
+      "metadata": {}
+    },
+    {
+      "id": "service_account:kube-system:kube-dns",
+      "label": "kube-dns",
+      "type": "service_account",
+      "risk": 5.0,
+      "namespace": "kube-system",
+      "metadata": {
+        "inferred": true
+      }
+    },
+    {
+      "id": "user:cluster:system:kube-scheduler",
+      "label": "system:kube-scheduler",
+      "type": "user",
+      "risk": 4.0,
+      "namespace": "cluster",
+      "metadata": {}
+    },
+    {
+      "id": "user:cluster:system:kube-proxy",
+      "label": "system:kube-proxy",
+      "type": "user",
+      "risk": 4.0,
+      "namespace": "cluster",
+      "metadata": {}
     }
   ],
   "edges": [
+    {
+      "source": "pod:kube-system:coredns-7d764666f9",
+      "target": "service_account:kube-system:coredns",
+      "relation": "uses",
+      "risk": 3.5,
+      "weight": 6.5
+    },
+    {
+      "source": "pod:kube-system:etcd-minikube",
+      "target": "service_account:kube-system:default",
+      "relation": "uses",
+      "risk": 5.0,
+      "weight": 5.0
+    },
+    {
+      "source": "pod:kube-system:kube-apiserver-minikube",
+      "target": "service_account:kube-system:default",
+      "relation": "uses",
+      "risk": 5.0,
+      "weight": 5.0
+    },
+    {
+      "source": "pod:kube-system:kube-controller-manager-minikube",
+      "target": "service_account:kube-system:default",
+      "relation": "uses",
+      "risk": 5.0,
+      "weight": 5.0
+    },
+    {
+      "source": "pod:kube-system:kube-proxy",
+      "target": "service_account:kube-system:kube-proxy",
+      "relation": "uses",
+      "risk": 8.0,
+      "weight": 2.0
+    },
+    {
+      "source": "pod:kube-system:kube-scheduler-minikube",
+      "target": "service_account:kube-system:default",
+      "relation": "uses",
+      "risk": 5.0,
+      "weight": 5.0
+    },
+    {
+      "source": "pod:kube-system:storage-provisioner",
+      "target": "service_account:kube-system:storage-provisioner",
+      "relation": "uses",
+      "risk": 5.0,
+      "weight": 5.0
+    },
+    {
+      "source": "pod:nokia-demo:api-server",
+      "target": "service_account:nokia-demo:backend-sa",
+      "relation": "uses",
+      "risk": 3.5,
+      "weight": 6.5
+    },
+    {
+      "source": "pod:nokia-demo:billing-db",
+      "target": "service_account:nokia-demo:backend-sa",
+      "relation": "uses",
+      "risk": 3.5,
+      "weight": 6.5
+    },
+    {
+      "source": "pod:nokia-demo:metrics-collector",
+      "target": "service_account:nokia-demo:metrics-sa",
+      "relation": "uses",
+      "risk": 3.5,
+      "weight": 6.5
+    },
+    {
+      "source": "pod:nokia-demo:web-server",
+      "target": "service_account:nokia-demo:backend-sa",
+      "relation": "uses",
+      "risk": 3.5,
+      "weight": 6.5
+    },
+    {
+      "source": "secret:nokia-demo:db-credentials",
+      "target": "database:nokia-demo:db-db-credentials",
+      "relation": "exposes",
+      "risk": 8.5,
+      "weight": 1.5
+    },
+    {
+      "source": "user:kube-public:system:anonymous",
+      "target": "role:kube-public:kubeadm:bootstrap-signer-clusterinfo",
+      "relation": "bound-to",
+      "risk": 4.0,
+      "weight": 6.0
+    },
+    {
+      "source": "service_account:kube-system:bootstrap-signer",
+      "target": "role:kube-public:system:controller:bootstrap-signer",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "user:kube-system:system:kube-controller-manager",
+      "target": "role:kube-system:extension-apiserver-authentication-reader",
+      "relation": "bound-to",
+      "risk": 4.0,
+      "weight": 6.0
+    },
+    {
+      "source": "user:kube-system:system:kube-scheduler",
+      "target": "role:kube-system:extension-apiserver-authentication-reader",
+      "relation": "bound-to",
+      "risk": 4.0,
+      "weight": 6.0
+    },
+    {
+      "source": "user:kube-system:system:kube-controller-manager",
+      "target": "role:kube-system:system::leader-locking-kube-controller-manager",
+      "relation": "bound-to",
+      "risk": 4.0,
+      "weight": 6.0
+    },
+    {
+      "source": "service_account:kube-system:kube-controller-manager",
+      "target": "role:kube-system:system::leader-locking-kube-controller-manager",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:leader-election",
+      "target": "role:kube-system:system::leader-locking-kube-controller-manager",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "user:kube-system:system:kube-scheduler",
+      "target": "role:kube-system:system::leader-locking-kube-scheduler",
+      "relation": "bound-to",
+      "risk": 4.0,
+      "weight": 6.0
+    },
+    {
+      "source": "service_account:kube-system:kube-scheduler",
+      "target": "role:kube-system:system::leader-locking-kube-scheduler",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:bootstrap-signer",
+      "target": "role:kube-system:system:controller:bootstrap-signer",
+      "relation": "bound-to",
+      "risk": 4.5,
+      "weight": 5.5
+    },
+    {
+      "source": "role:kube-system:system:controller:bootstrap-signer",
+      "target": "secret:kube-system:bootstrap-token-7zk80k",
+      "relation": "can-read",
+      "risk": 4.5,
+      "weight": 5.5
+    },
+    {
+      "source": "service_account:kube-system:cloud-provider",
+      "target": "role:kube-system:system:controller:cloud-provider",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:token-cleaner",
+      "target": "role:kube-system:system:controller:token-cleaner",
+      "relation": "bound-to",
+      "risk": 4.5,
+      "weight": 5.5
+    },
+    {
+      "source": "role:kube-system:system:controller:token-cleaner",
+      "target": "secret:kube-system:bootstrap-token-7zk80k",
+      "relation": "can-read",
+      "risk": 4.5,
+      "weight": 5.5
+    },
+    {
+      "source": "service_account:kube-system:storage-provisioner",
+      "target": "role:kube-system:system:persistent-volume-provisioner",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:nokia-demo:backend-sa",
+      "target": "role:nokia-demo:admin-role",
+      "relation": "bound-to",
+      "risk": 7.0,
+      "weight": 3.0
+    },
+    {
+      "source": "role:nokia-demo:admin-role",
+      "target": "secret:nokia-demo:api-token",
+      "relation": "can-read",
+      "risk": 7.0,
+      "weight": 3.0
+    },
+    {
+      "source": "role:nokia-demo:admin-role",
+      "target": "secret:nokia-demo:db-credentials",
+      "relation": "can-read",
+      "risk": 7.5,
+      "weight": 2.5
+    },
+    {
+      "source": "user:nokia-demo:dev-1",
+      "target": "role:nokia-demo:secret-reader",
+      "relation": "bound-to",
+      "risk": 4.0,
+      "weight": 6.0
+    },
+    {
+      "source": "role:nokia-demo:secret-reader",
+      "target": "secret:nokia-demo:api-token",
+      "relation": "can-read",
+      "risk": 4.5,
+      "weight": 5.5
+    },
+    {
+      "source": "role:nokia-demo:secret-reader",
+      "target": "secret:nokia-demo:db-credentials",
+      "relation": "can-read",
+      "risk": 7.5,
+      "weight": 2.5
+    },
+    {
+      "source": "role:cluster:cluster-admin",
+      "target": "secret:kube-system:bootstrap-token-7zk80k",
+      "relation": "can-read",
+      "risk": 9.5,
+      "weight": 0.5
+    },
+    {
+      "source": "role:cluster:cluster-admin",
+      "target": "secret:nokia-demo:api-token",
+      "relation": "can-read",
+      "risk": 9.5,
+      "weight": 0.5
+    },
+    {
+      "source": "role:cluster:cluster-admin",
+      "target": "secret:nokia-demo:db-credentials",
+      "relation": "can-read",
+      "risk": 9.5,
+      "weight": 0.5
+    },
+    {
+      "source": "service_account:kube-system:kube-proxy",
+      "target": "role:cluster:system:node-proxier",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
     {
       "source": "service_account:kube-system:default",
       "target": "role:cluster:cluster-admin",
       "relation": "bound-to",
       "risk": 9.5,
       "weight": 0.5
+    },
+    {
+      "source": "user:cluster:ci-bot",
+      "target": "role:cluster:nokia-demo-cluster",
+      "relation": "bound-to",
+      "risk": 4.0,
+      "weight": 6.0
+    },
+    {
+      "source": "role:cluster:nokia-demo-cluster",
+      "target": "secret:kube-system:bootstrap-token-7zk80k",
+      "relation": "can-read",
+      "risk": 7.0,
+      "weight": 3.0
+    },
+    {
+      "source": "role:cluster:nokia-demo-cluster",
+      "target": "secret:nokia-demo:api-token",
+      "relation": "can-read",
+      "risk": 7.0,
+      "weight": 3.0
+    },
+    {
+      "source": "role:cluster:nokia-demo-cluster",
+      "target": "secret:nokia-demo:db-credentials",
+      "relation": "can-read",
+      "risk": 7.5,
+      "weight": 2.5
+    },
+    {
+      "source": "service_account:kube-system:storage-provisioner",
+      "target": "role:cluster:system:persistent-volume-provisioner",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:attachdetach-controller",
+      "target": "role:cluster:system:controller:attachdetach-controller",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:certificate-controller",
+      "target": "role:cluster:system:controller:certificate-controller",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:clusterrole-aggregation",
+      "target": "role:cluster:system:controller:clusterrole-aggregation",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:cronjob-controller",
+      "target": "role:cluster:system:controller:cronjob-controller",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:daemon-set",
+      "target": "role:cluster:system:controller:daemon-set",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:deployment-controller",
+      "target": "role:cluster:system:controller:deployment-controller",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:disruption-controller",
+      "target": "role:cluster:system:controller:disruption-controller",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:endpoint-controller",
+      "target": "role:cluster:system:controller:endpoint-controller",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:endpointslice-controller",
+      "target": "role:cluster:system:controller:endpointslice-controller",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:endpointslicemirroring-controller",
+      "target": "role:cluster:system:controller:endpointslicemirroring-controller",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:ephemeral-volume",
+      "target": "role:cluster:system:controller:ephemeral-volume",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:expand-controller",
+      "target": "role:cluster:system:controller:expand-controller",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:generic-garbage-collector",
+      "target": "role:cluster:system:controller:generic-garbage-collector",
+      "relation": "bound-to",
+      "risk": 7.0,
+      "weight": 3.0
+    },
+    {
+      "source": "role:cluster:system:controller:generic-garbage-collector",
+      "target": "secret:kube-system:bootstrap-token-7zk80k",
+      "relation": "can-read",
+      "risk": 7.0,
+      "weight": 3.0
+    },
+    {
+      "source": "role:cluster:system:controller:generic-garbage-collector",
+      "target": "secret:nokia-demo:api-token",
+      "relation": "can-read",
+      "risk": 7.0,
+      "weight": 3.0
+    },
+    {
+      "source": "role:cluster:system:controller:generic-garbage-collector",
+      "target": "secret:nokia-demo:db-credentials",
+      "relation": "can-read",
+      "risk": 7.5,
+      "weight": 2.5
+    },
+    {
+      "source": "service_account:kube-system:horizontal-pod",
+      "target": "role:cluster:system:controller:horizontal-pod",
+      "relation": "bound-to",
+      "risk": 7.0,
+      "weight": 3.0
+    },
+    {
+      "source": "role:cluster:system:controller:horizontal-pod",
+      "target": "secret:kube-system:bootstrap-token-7zk80k",
+      "relation": "can-read",
+      "risk": 7.0,
+      "weight": 3.0
+    },
+    {
+      "source": "role:cluster:system:controller:horizontal-pod",
+      "target": "secret:nokia-demo:api-token",
+      "relation": "can-read",
+      "risk": 7.0,
+      "weight": 3.0
+    },
+    {
+      "source": "role:cluster:system:controller:horizontal-pod",
+      "target": "secret:nokia-demo:db-credentials",
+      "relation": "can-read",
+      "risk": 7.5,
+      "weight": 2.5
+    },
+    {
+      "source": "service_account:kube-system:job-controller",
+      "target": "role:cluster:system:controller:job-controller",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:legacy-service-account-token-cleaner",
+      "target": "role:cluster:system:controller:legacy-service-account-token-cleaner",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:namespace-controller",
+      "target": "role:cluster:system:controller:namespace-controller",
+      "relation": "bound-to",
+      "risk": 7.0,
+      "weight": 3.0
+    },
+    {
+      "source": "role:cluster:system:controller:namespace-controller",
+      "target": "secret:kube-system:bootstrap-token-7zk80k",
+      "relation": "can-read",
+      "risk": 7.0,
+      "weight": 3.0
+    },
+    {
+      "source": "role:cluster:system:controller:namespace-controller",
+      "target": "secret:nokia-demo:api-token",
+      "relation": "can-read",
+      "risk": 7.0,
+      "weight": 3.0
+    },
+    {
+      "source": "role:cluster:system:controller:namespace-controller",
+      "target": "secret:nokia-demo:db-credentials",
+      "relation": "can-read",
+      "risk": 7.5,
+      "weight": 2.5
+    },
+    {
+      "source": "service_account:kube-system:node-controller",
+      "target": "role:cluster:system:controller:node-controller",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:persistent-volume-binder",
+      "target": "role:cluster:system:controller:persistent-volume-binder",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:pod-garbage-collector",
+      "target": "role:cluster:system:controller:pod-garbage-collector",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:pv-protection",
+      "target": "role:cluster:system:controller:pv-protection",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:pvc-protection",
+      "target": "role:cluster:system:controller:pvc-protection",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:replicaset-controller",
+      "target": "role:cluster:system:controller:replicaset-controller",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:replication-controller",
+      "target": "role:cluster:system:controller:replication-controller",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:resource-claim",
+      "target": "role:cluster:system:controller:resource-claim",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:resourcequota-controller",
+      "target": "role:cluster:system:controller:resourcequota-controller",
+      "relation": "bound-to",
+      "risk": 7.0,
+      "weight": 3.0
+    },
+    {
+      "source": "role:cluster:system:controller:resourcequota-controller",
+      "target": "secret:kube-system:bootstrap-token-7zk80k",
+      "relation": "can-read",
+      "risk": 7.0,
+      "weight": 3.0
+    },
+    {
+      "source": "role:cluster:system:controller:resourcequota-controller",
+      "target": "secret:nokia-demo:api-token",
+      "relation": "can-read",
+      "risk": 7.0,
+      "weight": 3.0
+    },
+    {
+      "source": "role:cluster:system:controller:resourcequota-controller",
+      "target": "secret:nokia-demo:db-credentials",
+      "relation": "can-read",
+      "risk": 7.5,
+      "weight": 2.5
+    },
+    {
+      "source": "service_account:kube-system:root-ca-cert-publisher",
+      "target": "role:cluster:system:controller:root-ca-cert-publisher",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:route-controller",
+      "target": "role:cluster:system:controller:route-controller",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:selinux-warning",
+      "target": "role:cluster:system:controller:selinux-warning",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:service-account",
+      "target": "role:cluster:system:controller:service-account",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:service-cidrs",
+      "target": "role:cluster:system:controller:service-cidrs",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:service-controller",
+      "target": "role:cluster:system:controller:service-controller",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:statefulset-controller",
+      "target": "role:cluster:system:controller:statefulset-controller",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:ttl-after-finished",
+      "target": "role:cluster:system:controller:ttl-after-finished",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:ttl-controller",
+      "target": "role:cluster:system:controller:ttl-controller",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:validatingadmissionpolicy-status",
+      "target": "role:cluster:system:controller:validatingadmissionpolicy-status",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:volumeattributesclass-protection",
+      "target": "role:cluster:system:controller:volumeattributesclass-protection",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "service_account:kube-system:coredns",
+      "target": "role:cluster:system:coredns",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "user:cluster:system:kube-controller-manager",
+      "target": "role:cluster:system:kube-controller-manager",
+      "relation": "bound-to",
+      "risk": 4.0,
+      "weight": 6.0
+    },
+    {
+      "source": "role:cluster:system:kube-controller-manager",
+      "target": "secret:kube-system:bootstrap-token-7zk80k",
+      "relation": "can-read",
+      "risk": 9.0,
+      "weight": 1.0
+    },
+    {
+      "source": "role:cluster:system:kube-controller-manager",
+      "target": "secret:nokia-demo:api-token",
+      "relation": "can-read",
+      "risk": 9.0,
+      "weight": 1.0
+    },
+    {
+      "source": "role:cluster:system:kube-controller-manager",
+      "target": "secret:nokia-demo:db-credentials",
+      "relation": "can-read",
+      "risk": 9.0,
+      "weight": 1.0
+    },
+    {
+      "source": "service_account:kube-system:kube-dns",
+      "target": "role:cluster:system:kube-dns",
+      "relation": "bound-to",
+      "risk": 3.0,
+      "weight": 7.0
+    },
+    {
+      "source": "user:cluster:system:kube-scheduler",
+      "target": "role:cluster:system:kube-scheduler",
+      "relation": "bound-to",
+      "risk": 4.0,
+      "weight": 6.0
+    },
+    {
+      "source": "role:cluster:system:node",
+      "target": "secret:kube-system:bootstrap-token-7zk80k",
+      "relation": "can-read",
+      "risk": 5.0,
+      "weight": 5.0
+    },
+    {
+      "source": "role:cluster:system:node",
+      "target": "secret:nokia-demo:api-token",
+      "relation": "can-read",
+      "risk": 5.0,
+      "weight": 5.0
+    },
+    {
+      "source": "role:cluster:system:node",
+      "target": "secret:nokia-demo:db-credentials",
+      "relation": "can-read",
+      "risk": 7.5,
+      "weight": 2.5
+    },
+    {
+      "source": "user:cluster:system:kube-proxy",
+      "target": "role:cluster:system:node-proxier",
+      "relation": "bound-to",
+      "risk": 4.0,
+      "weight": 6.0
+    },
+    {
+      "source": "user:cluster:system:kube-scheduler",
+      "target": "role:cluster:system:volume-scheduler",
+      "relation": "bound-to",
+      "risk": 4.0,
+      "weight": 6.0
     }
   ]
 }

@@ -1,7 +1,522 @@
 [
   {
+    "source": "pod:kube-system:coredns-7d764666f9",
+    "target": "service_account:kube-system:coredns",
+    "relation": "uses"
+  },
+  {
+    "source": "pod:kube-system:etcd-minikube",
+    "target": "service_account:kube-system:default",
+    "relation": "uses"
+  },
+  {
+    "source": "pod:kube-system:kube-apiserver-minikube",
+    "target": "service_account:kube-system:default",
+    "relation": "uses"
+  },
+  {
+    "source": "pod:kube-system:kube-controller-manager-minikube",
+    "target": "service_account:kube-system:default",
+    "relation": "uses"
+  },
+  {
+    "source": "pod:kube-system:kube-proxy",
+    "target": "service_account:kube-system:kube-proxy",
+    "relation": "uses"
+  },
+  {
+    "source": "pod:kube-system:kube-scheduler-minikube",
+    "target": "service_account:kube-system:default",
+    "relation": "uses"
+  },
+  {
+    "source": "pod:kube-system:storage-provisioner",
+    "target": "service_account:kube-system:storage-provisioner",
+    "relation": "uses"
+  },
+  {
+    "source": "pod:nokia-demo:api-server",
+    "target": "service_account:nokia-demo:backend-sa",
+    "relation": "uses"
+  },
+  {
+    "source": "pod:nokia-demo:billing-db",
+    "target": "service_account:nokia-demo:backend-sa",
+    "relation": "uses"
+  },
+  {
+    "source": "pod:nokia-demo:metrics-collector",
+    "target": "service_account:nokia-demo:metrics-sa",
+    "relation": "uses"
+  },
+  {
+    "source": "pod:nokia-demo:web-server",
+    "target": "service_account:nokia-demo:backend-sa",
+    "relation": "uses"
+  },
+  {
+    "source": "secret:nokia-demo:db-credentials",
+    "target": "database:nokia-demo:db-db-credentials",
+    "relation": "exposes"
+  },
+  {
+    "source": "user:kube-public:system:anonymous",
+    "target": "role:kube-public:kubeadm:bootstrap-signer-clusterinfo",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:bootstrap-signer",
+    "target": "role:kube-public:system:controller:bootstrap-signer",
+    "relation": "bound-to"
+  },
+  {
+    "source": "user:kube-system:system:kube-controller-manager",
+    "target": "role:kube-system:extension-apiserver-authentication-reader",
+    "relation": "bound-to"
+  },
+  {
+    "source": "user:kube-system:system:kube-scheduler",
+    "target": "role:kube-system:extension-apiserver-authentication-reader",
+    "relation": "bound-to"
+  },
+  {
+    "source": "user:kube-system:system:kube-controller-manager",
+    "target": "role:kube-system:system::leader-locking-kube-controller-manager",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:kube-controller-manager",
+    "target": "role:kube-system:system::leader-locking-kube-controller-manager",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:leader-election",
+    "target": "role:kube-system:system::leader-locking-kube-controller-manager",
+    "relation": "bound-to"
+  },
+  {
+    "source": "user:kube-system:system:kube-scheduler",
+    "target": "role:kube-system:system::leader-locking-kube-scheduler",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:kube-scheduler",
+    "target": "role:kube-system:system::leader-locking-kube-scheduler",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:bootstrap-signer",
+    "target": "role:kube-system:system:controller:bootstrap-signer",
+    "relation": "bound-to"
+  },
+  {
+    "source": "role:kube-system:system:controller:bootstrap-signer",
+    "target": "secret:kube-system:bootstrap-token-7zk80k",
+    "relation": "can-read"
+  },
+  {
+    "source": "service_account:kube-system:cloud-provider",
+    "target": "role:kube-system:system:controller:cloud-provider",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:token-cleaner",
+    "target": "role:kube-system:system:controller:token-cleaner",
+    "relation": "bound-to"
+  },
+  {
+    "source": "role:kube-system:system:controller:token-cleaner",
+    "target": "secret:kube-system:bootstrap-token-7zk80k",
+    "relation": "can-read"
+  },
+  {
+    "source": "service_account:kube-system:storage-provisioner",
+    "target": "role:kube-system:system:persistent-volume-provisioner",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:nokia-demo:backend-sa",
+    "target": "role:nokia-demo:admin-role",
+    "relation": "bound-to"
+  },
+  {
+    "source": "role:nokia-demo:admin-role",
+    "target": "secret:nokia-demo:api-token",
+    "relation": "can-read"
+  },
+  {
+    "source": "role:nokia-demo:admin-role",
+    "target": "secret:nokia-demo:db-credentials",
+    "relation": "can-read"
+  },
+  {
+    "source": "user:nokia-demo:dev-1",
+    "target": "role:nokia-demo:secret-reader",
+    "relation": "bound-to"
+  },
+  {
+    "source": "role:nokia-demo:secret-reader",
+    "target": "secret:nokia-demo:api-token",
+    "relation": "can-read"
+  },
+  {
+    "source": "role:nokia-demo:secret-reader",
+    "target": "secret:nokia-demo:db-credentials",
+    "relation": "can-read"
+  },
+  {
+    "source": "role:cluster:cluster-admin",
+    "target": "secret:kube-system:bootstrap-token-7zk80k",
+    "relation": "can-read"
+  },
+  {
+    "source": "role:cluster:cluster-admin",
+    "target": "secret:nokia-demo:api-token",
+    "relation": "can-read"
+  },
+  {
+    "source": "role:cluster:cluster-admin",
+    "target": "secret:nokia-demo:db-credentials",
+    "relation": "can-read"
+  },
+  {
+    "source": "service_account:kube-system:kube-proxy",
+    "target": "role:cluster:system:node-proxier",
+    "relation": "bound-to"
+  },
+  {
     "source": "service_account:kube-system:default",
     "target": "role:cluster:cluster-admin",
+    "relation": "bound-to"
+  },
+  {
+    "source": "user:cluster:ci-bot",
+    "target": "role:cluster:nokia-demo-cluster",
+    "relation": "bound-to"
+  },
+  {
+    "source": "role:cluster:nokia-demo-cluster",
+    "target": "secret:kube-system:bootstrap-token-7zk80k",
+    "relation": "can-read"
+  },
+  {
+    "source": "role:cluster:nokia-demo-cluster",
+    "target": "secret:nokia-demo:api-token",
+    "relation": "can-read"
+  },
+  {
+    "source": "role:cluster:nokia-demo-cluster",
+    "target": "secret:nokia-demo:db-credentials",
+    "relation": "can-read"
+  },
+  {
+    "source": "service_account:kube-system:storage-provisioner",
+    "target": "role:cluster:system:persistent-volume-provisioner",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:attachdetach-controller",
+    "target": "role:cluster:system:controller:attachdetach-controller",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:certificate-controller",
+    "target": "role:cluster:system:controller:certificate-controller",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:clusterrole-aggregation",
+    "target": "role:cluster:system:controller:clusterrole-aggregation",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:cronjob-controller",
+    "target": "role:cluster:system:controller:cronjob-controller",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:daemon-set",
+    "target": "role:cluster:system:controller:daemon-set",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:deployment-controller",
+    "target": "role:cluster:system:controller:deployment-controller",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:disruption-controller",
+    "target": "role:cluster:system:controller:disruption-controller",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:endpoint-controller",
+    "target": "role:cluster:system:controller:endpoint-controller",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:endpointslice-controller",
+    "target": "role:cluster:system:controller:endpointslice-controller",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:endpointslicemirroring-controller",
+    "target": "role:cluster:system:controller:endpointslicemirroring-controller",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:ephemeral-volume",
+    "target": "role:cluster:system:controller:ephemeral-volume",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:expand-controller",
+    "target": "role:cluster:system:controller:expand-controller",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:generic-garbage-collector",
+    "target": "role:cluster:system:controller:generic-garbage-collector",
+    "relation": "bound-to"
+  },
+  {
+    "source": "role:cluster:system:controller:generic-garbage-collector",
+    "target": "secret:kube-system:bootstrap-token-7zk80k",
+    "relation": "can-read"
+  },
+  {
+    "source": "role:cluster:system:controller:generic-garbage-collector",
+    "target": "secret:nokia-demo:api-token",
+    "relation": "can-read"
+  },
+  {
+    "source": "role:cluster:system:controller:generic-garbage-collector",
+    "target": "secret:nokia-demo:db-credentials",
+    "relation": "can-read"
+  },
+  {
+    "source": "service_account:kube-system:horizontal-pod",
+    "target": "role:cluster:system:controller:horizontal-pod",
+    "relation": "bound-to"
+  },
+  {
+    "source": "role:cluster:system:controller:horizontal-pod",
+    "target": "secret:kube-system:bootstrap-token-7zk80k",
+    "relation": "can-read"
+  },
+  {
+    "source": "role:cluster:system:controller:horizontal-pod",
+    "target": "secret:nokia-demo:api-token",
+    "relation": "can-read"
+  },
+  {
+    "source": "role:cluster:system:controller:horizontal-pod",
+    "target": "secret:nokia-demo:db-credentials",
+    "relation": "can-read"
+  },
+  {
+    "source": "service_account:kube-system:job-controller",
+    "target": "role:cluster:system:controller:job-controller",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:legacy-service-account-token-cleaner",
+    "target": "role:cluster:system:controller:legacy-service-account-token-cleaner",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:namespace-controller",
+    "target": "role:cluster:system:controller:namespace-controller",
+    "relation": "bound-to"
+  },
+  {
+    "source": "role:cluster:system:controller:namespace-controller",
+    "target": "secret:kube-system:bootstrap-token-7zk80k",
+    "relation": "can-read"
+  },
+  {
+    "source": "role:cluster:system:controller:namespace-controller",
+    "target": "secret:nokia-demo:api-token",
+    "relation": "can-read"
+  },
+  {
+    "source": "role:cluster:system:controller:namespace-controller",
+    "target": "secret:nokia-demo:db-credentials",
+    "relation": "can-read"
+  },
+  {
+    "source": "service_account:kube-system:node-controller",
+    "target": "role:cluster:system:controller:node-controller",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:persistent-volume-binder",
+    "target": "role:cluster:system:controller:persistent-volume-binder",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:pod-garbage-collector",
+    "target": "role:cluster:system:controller:pod-garbage-collector",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:pv-protection",
+    "target": "role:cluster:system:controller:pv-protection",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:pvc-protection",
+    "target": "role:cluster:system:controller:pvc-protection",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:replicaset-controller",
+    "target": "role:cluster:system:controller:replicaset-controller",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:replication-controller",
+    "target": "role:cluster:system:controller:replication-controller",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:resource-claim",
+    "target": "role:cluster:system:controller:resource-claim",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:resourcequota-controller",
+    "target": "role:cluster:system:controller:resourcequota-controller",
+    "relation": "bound-to"
+  },
+  {
+    "source": "role:cluster:system:controller:resourcequota-controller",
+    "target": "secret:kube-system:bootstrap-token-7zk80k",
+    "relation": "can-read"
+  },
+  {
+    "source": "role:cluster:system:controller:resourcequota-controller",
+    "target": "secret:nokia-demo:api-token",
+    "relation": "can-read"
+  },
+  {
+    "source": "role:cluster:system:controller:resourcequota-controller",
+    "target": "secret:nokia-demo:db-credentials",
+    "relation": "can-read"
+  },
+  {
+    "source": "service_account:kube-system:root-ca-cert-publisher",
+    "target": "role:cluster:system:controller:root-ca-cert-publisher",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:route-controller",
+    "target": "role:cluster:system:controller:route-controller",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:selinux-warning",
+    "target": "role:cluster:system:controller:selinux-warning",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:service-account",
+    "target": "role:cluster:system:controller:service-account",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:service-cidrs",
+    "target": "role:cluster:system:controller:service-cidrs",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:service-controller",
+    "target": "role:cluster:system:controller:service-controller",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:statefulset-controller",
+    "target": "role:cluster:system:controller:statefulset-controller",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:ttl-after-finished",
+    "target": "role:cluster:system:controller:ttl-after-finished",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:ttl-controller",
+    "target": "role:cluster:system:controller:ttl-controller",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:validatingadmissionpolicy-status",
+    "target": "role:cluster:system:controller:validatingadmissionpolicy-status",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:volumeattributesclass-protection",
+    "target": "role:cluster:system:controller:volumeattributesclass-protection",
+    "relation": "bound-to"
+  },
+  {
+    "source": "service_account:kube-system:coredns",
+    "target": "role:cluster:system:coredns",
+    "relation": "bound-to"
+  },
+  {
+    "source": "user:cluster:system:kube-controller-manager",
+    "target": "role:cluster:system:kube-controller-manager",
+    "relation": "bound-to"
+  },
+  {
+    "source": "role:cluster:system:kube-controller-manager",
+    "target": "secret:kube-system:bootstrap-token-7zk80k",
+    "relation": "can-read"
+  },
+  {
+    "source": "role:cluster:system:kube-controller-manager",
+    "target": "secret:nokia-demo:api-token",
+    "relation": "can-read"
+  },
+  {
+    "source": "role:cluster:system:kube-controller-manager",
+    "target": "secret:nokia-demo:db-credentials",
+    "relation": "can-read"
+  },
+  {
+    "source": "service_account:kube-system:kube-dns",
+    "target": "role:cluster:system:kube-dns",
+    "relation": "bound-to"
+  },
+  {
+    "source": "user:cluster:system:kube-scheduler",
+    "target": "role:cluster:system:kube-scheduler",
+    "relation": "bound-to"
+  },
+  {
+    "source": "role:cluster:system:node",
+    "target": "secret:kube-system:bootstrap-token-7zk80k",
+    "relation": "can-read"
+  },
+  {
+    "source": "role:cluster:system:node",
+    "target": "secret:nokia-demo:api-token",
+    "relation": "can-read"
+  },
+  {
+    "source": "role:cluster:system:node",
+    "target": "secret:nokia-demo:db-credentials",
+    "relation": "can-read"
+  },
+  {
+    "source": "user:cluster:system:kube-proxy",
+    "target": "role:cluster:system:node-proxier",
+    "relation": "bound-to"
+  },
+  {
+    "source": "user:cluster:system:kube-scheduler",
+    "target": "role:cluster:system:volume-scheduler",
     "relation": "bound-to"
   }
 ]

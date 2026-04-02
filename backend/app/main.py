@@ -31,6 +31,16 @@ async def lifespan(app: FastAPI):
     logger.info("  GROQ MODEL  : %s", settings.GROQ_MODEL)
     logger.info("=" * 60)
 
+    from app.core.database import init_db
+    init_db()
+ 
+# Auto-record first snapshot on startup
+    from app.services.history_service import record_analysis_run
+    record_analysis_run(
+    cluster_name = settings.CLUSTER_NAME,
+    source       = "mock" if settings.MOCK_MODE else "kubectl",
+    triggered_by = "startup",
+)
     # Build graph on startup so first API call is instant
     try:
         from app.services.ingestion_service import ingest_and_build
@@ -116,6 +126,7 @@ from app.api.routes_report   import router as report_router
 from app.api.routes_simulate import router as simulate_router
 from app.api.routes_ai       import router as ai_router
 from app.api.routes_cve      import router as cve_router
+from app.api.routes_history import router as history_router
 
 app.include_router(graph_router,    prefix="/api/graph",    tags=["Graph"])
 app.include_router(attack_router,   prefix="/api/attack",   tags=["Attack Path"])
@@ -126,6 +137,7 @@ app.include_router(report_router,   prefix="/api/report",   tags=["AI Report"])
 app.include_router(simulate_router, prefix="/api/simulate", tags=["Simulation"])
 app.include_router(ai_router,       prefix="/api/ai",       tags=["AI"])
 app.include_router(cve_router, prefix = "/api/cves", tags = ["CVE Feed"])
+app.include_router(history_router, prefix="/api/history", tags=["History"])
 
 
 # ─── Health & info endpoints ───────────────────────────────────────────────────

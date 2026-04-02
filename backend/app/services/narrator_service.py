@@ -11,6 +11,7 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 
 from app.config import settings
 from app.services.analysis_service import get_full_analysis
+from app.services.history_service import record_analysis_run
 from app.utils.helpers import utc_now
 from app.utils.logger import get_logger
 from app.utils.prompt_templates import (
@@ -146,6 +147,13 @@ def generate_report(cluster_name: str = "nokia-telecom-cluster") -> dict:
     )
 
     findings = _call_groq(prompt)
+    record_analysis_run(
+        cluster_name=cluster_name,
+        source="mock" if settings.MOCK_MODE else "kubectl",
+        has_ai_report=True,
+        findings=findings,
+        triggered_by="report",
+    )
     timestamp = utc_now()
     header = build_report_header(cluster_name, len(findings), timestamp)
 

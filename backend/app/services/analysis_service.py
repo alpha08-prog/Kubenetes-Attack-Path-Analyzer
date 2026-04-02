@@ -96,7 +96,17 @@ def get_full_analysis() -> dict:
         cycles["cycle_count"],
         len(critical["nodes"]),
     )
-
+    from app.services.history_service import record_analysis_run
+    from app.config import settings
+ 
+    record_analysis_run(
+    cluster_name  = settings.CLUSTER_NAME,
+    source        = "mock" if settings.MOCK_MODE else "kubectl",
+    attack_paths  = 1 if (attack_path and attack_path.get("found")) else 0,
+    cycles        = cycles.get("cycle_count", 0),
+    has_ai_report = False,
+    triggered_by  = "analysis",
+)
     return {
         "attack_path":    attack_path,
         "blast_radius":   blast,
