@@ -55,9 +55,9 @@ def ingest_and_build() -> dict:
         processed_source = "mock"
     else:
         logger.info("Fetching live cluster data via kubectl")
-        raw = _fetch_kubectl()
+        raw, fetch_meta = _fetch_kubectl()
         parsed = parse_cluster_data(raw)
-        processed_source = "kubectl"
+        processed_source = fetch_meta["source"]
 
     _save_processed(parsed, source=processed_source)
     graph = build_graph(parsed)
@@ -66,18 +66,22 @@ def ingest_and_build() -> dict:
         "ingest_complete",
         graph.number_of_nodes(),
         graph.number_of_edges(),
-        source="mock" if settings.MOCK_MODE else "kubectl",
+        source=processed_source,
     )
 
-    return {
-        "source": "mock" if settings.MOCK_MODE else "kubectl",
+    summary = {
+        "source": processed_source,
         "node_count": graph.number_of_nodes(),
         "edge_count": graph.number_of_edges(),
         "status": "ok",
     }
+    if not settings.MOCK_MODE:
+        summary["fallback_count"] = fetch_meta["fallback_count"]
+        summary["live_resource_count"] = fetch_meta["live_resource_count"]
+    return summary
 
 
-def _fetch_kubectl() -> dict:
+def _fetch_kubectl() -> tuple[dict, dict]:
     """
     Run kubectl commands and return raw JSON blobs.
     Falls back to saved raw files in data/raw if kubectl fails.
@@ -105,6 +109,10 @@ def _fetch_kubectl() -> dict:
             return None, str(exc)
 
     raw = {}
+    fallback_count = 0
+    live_resource_count = 0
+    live_sources: set[str] = set()
+
     for key, args in resources.items():
         payload = None
         error = ""
@@ -113,6 +121,8 @@ def _fetch_kubectl() -> dict:
             payload, error = _run_json([kubectl_bin, *args])
             if payload is not None:
                 raw[key] = payload
+                live_resource_count += 1
+                live_sources.add("kubectl")
                 logger.info("Fetched %s via %s: %d items", key, kubectl_bin, len(payload.get("items", [])))
                 continue
             logger.warning("kubectl failed for %s: %s", key, error)
@@ -121,6 +131,8 @@ def _fetch_kubectl() -> dict:
             payload, error = _run_json([minikube_bin, "kubectl", "--", *args])
             if payload is not None:
                 raw[key] = payload
+                live_resource_count += 1
+                live_sources.add("minikube")
                 logger.info(
                     "Fetched %s via minikube kubectl: %d items",
                     key,
@@ -129,10 +141,32 @@ def _fetch_kubectl() -> dict:
                 continue
             logger.warning("minikube kubectl failed for %s: %s", key, error)
 
-        logger.error("Error fetching %s - using saved raw file", key)
+        fallback_count += 1
+        logger.warning("Falling back to saved raw file for %s", key)
         raw[key] = _load_raw_file(key)
 
-    return raw
+    total_resources = len(resources)
+    if fallback_count == total_resources:
+        source = "saved_raw"
+    elif fallback_count > 0 or len(live_sources) > 1:
+        source = "mixed"
+    elif "minikube" in live_sources:
+        source = "minikube"
+    else:
+        source = "kubectl"
+
+    if fallback_count:
+        logger.warning(
+            "Cluster data loaded in fallback mode: %d/%d resources came from saved raw files",
+            fallback_count,
+            total_resources,
+        )
+
+    return raw, {
+        "source": source,
+        "fallback_count": fallback_count,
+        "live_resource_count": live_resource_count,
+    }
 
 
 def _load_raw_file(resource: str) -> dict:

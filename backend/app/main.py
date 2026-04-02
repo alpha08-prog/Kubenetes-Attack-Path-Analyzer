@@ -34,13 +34,6 @@ async def lifespan(app: FastAPI):
     from app.core.database import init_db
     init_db()
  
-# Auto-record first snapshot on startup
-    from app.services.history_service import record_analysis_run
-    record_analysis_run(
-    cluster_name = settings.CLUSTER_NAME,
-    source       = "mock" if settings.MOCK_MODE else "kubectl",
-    triggered_by = "startup",
-)
     # Build graph on startup so first API call is instant
     try:
         from app.services.ingestion_service import ingest_and_build
@@ -50,6 +43,12 @@ async def lifespan(app: FastAPI):
             summary["node_count"],
             summary["edge_count"],
             summary["source"],
+        )
+        from app.services.history_service import record_analysis_run
+        record_analysis_run(
+            cluster_name=settings.CLUSTER_NAME,
+            source=summary["source"],
+            triggered_by="startup",
         )
     except Exception as e:
         logger.error("Startup graph load failed: %s", e)
