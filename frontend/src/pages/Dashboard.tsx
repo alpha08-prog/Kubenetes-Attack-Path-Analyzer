@@ -66,8 +66,8 @@ export default function Dashboard() {
   return (
     <div className="h-screen flex flex-col bg-background overflow-hidden">
       {/* Header */}
-      <header className="flex items-center justify-between px-6 py-3 border-b border-border bg-card">
-        <div className="flex items-center gap-3">
+      <header className="flex flex-wrap items-center justify-between gap-2 px-3 sm:px-6 py-3 border-b border-border bg-card">
+        <div className="flex items-center gap-2 min-w-0">
           <Shield className="w-6 h-6 text-primary" />
           <h1 className="text-lg font-bold text-foreground">Attack Path Analyzer</h1>
           <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded font-medium">
@@ -94,7 +94,7 @@ export default function Dashboard() {
       </header>
 
       {/* Stats */}
-      <div className="grid grid-cols-5 gap-3 px-6 py-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 px-3 sm:px-6 py-3">
         <ThreatScoreCard threatScore={analysis.threatScore} loading={graphLoading} />
         <StatCard title="Total Nodes" value={summary?.total_nodes ?? '—'} icon={<Network className="w-4 h-4" />} color="#378ADD" loading={graphLoading} />
         <StatCard title="Total Edges" value={summary?.total_edges ?? '—'} icon={<GitBranch className="w-4 h-4" />} color="#1D9E75" loading={graphLoading} />
@@ -103,9 +103,9 @@ export default function Dashboard() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex min-h-0 px-6 pb-0 gap-4">
+      <div className="flex-1 flex flex-col md:flex-row min-h-0 px-3 sm:px-6 pb-0 gap-4">
         {/* Left - Graph */}
-        <div className="w-[60%] flex flex-col min-h-0">
+        <div className="w-full md:w-[60%] flex flex-col min-h-0 overflow-hidden">
           {/* Overlay toggles */}
           <div className="flex gap-2 mb-2">
             {[
@@ -140,7 +140,7 @@ export default function Dashboard() {
         </div>
 
         {/* Right - Sidebar */}
-        <div className="w-[40%] flex flex-col min-h-0 gap-4">
+        <div className="w-full md:w-[40%] flex flex-col min-h-0 gap-4">
           <div className="flex min-h-0 flex-[1.2] flex-col overflow-hidden rounded-lg border border-border bg-card">
             <div className="flex border-b border-border">
               {tabs.map(t => (
@@ -203,7 +203,7 @@ export default function Dashboard() {
               )}
             </div>
           </div>
-          <div className="min-h-0 flex-1">
+          <div className="min-h-0 flex-1 overflow-hidden">
             <LiveCveFeedPanel />
           </div>
         </div>

@@ -10,7 +10,10 @@
     "lint": "eslint .",
     "preview": "vite preview --config vite.config.js",
     "test": "vitest run --config vite.config.js",
-    "test:watch": "vitest --config vite.config.js"
+    "test:watch": "vitest --config vite.config.js",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:report": "playwright show-report playwright-report"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

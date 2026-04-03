@@ -167,12 +167,12 @@ export default function DemoMode() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Top bar */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-border">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-2 px-4 sm:px-6 py-4 border-b border-border">
+        <div className="flex items-center gap-2 min-w-0">
           <Shield className="w-6 h-6 text-primary" />
           <h1 className="text-lg font-bold">Attack Path Analyzer — Demo</h1>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button onClick={() => setPaused(!paused)} className="flex items-center gap-2 bg-secondary text-foreground px-3 py-1.5 rounded-md text-sm">
             {paused ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
             {paused ? 'Resume' : 'Pause'}
@@ -189,7 +189,7 @@ export default function DemoMode() {
       </div>
 
       {/* Progress */}
-      <div className="flex items-center justify-center gap-2 py-4">
+      <div className="flex items-center justify-center gap-2 py-4 overflow-x-auto px-4">
         {STEPS.map((_, i) => (
           <div key={i} className="flex items-center gap-1">
             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
@@ -210,12 +210,12 @@ export default function DemoMode() {
       </p>
 
       {/* Content */}
-      <div className="max-w-4xl mx-auto px-6 space-y-6 pb-12">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 space-y-6 pb-12">
         {/* Step 0 - Cluster */}
         {stepDone.has(0) && summary && (
           <div className="animate-slide-in-right bg-card border border-border rounded-lg p-6">
             <h3 className="font-semibold mb-3">Cluster Overview</h3>
-            <div className="grid grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div className="text-center"><p className="text-2xl font-bold text-primary">{summary.total_nodes}</p><p className="text-xs text-muted-foreground">Nodes</p></div>
               <div className="text-center"><p className="text-2xl font-bold text-accent">{summary.total_edges}</p><p className="text-xs text-muted-foreground">Edges</p></div>
               <div className="text-center"><p className="text-2xl font-bold text-destructive">{summary.critical_findings}</p><p className="text-xs text-muted-foreground">Critical</p></div>

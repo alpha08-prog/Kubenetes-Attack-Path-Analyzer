@@ -23,7 +23,15 @@
       "Bash(curl -s http://localhost:8000/api/attack/auto)",
       "Bash(curl -s http://localhost:8000/ready)",
       "Bash(npm run:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(grep -E \"\\\\.\\(ts|js\\)$\")",
+      "Bash(find /c/Users/agraw/Attack_path_analyzer -maxdepth 3 -not -path */node_modules/* -not -path */.git/* -not -path */dist/* -not -path */.npm-cache/*)",
+      "Bash(grep -r \"vitest\\\\|playwright\" /c/Users/agraw/Attack_path_analyzer/frontend/vite.config.*)",
+      "Bash(ls -la /c/Users/agraw/Attack_path_analyzer/frontend/*.config.*)",
+      "Bash(cat /c/Users/agraw/Attack_path_analyzer/frontend/src/test/*.*)",
+      "Bash(npx --version)",
+      "Bash(npx playwright:*)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173)"
     ]
   }
 }
