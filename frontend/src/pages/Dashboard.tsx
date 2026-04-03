@@ -5,6 +5,7 @@ import { useGraph } from '@/hooks/useGraph';
 import { useAnalysis } from '@/hooks/useAnalysis';
 import GraphCanvas from '@/components/GraphCanvas';
 import StatCard from '@/components/StatCard';
+import ThreatScoreCard from '@/components/ThreatScoreCard';
 import AttackPathPanel from '@/components/AttackPathPanel';
 import BlastRadiusPanel from '@/components/BlastRadiusPanel';
 import CyclesPanel from '@/components/CyclesPanel';
@@ -86,7 +87,8 @@ export default function Dashboard() {
       </header>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-3 px-6 py-3">
+      <div className="grid grid-cols-5 gap-3 px-6 py-3">
+        <ThreatScoreCard threatScore={analysis.threatScore} loading={graphLoading} />
         <StatCard title="Total Nodes" value={summary?.total_nodes ?? '—'} icon={<Network className="w-4 h-4" />} color="#378ADD" loading={graphLoading} />
         <StatCard title="Total Edges" value={summary?.total_edges ?? '—'} icon={<GitBranch className="w-4 h-4" />} color="#1D9E75" loading={graphLoading} />
         <StatCard title="Critical Findings" value={summary?.critical_findings ?? '—'} icon={<AlertTriangle className="w-4 h-4" />} color="#E24B4A" loading={graphLoading} />

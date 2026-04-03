@@ -3,31 +3,35 @@ prompt_templates.py - Groq prompt templates for report and simulation narration.
 """
 
 
-NARRATOR_SYSTEM_PROMPT = """You are a senior Kubernetes security analyst at a Nokia infrastructure team.
-You analyze attack graph data from a Kubernetes cluster and generate clear, actionable security findings.
+NARRATOR_SYSTEM_PROMPT = """You are a senior Kubernetes security architect briefing C-level executives on cluster risks.
 
-Your output must always be a valid JSON array of findings. No preamble, no markdown, no explanation outside the JSON.
+Your job: Translate raw attack graph data into a compelling security narrative that shows:
+1. WHAT the risk is (clear, dramatic, no jargon)
+2. WHY it matters (business impact, not technical detail)
+3. HOW to fix it (specific, 1-3 action items per finding)
 
-Each finding must follow this exact schema:
+Your output must be a valid JSON array. No preamble, no markdown, only JSON.
+
+Each finding must follow this schema:
 {
   "id": "finding_001",
   "severity": "critical" | "high" | "medium" | "low",
   "category": "attack_path" | "blast_radius" | "privilege_escalation" | "critical_node",
-  "title": "Short title under 10 words",
-  "description": "One sentence explaining what the risk is and why it matters.",
-  "kill_chain": "Node-A -> relation -> Node-B -> relation -> Node-C (if applicable, else null)",
+  "title": "Human-readable risk headline (under 10 words)",
+  "description": "2-3 sentences: What is the risk? Why does it matter? Use business language, not technical jargon.",
+  "kill_chain": "Node-A → relation → Node-B → relation → Node-C (actual node names, if applicable, else null)",
   "affected_nodes": ["node-id-1", "node-id-2"],
-  "recommendation": "One specific, actionable fix. Name the exact resource to change.",
+  "recommendation": "Specific fix: Name the exact resource and the action (e.g., 'Remove admin role from web-sa')",
   "effort": "low" | "medium" | "high"
 }
 
-Rules:
-- Write for a Nokia security engineer, not a developer. Be direct and specific.
-- Never use vague language like "consider" or "might". Say exactly what to do.
-- Kill chains must name actual node labels from the data, not generic names.
-- Severity follows CVSS v3: critical=9+, high=7-8.9, medium=4-6.9, low=0.1-3.9.
-- Sort findings by severity descending (critical first).
-- Output ONLY the JSON array. No other text."""
+TONE RULES:
+- Be dramatic: "Attackers can reach your billing database in 2 hops" not "Path exists with 2 edges"
+- Focus on business impact: "Customer data exposure" not "Overly permissive RBAC"
+- Every finding = one specific, not-optional action item
+- Sort by severity first, then by blast radius size (bigger = worse)
+- No hedging: say "will" not "could", "is" not "may be"
+- Output ONLY the JSON array."""
 
 
 def build_narrator_prompt(
@@ -38,67 +42,92 @@ def build_narrator_prompt(
     cluster_name: str = "nokia-telecom-cluster",
 ) -> str:
     """
-    Build the user prompt for Groq by injecting algorithm results.
+    Build a narrative-focused prompt for Groq that emphasizes business impact and urgency.
     """
     sections = [
         f"Cluster: {cluster_name}",
-        "Analysis timestamp: see response metadata",
+        "Your job: Summarize the security risks in language a CEO would understand.",
         "",
     ]
 
+    # EXECUTIVE SUMMARY
+    risk_count = 0
     if attack_path and attack_path.get("found"):
+        risk_count += 1
+    if blast_radius and blast_radius.get("total_reachable", 0) > 10:
+        risk_count += 1
+    if cycles and cycles.get("cycle_count", 0) > 0:
+        risk_count += 1
+
+    sections.append(f"EXECUTIVE SUMMARY: {risk_count} critical security gaps found")
+    sections.append("")
+
+    # ATTACK PATHS - EMPHASIZE EASE OF EXPLOITATION
+    if attack_path and attack_path.get("found"):
+        hop_count = attack_path.get("hop_count", 0)
+        source = attack_path.get('source_label', attack_path.get('source', 'unknown'))
+        target = attack_path.get('target_label', attack_path.get('target', 'unknown'))
+
+        urgency = "IMMEDIATE THREAT" if hop_count <= 2 else "HIGH RISK" if hop_count <= 3 else "MODERATE RISK"
         sections += [
-            "## Shortest Attack Path (Dijkstra)",
-            f"Source: {attack_path.get('source_label', attack_path.get('source'))}",
-            f"Target: {attack_path.get('target_label', attack_path.get('target'))}",
-            f"Hops: {attack_path.get('hop_count')}",
-            f"Exploitability cost: {attack_path.get('total_cost')} (lower = easier)",
-            "Hop-by-hop:",
+            f"## RISK 1: Direct Attack Path ({urgency})",
+            f"Attackers can reach '{target}' from '{source}' in just {hop_count} hop{'s' if hop_count != 1 else ''}.",
+            f"This is {'extremely short and very dangerous' if hop_count <= 2 else 'concerning' if hop_count <= 3 else 'worth addressing'}.",
+            "Attack sequence:",
         ]
-        for hop in attack_path.get("hops", []):
+        for i, hop in enumerate(attack_path.get("hops", []), 1):
             sections.append(
-                f"  Step {hop['step']}: {hop['from_label']} --[{hop['relation']}]--> "
-                f"{hop['to_label']} (type={hop['to_type']}, risk={hop['edge_risk']})"
+                f"  {i}. {hop['from_label']} --{hop['relation']}→ {hop['to_label']} (Risk: {hop['edge_risk']:.1f}/10)"
             )
         sections.append("")
 
+    # BLAST RADIUS - EMPHASIZE SCALE OF DAMAGE
     if blast_radius and blast_radius.get("total_reachable", 0) > 0:
+        total = blast_radius.get('total_reachable', 0)
+        source = blast_radius.get('source_label', blast_radius.get('source', 'unknown'))
         sections += [
-            "## Blast Radius (BFS)",
-            f"Compromised node: {blast_radius.get('source_label', blast_radius.get('source'))}",
-            f"Total reachable: {blast_radius.get('total_reachable')} nodes within {blast_radius.get('max_hops')} hops",
+            f"## RISK 2: Blast Radius (Scale of Damage)",
+            f"If '{source}' is compromised, attackers can reach {total} additional resources.",
+            f"This is {'a massive blast radius - total cluster at risk' if total > 30 else 'a significant blast radius' if total > 10 else 'a limited blast radius'}.",
+            "Resources at risk by distance:",
         ]
         for hop_num, nodes in sorted(blast_radius.get("zones", {}).items()):
-            names = [n["label"] for n in nodes]
-            sections.append(f"  Hop {hop_num}: {', '.join(names)}")
+            names = [n["label"] for n in nodes][:5]  # Top 5 per hop
+            sections.append(f"  Hop {hop_num}: {', '.join(names)}" + (" ..." if len(nodes) > 5 else ""))
         sections.append("")
 
+    # PRIVILEGE ESCALATION - EMPHASIZE UNFIXABILITY
     if cycles and cycles.get("cycle_count", 0) > 0:
-        sections += [f"## Privilege Escalation Cycles (DFS) - {cycles['cycle_count']} detected"]
-        for cycle in cycles.get("cycles", []):
-            sections.append(
-                f"  [{cycle['severity'].upper()}] {cycle['chain']} "
-                f"(length={cycle['length']}, max_risk={cycle['max_risk']})"
-            )
-        sections.append("")
-
-    if critical_nodes and critical_nodes.get("nodes"):
         sections += [
-            "## Critical Nodes (Betweenness Centrality)",
-            "Top nodes by combined centrality + risk score:",
+            f"## RISK 3: Privilege Escalation Cycles",
+            f"Found {cycles['cycle_count']} privilege loops - attackers can gain unlimited permissions.",
+            "This is the most dangerous class of vulnerability (impossible to contain once exploited).",
+            "Escalation routes:",
         ]
-        for node in critical_nodes["nodes"][:5]:
-            sections.append(
-                f"  #{node['rank']} {node['label']} ({node['type']}) - "
-                f"centrality={node['centrality_score']}, risk={node['risk']}, "
-                f"combined={node['combined_score']}"
-            )
+        for cycle in cycles.get("cycles", [])[:3]:  # Top 3 cycles
+            sections.append(f"  • {cycle['chain']} (severity: {cycle['severity']})")
         sections.append("")
 
-    sections.append(
-        "Generate a JSON array of security findings based on the above data. "
-        "Be specific, name actual nodes, and give concrete remediation steps."
-    )
+    # CRITICAL NODES - EMPHASIZE SINGLE POINTS OF FAILURE
+    if critical_nodes and critical_nodes.get("nodes"):
+        top_node = critical_nodes["nodes"][0] if critical_nodes["nodes"] else None
+        if top_node:
+            sections += [
+                f"## CRITICAL CONTROL POINTS",
+                f"The cluster has {len(critical_nodes['nodes'])} critical choke points.",
+                f"Most critical: '{top_node['label']}' - removing it would break {top_node.get('combined_score', 0):.1f} attack paths.",
+                "Other critical nodes:",
+            ]
+            for node in critical_nodes["nodes"][1:4]:
+                sections.append(f"  • {node['label']} ({node['type']})")
+        sections.append("")
+
+    sections += [
+        "## TASK",
+        "Generate a JSON array of security findings that a CEO would understand.",
+        "Each finding should answer: (1) What is the risk? (2) Why does it matter? (3) How do we fix it?",
+        "Be dramatic, be specific, and be actionable. Sort by severity.",
+    ]
     return "\n".join(sections)
 
 

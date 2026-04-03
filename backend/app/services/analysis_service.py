@@ -9,6 +9,7 @@ from app.algorithm.centrality import find_critical_nodes
 from app.core.graph_builder import get_graph
 from app.utils.helpers import timed
 from app.utils.logger import get_logger, log_algorithm_run
+from app.services.threat_score_service import calculate_threat_score
 
 logger = get_logger(__name__)
 
@@ -107,9 +108,16 @@ def get_full_analysis() -> dict:
     has_ai_report = False,
     triggered_by  = "analysis",
 )
-    return {
+
+    # NEW: Calculate threat score
+    analysis_result = {
         "attack_path":    attack_path,
         "blast_radius":   blast,
         "cycles":         cycles,
         "critical_nodes": critical,
     }
+
+    threat_score_result = calculate_threat_score(analysis_result)
+    analysis_result["threat_score"] = threat_score_result
+
+    return analysis_result

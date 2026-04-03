@@ -9,6 +9,7 @@ from app.algorithm.dijkstra import shortest_attack_path, all_attack_paths
 from app.core.graph_builder import get_graph, find_entry_points, find_sensitive_targets
 from app.utils.helpers import severity_label, timed
 from app.utils.logger import get_logger, log_algorithm_run
+from app.services.remediation_service import analyze_attack_path_for_remediation
 
 logger = get_logger(__name__)
 
@@ -38,6 +39,10 @@ def get_attack_path(source: str, target: str) -> dict:
     # Overall path severity = worst single hop
     max_risk = max((h["edge_risk"] for h in result.get("hops", [])), default=0.0)
     result["severity"] = severity_label(max_risk)
+
+    # NEW: Add remediation suggestions
+    remediations = analyze_attack_path_for_remediation(result)
+    result["remediations"] = [r.to_dict() for r in remediations]
 
     if result.get("found"):
         from app.services.slack_service import send_attack_path_alert

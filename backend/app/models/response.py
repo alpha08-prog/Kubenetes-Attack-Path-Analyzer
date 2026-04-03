@@ -56,6 +56,18 @@ class HopDetail(BaseModel):
     severity:    str | None = None
 
 
+class RemediationStep(BaseModel):
+    title: str
+    description: str
+    action_type: str  # "rbac", "network_policy", "pod_hardening", "secret_isolation"
+    target_resource: str
+    target_resource_type: str
+    change: str
+    yaml_snippet: str
+    impact_count: int
+    difficulty: str  # "low", "medium", "high"
+
+
 class AttackPathResponse(BaseModel):
     source:        str
     source_label:  str
@@ -69,6 +81,7 @@ class AttackPathResponse(BaseModel):
     hops:          list[HopDetail] | None = None
     message:       str   | None = None
     auto_detected: bool  | None = None
+    remediations:  list[RemediationStep] | None = None  # NEW: suggested fixes
 
 
 class AllPathsEntry(BaseModel):
@@ -246,3 +259,34 @@ class ErrorResponse(BaseModel):
 class StatusResponse(BaseModel):
     status:  str
     message: str | None = None
+
+
+# ─── Threat Score ─────────────────────────────────────────────────────────────
+
+class ThreatScoreFactors(BaseModel):
+    attack_paths: bool
+    shortest_path_hops: int | None
+    privilege_escalation_cycles: int
+    critical_node_junctions: int
+    blast_radius_size: int
+
+
+class ThreatScoreBenchmarks(BaseModel):
+    example_safe_cluster: float
+    example_typical_cluster: float
+    example_vulnerable_cluster: float
+
+
+class ThreatScoreResponse(BaseModel):
+    threat_score: float  # 1.0-10.0
+    risk_level: str  # "critical", "high", "medium", "low", "minimal"
+    description: str
+    factors: ThreatScoreFactors
+    benchmarks: ThreatScoreBenchmarks
+
+
+class ThreatScoreTrend(BaseModel):
+    trend: str  # "improving", "worsening", "stable", "insufficient_data"
+    score_delta: float | None
+    previous_score: float | None
+    latest_score: float | None

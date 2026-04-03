@@ -29,3 +29,5 @@ export const getReportPdf = (clusterName = 'nokia-telecom-cluster') =>
     params: { cluster_name: clusterName },
     responseType: 'blob',
   });
+
+export const getFullAnalysis = () => client.get('/api/analysis/');

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Loader2, Play, Zap, ArrowRight } from 'lucide-react';
+import { Loader2, Play, Zap, ArrowRight, Copy, CheckCircle2 } from 'lucide-react';
 import SeverityBadge from './SeverityBadge';
 import type { GraphNode } from '@/hooks/useGraph';
 
@@ -23,6 +23,8 @@ const FALLBACK_TARGETS = [
 export default function AttackPathPanel({ nodes, attackPath, loading, onFindPath, onAutoDetect, onShowOnGraph }: Props) {
   const [source, setSource] = useState('');
   const [target, setTarget] = useState('');
+  const [activeTab, setActiveTab] = useState<'path' | 'remediation'>('path');
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
   const sources = nodes.filter(n => ['pod', 'user', 'service_account'].includes(n.type));
   const targets = nodes.filter(n => ['database', 'secret'].includes(n.type));
@@ -81,33 +83,119 @@ export default function AttackPathPanel({ nodes, attackPath, loading, onFindPath
         <div className="space-y-3 mt-4">
           {attackPath.path && attackPath.path.length > 0 ? (
             <>
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-foreground">Kill Chain ({attackPath.path.length} hops)</span>
-                {attackPath.total_cost != null && (
-                  <span className="text-xs text-muted-foreground">Cost: {attackPath.total_cost.toFixed(1)}</span>
-                )}
+              {/* Tabs */}
+              <div className="flex border-b border-border">
+                <button
+                  onClick={() => setActiveTab('path')}
+                  className={`flex-1 px-3 py-2 text-sm font-medium border-b-2 transition-colors ${
+                    activeTab === 'path'
+                      ? 'border-primary text-primary'
+                      : 'border-transparent text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  Kill Chain
+                </button>
+                <button
+                  onClick={() => setActiveTab('remediation')}
+                  className={`flex-1 px-3 py-2 text-sm font-medium border-b-2 transition-colors ${
+                    activeTab === 'remediation'
+                      ? 'border-primary text-primary'
+                      : 'border-transparent text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  Remediation ({attackPath.remediations?.length || 0})
+                </button>
               </div>
-              <div className="space-y-2">
-                {attackPath.path.map((step: any, i: number) => (
-                  <div key={i} className="flex items-center gap-2 p-2 bg-secondary rounded text-sm">
-                    <span className="text-foreground font-medium">{step.from_label || step.from}</span>
-                    <ArrowRight className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-                    <span className="text-xs text-muted-foreground">[{step.relation}]</span>
-                    <ArrowRight className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-                    <span className="text-foreground font-medium">{step.to_label || step.to}</span>
-                    {step.severity && <SeverityBadge severity={step.severity} />}
-                    {step.risk_score != null && (
-                      <span className="text-xs text-muted-foreground ml-auto">{step.risk_score}</span>
+
+              {/* Kill Chain Tab */}
+              {activeTab === 'path' && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-foreground">({attackPath.path.length} hops)</span>
+                    {attackPath.total_cost != null && (
+                      <span className="text-xs text-muted-foreground">Cost: {attackPath.total_cost.toFixed(1)}</span>
                     )}
                   </div>
-                ))}
-              </div>
-              <button
-                onClick={onShowOnGraph}
-                className="w-full bg-destructive/20 text-destructive border border-destructive/30 rounded-md px-3 py-2 text-sm font-medium hover:bg-destructive/30 transition-colors"
-              >
-                Show on Graph
-              </button>
+                  <div className="space-y-2">
+                    {attackPath.path.map((step: any, i: number) => (
+                      <div key={i} className="flex items-center gap-2 p-2 bg-secondary rounded text-sm">
+                        <span className="text-foreground font-medium">{step.from_label || step.from}</span>
+                        <ArrowRight className="w-3 h-3 text-muted-foreground flex-shrink-0" />
+                        <span className="text-xs text-muted-foreground">[{step.relation}]</span>
+                        <ArrowRight className="w-3 h-3 text-muted-foreground flex-shrink-0" />
+                        <span className="text-foreground font-medium">{step.to_label || step.to}</span>
+                        {step.severity && <SeverityBadge severity={step.severity} />}
+                        {step.risk_score != null && (
+                          <span className="text-xs text-muted-foreground ml-auto">{step.risk_score}</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    onClick={onShowOnGraph}
+                    className="w-full bg-destructive/20 text-destructive border border-destructive/30 rounded-md px-3 py-2 text-sm font-medium hover:bg-destructive/30 transition-colors"
+                  >
+                    Show on Graph
+                  </button>
+                </div>
+              )}
+
+              {/* Remediation Tab */}
+              {activeTab === 'remediation' && (
+                <div className="space-y-2 max-h-96 overflow-y-auto">
+                  {attackPath.remediations && attackPath.remediations.length > 0 ? (
+                    attackPath.remediations.map((rem: any, idx: number) => (
+                      <div key={idx} className="p-3 bg-secondary rounded border border-border space-y-2">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <p className="text-sm font-medium text-foreground">{rem.title}</p>
+                            <p className="text-xs text-muted-foreground mt-1">{rem.description}</p>
+                          </div>
+                          <span className={`text-xs px-2 py-1 rounded whitespace-nowrap ${
+                            rem.difficulty === 'low' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                            rem.difficulty === 'medium' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
+                            'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200'
+                          }`}>
+                            {rem.difficulty}
+                          </span>
+                        </div>
+                        <div className="text-xs space-y-1">
+                          <p className="text-muted-foreground"><span className="font-medium">Action:</span> {rem.change}</p>
+                          <p className="text-muted-foreground"><span className="font-medium">Resource:</span> {rem.target_resource} ({rem.target_resource_type})</p>
+                          <p className="text-muted-foreground"><span className="font-medium">Breaks:</span> {rem.impact_count} attack path(s)</p>
+                        </div>
+                        <div className="bg-muted rounded p-2 font-mono text-xs overflow-x-auto max-h-24 overflow-y-auto">
+                          {rem.yaml_snippet}
+                        </div>
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(rem.yaml_snippet);
+                            setCopiedIndex(idx);
+                            setTimeout(() => setCopiedIndex(null), 2000);
+                          }}
+                          className="flex items-center gap-2 text-xs text-primary hover:text-primary/80 transition-colors"
+                        >
+                          {copiedIndex === idx ? (
+                            <>
+                              <CheckCircle2 className="w-3 h-3" />
+                              Copied
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3 h-3" />
+                              Copy YAML
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-4 text-muted-foreground">
+                      <p className="text-sm">No specific remediation suggestions available</p>
+                    </div>
+                  )}
+                </div>
+              )}
             </>
           ) : (
             <div className="text-center py-6 text-destructive">
