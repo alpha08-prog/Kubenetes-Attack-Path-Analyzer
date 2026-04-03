@@ -152,9 +152,12 @@ export default function GraphCanvas({
           } as any)
         : ({
             name: 'dagre',
-            rankDir: 'TB',
+            rankDir: 'LR',
             nodeSep: 60,
-            rankSep: 80,
+            rankSep: 100,
+            padding: 30,
+            fit: true,
+            spacingFactor: 1.1,
           } as any),
     [nodeCount],
   );
@@ -413,56 +416,60 @@ export default function GraphCanvas({
         </div>
       </div>
 
-      <div className="relative flex-1 min-h-0">
-        <div ref={containerRef} className="w-full h-full" />
-
-        <div className="absolute bottom-3 left-3 bg-card/90 backdrop-blur border border-border rounded-lg p-3 text-xs space-y-2">
-          <p className="text-xs font-semibold text-foreground">Risk Level</p>
-          {[
-            { color: '#E24B4A', label: 'Critical (≥8)' },
-            { color: '#EF9F27', label: 'High (6-7.9)' },
-            { color: '#378ADD', label: 'Medium (4-5.9)' },
-            { color: '#1D9E75', label: 'Low (<4)' },
-          ].map((item) => (
-            <div key={item.label} className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
-              <span className="text-muted-foreground">{item.label}</span>
-            </div>
-          ))}
-          <div className="border-t border-border pt-1 mt-1 space-y-1">
-            <p className="text-xs font-semibold text-foreground">Node Type</p>
+      <div className="flex flex-1 min-h-0">
+        <div className="w-40 flex-shrink-0 border-r border-border bg-card/50 p-4 text-xs space-y-5 overflow-y-auto hidden sm:block">
+          <div>
+            <p className="text-xs font-semibold text-foreground mb-3">Risk Level</p>
+            {[
+              { color: '#E24B4A', label: 'Critical (≥8)' },
+              { color: '#EF9F27', label: 'High (6-7.9)' },
+              { color: '#378ADD', label: 'Medium (4-5.9)' },
+              { color: '#1D9E75', label: 'Low (<4)' },
+            ].map((item) => (
+              <div key={item.label} className="flex items-center gap-2.5 mb-2">
+                <span className="w-3 h-3 rounded-full flex-shrink-0 shadow-sm" style={{ backgroundColor: item.color }} />
+                <span className="text-muted-foreground">{item.label}</span>
+              </div>
+            ))}
+          </div>
+          <div className="border-t border-border pt-4">
+            <p className="text-xs font-semibold text-foreground mb-3">Node Type</p>
             {LEGEND_ITEMS.map((item) => (
-              <div key={item.type} className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-sm flex-shrink-0" style={{ backgroundColor: NODE_COLORS[item.type] }} />
+              <div key={item.type} className="flex items-center gap-2.5 mb-2">
+                <span className="w-3 h-3 rounded-sm flex-shrink-0 shadow-sm" style={{ backgroundColor: NODE_COLORS[item.type] }} />
                 <span className="text-muted-foreground">{item.label}</span>
               </div>
             ))}
           </div>
         </div>
 
-        {contextMenu && (
-          <div
-            className="absolute z-30 bg-card border border-border rounded-lg shadow-lg py-1 min-w-[180px]"
-            style={{ left: contextMenu.x, top: contextMenu.y }}
-          >
-            {[
-              { action: 'set-source', label: 'Set as Attack Source' },
-              { action: 'set-target', label: 'Set as Attack Target' },
-              { action: 'blast-radius', label: 'Show Blast Radius' },
-              { action: 'simulate-removal', label: 'Simulate Removal' },
-            ].map((item) => (
-              <button
-                key={item.action}
-                className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-secondary transition-colors"
-                onClick={() => handleContextAction(item.action)}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
-        )}
+        <div className="relative flex-1 min-h-0">
+          <div ref={containerRef} className="w-full h-full" />
+
+          {contextMenu && (
+            <div
+              className="absolute z-30 bg-card border border-border rounded-lg shadow-lg py-1 min-w-[180px]"
+              style={{ left: contextMenu.x, top: contextMenu.y }}
+            >
+              {[
+                { action: 'set-source', label: 'Set as Attack Source' },
+                { action: 'set-target', label: 'Set as Attack Target' },
+                { action: 'blast-radius', label: 'Show Blast Radius' },
+                { action: 'simulate-removal', label: 'Simulate Removal' },
+              ].map((item) => (
+                <button
+                  key={item.action}
+                  className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-secondary transition-colors"
+                  onClick={() => handleContextAction(item.action)}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          )}
 
         <NodeSidebar node={selectedNode} onClose={() => setSelectedNode(null)} />
+        </div>
       </div>
     </div>
   );

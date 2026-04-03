@@ -16,7 +16,6 @@ import CriticalNodeTable from '@/components/CriticalNodeTable';
 import SimulationPanel from '@/components/SimulationPanel';
 import SimulationModal from '@/components/SimulationModal';
 import NarratorPanel from '@/components/NarratorPanel';
-import LiveCveFeedPanel from '@/components/LiveCveFeedPanel';
 
 type OverlayMode = 'default' | 'attack' | 'blast' | 'cycle';
 type Tab = 'attack' | 'blast' | 'cycles' | 'simulation';
@@ -76,55 +75,65 @@ export default function Dashboard() {
     <div className="h-screen flex flex-col bg-background overflow-hidden">
 
       {/* ── Header ─────────────────────────────────────────────── */}
-      <header className="flex-shrink-0 flex flex-wrap items-center justify-between gap-2 px-4 sm:px-6 py-3 border-b border-border bg-card/80">
+      <header className="flex-shrink-0 flex flex-wrap items-center justify-between gap-2 px-3 sm:px-4 md:px-6 py-2 sm:py-3 border-b border-border bg-card/80">
         {/* Left: branding */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 min-w-0 flex-1">
           {/* Live indicator */}
-          <span className="hidden sm:flex items-center gap-1.5 text-[10px] font-semibold text-emerald-400 tracking-widest uppercase">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-live" />
+          <span className="hidden sm:flex items-center gap-1 text-[8px] md:text-[10px] font-semibold text-emerald-400 tracking-widest uppercase flex-shrink-0">
+            <span className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-emerald-400 animate-live" />
             Live
           </span>
 
-          <div className="w-px h-4 bg-border hidden sm:block" />
+          <div className="w-px h-3 md:h-4 bg-border hidden sm:block flex-shrink-0" />
 
-          <Shield className="w-5 h-5 text-primary flex-shrink-0" />
-          <h1 className="text-sm font-bold text-foreground tracking-tight whitespace-nowrap">
+          <Shield className="w-4 md:w-5 h-4 md:h-5 text-primary flex-shrink-0" />
+          <h1 className="text-xs md:text-sm lg:text-base font-bold text-foreground tracking-tight truncate">
             Attack Path Analyzer
           </h1>
-          <span className="text-[11px] bg-primary/15 text-primary border border-primary/20 px-2 py-0.5 rounded-full font-medium hidden md:inline">
+          <span className="hidden md:inline text-[10px] lg:text-[11px] bg-primary/15 text-primary border border-primary/20 px-1.5 md:px-2 py-0.5 rounded-full font-medium flex-shrink-0">
             nokia-telecom-cluster
           </span>
         </div>
 
         {/* Right: actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
           <button
             onClick={reload}
             disabled={graphLoading}
-            className="flex items-center gap-1.5 bg-secondary hover:bg-surface-hover text-foreground px-3 py-1.5 rounded-lg text-xs font-medium transition-colors disabled:opacity-50"
+            className="flex items-center gap-1 sm:gap-1.5 bg-secondary hover:bg-surface-hover text-foreground px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-medium transition-colors disabled:opacity-50"
+            title="Reload graph data"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${graphLoading ? 'animate-spin' : ''}`} />
-            <span className="hidden sm:inline">Reload Graph</span>
+            <RefreshCw className={`w-3 sm:w-3.5 h-3 sm:h-3.5 ${graphLoading ? 'animate-spin' : ''}`} />
+            <span className="hidden sm:inline">Reload</span>
+          </button>
+          <button
+            onClick={() => navigate('/cve-feed')}
+            className="flex items-center gap-1 sm:gap-1.5 bg-secondary hover:bg-surface-hover text-foreground px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-medium transition-colors"
+            title="View Live CVE Feed"
+          >
+            <AlertTriangle className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-orange-400" />
+            <span className="hidden sm:inline">CVE Feed</span>
           </button>
           <button
             onClick={() => navigate('/demo')}
-            className="flex items-center gap-1.5 bg-primary hover:opacity-90 text-primary-foreground px-3 py-1.5 rounded-lg text-xs font-medium transition-opacity"
+            className="flex items-center gap-1 sm:gap-1.5 bg-primary hover:opacity-90 text-primary-foreground px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-medium transition-opacity"
+            title="Start interactive demo"
           >
-            <Play className="w-3.5 h-3.5" />
-            Run Demo
+            <Play className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
+            <span className="hidden sm:inline">Demo</span>
           </button>
         </div>
       </header>
 
       {/* ── Metrics Bar ────────────────────────────────────────── */}
       <div className="flex-shrink-0 flex gap-2 px-3 sm:px-6 py-2 border-b border-border/60 overflow-x-auto scrollbar-thin">
-        {/* Threat Score — compact */}
-        <div className="w-40 flex-shrink-0">
+        {/* Threat Score — responsive width */}
+        <div className="w-32 sm:w-36 md:w-40 flex-shrink-0">
           <ThreatScoreCard threatScore={analysis.threatScore} loading={graphLoading} />
         </div>
 
-        {/* Stat cards — single row, flex layout */}
-        <div className="flex-1 flex gap-2 min-w-0">
+        {/* Stat cards — evenly distribute space across all cards */}
+        <div className="flex-1 grid grid-cols-2 lg:grid-cols-4 gap-1.5 sm:gap-2 min-w-0">
           <StatCard
             title="Total Nodes"
             value={summary?.total_nodes ?? '—'}
@@ -167,7 +176,7 @@ export default function Dashboard() {
               <Activity className="w-3.5 h-3.5 text-primary" />
               <span className="text-xs font-semibold text-foreground">Network Topology</span>
               {summary && (
-                <span className="text-[10px] text-muted-foreground">
+                <span className="text-[9px] md:text-[10px] text-muted-foreground truncate">
                   {summary.total_nodes} nodes · {summary.total_edges} edges
                 </span>
               )}
@@ -231,7 +240,7 @@ export default function Dashboard() {
                 >
                   {t.label}
                   {activeTab === t.key && (
-                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-full" />
+                    <span className="absolute bottom-0 left-0 right-0 h-1 bg-primary" />
                   )}
                 </button>
               ))}
@@ -283,11 +292,6 @@ export default function Dashboard() {
                 />
               )}
             </div>
-          </div>
-
-          {/* CVE Threat Intelligence panel — hidden on md/sm, visible on lg */}
-          <div className="hidden lg:flex flex-1 min-h-0 overflow-hidden rounded-xl border border-border bg-card">
-            <LiveCveFeedPanel />
           </div>
         </div>
       </div>

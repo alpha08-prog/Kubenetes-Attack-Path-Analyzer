@@ -52,9 +52,9 @@ function SummaryTile({
   className: string;
 }) {
   return (
-    <div className={cn('rounded-md border px-3 py-2', className)}>
-      <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">{label}</p>
-      <p className="mt-1 text-lg font-semibold text-foreground">{value}</p>
+    <div className={cn('rounded px-1.5 py-0.5 flex items-center gap-1.5 border', className)}>
+      <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>
+      <span className="text-sm font-bold text-foreground">{value}</span>
     </div>
   );
 }
@@ -178,29 +178,34 @@ export default function LiveCveFeedPanel() {
   }, [refreshPanel]);
 
   return (
-    <section className="flex min-h-0 flex-col rounded-lg border border-border bg-card">
-      <div className="border-b border-border px-4 py-3">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <h2 className="text-sm font-semibold text-foreground">Live CVE Feed</h2>
-            <p className="text-xs text-muted-foreground">
-              {hasSearch ? `Results for "${activeQuery}"` : 'Latest Kubernetes CVEs'}
-            </p>
+    <section className="flex h-full w-full min-h-0 flex-col border-0 bg-transparent">
+      <div className="border-b border-border px-3 py-2.5">
+        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-2.5">
+          <div className="flex items-center justify-between xl:justify-start flex-1 min-w-0">
+            <div className="truncate">
+              <h2 className="text-sm font-semibold text-foreground truncate">Live CVE Feed</h2>
+              <p className="text-[11px] text-muted-foreground truncate">
+                {hasSearch ? `Results for "${activeQuery}"` : 'Latest Kubernetes CVEs'}
+              </p>
+            </div>
+            
+            {/* Show refresh button next to titles on smaller screens, or hide logic */}
+            <RefreshCw className={cn('h-3.5 w-3.5 text-muted-foreground xl:hidden ml-2 flex-shrink-0', refreshing && 'animate-spin cursor-pointer')} onClick={refreshPanel} />
           </div>
-          <RefreshCw className={cn('h-4 w-4 text-muted-foreground', refreshing && 'animate-spin')} />
-        </div>
 
-        <div className="mt-3 grid grid-cols-2 gap-2">
-          <SummaryTile
-            label="Critical"
-            value={summary?.critical ?? (loading ? '...' : 0)}
-            className="border-red-500/20 bg-red-500/8"
-          />
-          <SummaryTile
-            label="High"
-            value={summary?.high ?? (loading ? '...' : 0)}
-            className="border-orange-500/20 bg-orange-500/8"
-          />
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <SummaryTile
+              label="Critical"
+              value={summary?.critical ?? (loading ? '...' : 0)}
+              className="border-red-500/20 bg-red-500/8 text-red-500"
+            />
+            <SummaryTile
+              label="High"
+              value={summary?.high ?? (loading ? '...' : 0)}
+              className="border-orange-500/20 bg-orange-500/8 text-orange-500"
+            />
+            <RefreshCw className={cn('h-3.5 w-3.5 text-muted-foreground hidden xl:block cursor-pointer hover:text-foreground transition-colors', refreshing && 'animate-spin')} onClick={refreshPanel} />
+          </div>
         </div>
 
         <form onSubmit={handleSearch} className="mt-3 flex gap-2">

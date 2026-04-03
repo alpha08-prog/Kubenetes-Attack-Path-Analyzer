@@ -42,7 +42,7 @@ export default function AttackPathPanel({ nodes, attackPath, loading, onFindPath
       : FALLBACK_TARGETS.map(id => ({ id, label: id.split(':').pop()!, type: id.split(':')[0] } as GraphNode));
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-3 p-3">
       <div className="space-y-2">
         <label className="text-xs text-muted-foreground">Source Node</label>
         <select value={source} onChange={e => setSource(e.target.value)} className="w-full bg-secondary text-foreground rounded-md px-3 py-2 text-sm border border-border">
@@ -78,8 +78,19 @@ export default function AttackPathPanel({ nodes, attackPath, loading, onFindPath
         </button>
       </div>
 
+      {/* Loading state */}
+      {loading && (
+        <div className="p-6 flex flex-col items-center justify-center gap-3">
+          <Loader2 className="w-5 h-5 animate-spin text-primary" />
+          <div className="text-center">
+            <p className="text-sm font-medium text-foreground">Analyzing paths...</p>
+            <p className="text-xs text-muted-foreground mt-1">This may take a few seconds</p>
+          </div>
+        </div>
+      )}
+
       {/* Results */}
-      {attackPath && (
+      {!loading && attackPath && (
         <div className="space-y-3 mt-4">
           {attackPath.path && attackPath.path.length > 0 ? (
             <>
@@ -206,7 +217,7 @@ export default function AttackPathPanel({ nodes, attackPath, loading, onFindPath
         </div>
       )}
 
-      {!attackPath && !loading && (
+      {!loading && !attackPath && (
         <div className="text-center py-8 text-muted-foreground">
           <Play className="w-8 h-8 mx-auto mb-2 opacity-50" />
           <p className="text-sm">Run analysis to find attack paths</p>

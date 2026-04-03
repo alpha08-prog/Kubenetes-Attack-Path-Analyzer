@@ -66,7 +66,7 @@ export default function NarratorPanel({ report, loading, onFetchReport, error }:
           setExpanded(!expanded);
           if (!expanded && !report && !loading) onFetchReport();
         }}
-        className="w-full flex items-center justify-between px-4 sm:px-6 py-2.5 hover:bg-secondary/40 transition-colors group"
+        className="w-full flex items-center justify-between px-4 sm:px-6 py-2.5 hover:bg-secondary/40 transition-colors duration-200 group"
       >
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
@@ -105,7 +105,7 @@ export default function NarratorPanel({ report, loading, onFetchReport, error }:
 
       {/* Expanded content */}
       {expanded && (
-        <div className="px-4 sm:px-6 pb-6 max-h-[50vh] overflow-y-auto scrollbar-thin border-t border-border/60">
+        <div className="px-4 sm:px-6 pb-6 max-h-[50vh] overflow-y-auto scrollbar-thin border-t border-border/60 animate-in fade-in slide-in-from-top-2 duration-300">
           {loading && (
             <div className="flex flex-col items-center justify-center py-10 gap-3">
               <div className="relative">

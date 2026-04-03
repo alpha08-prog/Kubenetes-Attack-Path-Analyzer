@@ -44,7 +44,15 @@ export default function BlastRadiusPanel({ nodes, blastRadius, loading, onAnalyz
         Analyze
       </button>
 
-      {blastRadius && (
+      {/* Loading state */}
+      {loading && (
+        <div className="flex flex-col items-center justify-center py-8 gap-2">
+          <Loader2 className="w-4 h-4 animate-spin text-primary" />
+          <span className="text-xs text-muted-foreground">Analyzing...</span>
+        </div>
+      )}
+
+      {!loading && blastRadius && (
         <div className="space-y-3 mt-4">
           <p className="text-sm font-medium text-foreground">
             {blastRadius.total_affected || 0} nodes reachable within {blastRadius.max_hops || hops} hops
@@ -87,7 +95,7 @@ export default function BlastRadiusPanel({ nodes, blastRadius, loading, onAnalyz
         </div>
       )}
 
-      {!blastRadius && !loading && (
+      {!loading && !blastRadius && (
         <div className="text-center py-8 text-muted-foreground">
           <Target className="w-8 h-8 mx-auto mb-2 opacity-50" />
           <p className="text-sm">Select a node to analyze blast radius</p>
