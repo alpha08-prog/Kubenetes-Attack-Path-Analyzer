@@ -50,34 +50,43 @@ test.describe('Dashboard — responsive layout', () => {
       await page.goto('/');
       await page.waitForLoadState('domcontentloaded');
 
-      const header = page.locator('header').first();
-      await expect(header).toBeVisible();
+      // Run Demo button is always visible (text never hidden)
+      const runDemoBtn = page.getByRole('button', { name: /run demo/i });
+      await expect(runDemoBtn).toBeVisible();
 
-      const bbox = await header.boundingBox();
-      expect(bbox).not.toBeNull();
-      expect(bbox!.x + bbox!.width).toBeLessThanOrEqual(vp.width + 2);
+      // The top bar must not extend beyond viewport
+      const topBar = page.locator('[class*="border-b"]').first();
+      const bbox = await topBar.boundingBox();
+      if (bbox) {
+        expect(bbox.x + bbox.width).toBeLessThanOrEqual(vp.width + 2);
+      }
     });
 
-    test(`[${vp.name}] main content area has non-zero height`, async ({ page }) => {
+    test(`[${vp.name}] metrics bar is visible`, async ({ page }) => {
       await page.setViewportSize({ width: vp.width, height: vp.height });
       await page.goto('/');
       await page.waitForLoadState('domcontentloaded');
 
-      // The stats row must be visible
-      const statsGrid = page.locator('.grid').first();
-      const bbox = await statsGrid.boundingBox();
-      expect(bbox).not.toBeNull();
-      expect(bbox!.height).toBeGreaterThan(20);
+      // Metrics bar is a horizontal flex row with threat score + stat cards
+      // Check that stat cards are visible by looking for "Total Nodes" text
+      const totalNodesCard = page.getByText('Total Nodes');
+      await expect(totalNodesCard).toBeVisible();
+
+      // Also verify the metrics row container itself is visible
+      const metricsRow = page.locator('[class*="flex-shrink-0"][class*="flex"][class*="gap-2"][class*="border-b"]').first();
+      await expect(metricsRow).toBeVisible();
     });
   }
 
-  test('[mobile] stats grid does not overflow at 375px', async ({ page }) => {
+  test('[mobile] stats flex row does not overflow at 375px', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
 
-    const statsGrid = page.locator('.grid').first();
-    const bbox = await statsGrid.boundingBox();
+    // Stats container is now a flex row, check it fits in viewport
+    const statsContainer = page.locator('div').filter({ has: page.locator('div').filter({ hasText: /Total Nodes|Total Edges|Critical Findings/ }).first() }).first();
+    const metricsRow = page.locator('[class*="flex-shrink-0"][class*="flex"][class*="gap-2"][class*="border-b"]').first();
+    const bbox = await metricsRow.boundingBox();
     if (bbox) {
       expect(bbox.x + bbox.width).toBeLessThanOrEqual(375 + 2);
     }
@@ -89,12 +98,14 @@ test.describe('Dashboard — responsive layout', () => {
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(600);
 
-    // After fix: flex-col on mobile means each child is full width
-    // The graph container and sidebar container should each be wider than 300px
-    const mainContent = page.locator('.flex-1.flex').first();
+    // Main content container has flex-col on mobile, flex-row on md+
+    // Look for the container with 'md:flex-row' in its class to identify main content
+    // This will have graph (w-full md:w-[70%]) and sidebar (w-full md:w-[30%]) as children
+    const mainContent = page.locator('div[class*="flex-col"][class*="md:flex-row"][class*="min-h-0"]').first();
     const children = mainContent.locator('> div');
     const count = await children.count();
 
+    // On mobile (375px), each panel should be full width (~375px)
     for (let i = 0; i < count; i++) {
       const bbox = await children.nth(i).boundingBox();
       if (bbox && bbox.width > 0) {

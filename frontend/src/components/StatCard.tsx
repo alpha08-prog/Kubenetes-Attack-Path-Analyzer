@@ -10,18 +10,33 @@ interface Props {
 
 export default function StatCard({ title, value, icon, color = 'hsl(var(--primary))', loading }: Props) {
   return (
-    <div className="flex items-center gap-3 rounded-lg bg-card border border-border px-4 py-3">
-      <div className="p-2 rounded-md" style={{ backgroundColor: color + '22' }}>
-        <span style={{ color }}>{icon}</span>
+    <div
+      className="relative flex flex-col justify-between rounded-xl bg-card border border-border px-4 py-1.5 overflow-hidden h-full"
+      style={{ borderLeftColor: color, borderLeftWidth: '3px' }}
+    >
+      {/* Subtle background tint */}
+      <div
+        className="absolute inset-0 opacity-[0.04] pointer-events-none"
+        style={{ background: `radial-gradient(ellipse at top left, ${color}, transparent 70%)` }}
+      />
+
+      {/* Icon + title row */}
+      <div className="flex items-center justify-between mb-1">
+        <p className="text-[10px] font-medium text-muted-foreground tracking-wide uppercase whitespace-nowrap">{title}</p>
+        <div
+          className="p-1 rounded-lg flex-shrink-0"
+          style={{ backgroundColor: color + '1a' }}
+        >
+          <span style={{ color }}>{icon}</span>
+        </div>
       </div>
-      <div>
-        <p className="text-xs text-muted-foreground">{title}</p>
-        {loading ? (
-          <Loader2 className="w-4 h-4 animate-spin text-muted-foreground mt-1" />
-        ) : (
-          <p className="text-lg font-bold text-foreground">{value}</p>
-        )}
-      </div>
+
+      {/* Value */}
+      {loading ? (
+        <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+      ) : (
+        <p className="text-lg font-black tabular-nums text-foreground leading-tight whitespace-nowrap">{value}</p>
+      )}
     </div>
   );
 }

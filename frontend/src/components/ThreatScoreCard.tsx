@@ -1,4 +1,4 @@
-import { AlertTriangle, TrendingUp, TrendingDown } from 'lucide-react';
+import { AlertTriangle, ShieldAlert, ShieldCheck } from 'lucide-react';
 
 interface ThreatScoreData {
   threat_score: number;
@@ -18,117 +18,124 @@ interface Props {
   loading?: boolean;
 }
 
+const RISK_CONFIG: Record<string, {
+  scoreColor: string;
+  badgeBg: string;
+  badgeText: string;
+  borderColor: string;
+  barColor: string;
+  glowClass: string;
+  Icon: React.ElementType;
+}> = {
+  critical: {
+    scoreColor: 'text-red-400',
+    badgeBg: 'bg-red-500/15 border border-red-500/30',
+    badgeText: 'text-red-400',
+    borderColor: 'border-red-500/40',
+    barColor: 'bg-red-500',
+    glowClass: 'glow-critical',
+    Icon: ShieldAlert,
+  },
+  high: {
+    scoreColor: 'text-orange-400',
+    badgeBg: 'bg-orange-500/15 border border-orange-500/30',
+    badgeText: 'text-orange-400',
+    borderColor: 'border-orange-500/40',
+    barColor: 'bg-orange-400',
+    glowClass: '',
+    Icon: AlertTriangle,
+  },
+  medium: {
+    scoreColor: 'text-yellow-400',
+    badgeBg: 'bg-yellow-500/15 border border-yellow-500/30',
+    badgeText: 'text-yellow-400',
+    borderColor: 'border-yellow-500/30',
+    barColor: 'bg-yellow-400',
+    glowClass: '',
+    Icon: AlertTriangle,
+  },
+  low: {
+    scoreColor: 'text-blue-400',
+    badgeBg: 'bg-blue-500/15 border border-blue-500/30',
+    badgeText: 'text-blue-400',
+    borderColor: 'border-blue-500/30',
+    barColor: 'bg-blue-400',
+    glowClass: 'glow-primary',
+    Icon: ShieldCheck,
+  },
+  minimal: {
+    scoreColor: 'text-emerald-400',
+    badgeBg: 'bg-emerald-500/15 border border-emerald-500/30',
+    badgeText: 'text-emerald-400',
+    borderColor: 'border-emerald-500/30',
+    barColor: 'bg-emerald-400',
+    glowClass: '',
+    Icon: ShieldCheck,
+  },
+};
+
+const FALLBACK = {
+  scoreColor: 'text-foreground',
+  badgeBg: 'bg-secondary',
+  badgeText: 'text-foreground',
+  borderColor: 'border-border',
+  barColor: 'bg-primary',
+  glowClass: '',
+  Icon: AlertTriangle,
+};
+
 export default function ThreatScoreCard({ threatScore, loading = false }: Props) {
-  if (!threatScore) {
-    return null;
-  }
+  if (!threatScore) return null;
 
-  const score = threatScore.threat_score;
-  const riskLevel = threatScore.risk_level;
-
-  // Determine color based on risk level
-  const getRiskColor = (level: string) => {
-    switch (level) {
-      case 'critical':
-        return 'text-red-600 dark:text-red-400';
-      case 'high':
-        return 'text-orange-600 dark:text-orange-400';
-      case 'medium':
-        return 'text-yellow-600 dark:text-yellow-400';
-      case 'low':
-        return 'text-blue-600 dark:text-blue-400';
-      case 'minimal':
-        return 'text-green-600 dark:text-green-400';
-      default:
-        return 'text-foreground';
-    }
-  };
-
-  const getBgColor = (level: string) => {
-    switch (level) {
-      case 'critical':
-        return 'bg-red-50 dark:bg-red-950 border-red-200 dark:border-red-800';
-      case 'high':
-        return 'bg-orange-50 dark:bg-orange-950 border-orange-200 dark:border-orange-800';
-      case 'medium':
-        return 'bg-yellow-50 dark:bg-yellow-950 border-yellow-200 dark:border-yellow-800';
-      case 'low':
-        return 'bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800';
-      case 'minimal':
-        return 'bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800';
-      default:
-        return 'bg-secondary border-border';
-    }
-  };
-
-  const getRiskBadgeColor = (level: string) => {
-    switch (level) {
-      case 'critical':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
-      case 'high':
-        return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
-      case 'medium':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
-      case 'low':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
-      case 'minimal':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-      default:
-        return 'bg-secondary text-foreground';
-    }
-  };
+  const { threat_score: score, risk_level: riskLevel, description, factors } = threatScore;
+  const cfg = RISK_CONFIG[riskLevel] ?? FALLBACK;
+  const { Icon } = cfg;
+  const pct = Math.min(100, (score / 10) * 100);
+  const label = riskLevel.charAt(0).toUpperCase() + riskLevel.slice(1);
 
   return (
-    <div className={`p-4 rounded-lg border ${getBgColor(riskLevel)} space-y-3`}>
-      <div className="flex items-start justify-between">
-        <div className="space-y-1">
-          <p className="text-xs font-medium text-muted-foreground uppercase">Threat Level</p>
-          <div className="flex items-baseline gap-2">
-            <span className={`text-3xl font-bold ${getRiskColor(riskLevel)}`}>
-              {loading ? '—' : score.toFixed(1)}
-            </span>
-            <span className="text-xs text-muted-foreground">/10</span>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <AlertTriangle className={`w-5 h-5 ${getRiskColor(riskLevel)}`} />
-          <span className={`text-xs font-semibold px-2 py-1 rounded ${getRiskBadgeColor(riskLevel)}`}>
-            {riskLevel.charAt(0).toUpperCase() + riskLevel.slice(1)}
-          </span>
+    <div className={`rounded-xl border bg-card p-2.5 flex flex-col gap-2 ${cfg.borderColor} ${cfg.glowClass}`}>
+      {/* Header row */}
+      <div className="flex items-center justify-between">
+        <span className="text-[9px] font-semibold tracking-widest text-muted-foreground uppercase">
+          Threat
+        </span>
+        <span className={`flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full ${cfg.badgeBg} ${cfg.badgeText}`}>
+          <Icon className="w-2.5 h-2.5" />
+          {label}
+        </span>
+      </div>
+
+      {/* Score + bar row */}
+      <div className="flex items-center gap-2">
+        <span className={`text-2xl font-black tabular-nums leading-none flex-shrink-0 ${cfg.scoreColor}`}>
+          {loading ? '—' : score.toFixed(1)}
+        </span>
+        <div className="h-1 rounded-full bg-secondary overflow-hidden flex-1">
+          <div
+            className={`h-full rounded-full animate-fill-bar ${cfg.barColor}`}
+            style={{ width: loading ? '0%' : `${pct}%` }}
+          />
         </div>
       </div>
 
-      <p className="text-xs text-muted-foreground leading-relaxed">
-        {threatScore.description}
+      {/* Description — single line only */}
+      <p className="text-[9px] text-muted-foreground leading-tight line-clamp-1">
+        {description}
       </p>
 
-      {threatScore.factors && (
-        <div className="space-y-1 border-t border-current/10 pt-3">
-          <p className="text-xs font-medium text-muted-foreground">Risk Factors</p>
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Attack Paths:</span>
-              <span className={threatScore.factors.attack_paths ? 'text-destructive font-medium' : 'text-green-600 dark:text-green-400'}>
-                {threatScore.factors.attack_paths ? '✓ Found' : '✗ None'}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Escalation:</span>
-              <span className={threatScore.factors.privilege_escalation_cycles > 0 ? 'text-destructive font-medium' : 'text-green-600 dark:text-green-400'}>
-                {threatScore.factors.privilege_escalation_cycles} cycle{threatScore.factors.privilege_escalation_cycles !== 1 ? 's' : ''}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Critical Nodes:</span>
-              <span className="font-medium">{threatScore.factors.critical_node_junctions}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Blast Radius:</span>
-              <span className="font-medium">{threatScore.factors.blast_radius_size} nodes</span>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Risk factors — hidden (use tooltip if needed in future) */}
+    </div>
+  );
+}
+
+function FactorRow({ label, value, danger }: { label: string; value: string; danger: boolean }) {
+  return (
+    <div className="flex items-center justify-between gap-1">
+      <span className="text-[10px] text-muted-foreground truncate">{label}</span>
+      <span className={`text-[10px] font-semibold tabular-nums ${danger ? 'text-destructive' : 'text-foreground'}`}>
+        {value}
+      </span>
     </div>
   );
 }
