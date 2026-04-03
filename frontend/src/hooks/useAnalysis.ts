@@ -69,9 +69,12 @@ export function useAnalysis() {
   const [simulation, setSimulation] = useState<any>(null);
   const [report, setReport] = useState<any>(null);
   const [threatScore, setThreatScore] = useState<any>(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState<Record<string, boolean>>({});
 
   const setL = (key: string, val: boolean) => setLoading(p => ({ ...p, [key]: val }));
+  const setE = (key: string, msg: string) => setErrors(p => ({ ...p, [key]: msg }));
+  const clearE = (key: string) => setErrors(p => { const n = { ...p }; delete n[key]; return n; });
 
   const findAttackPath = async (source: string, target: string) => {
     setL('attack', true);
@@ -137,11 +140,14 @@ export function useAnalysis() {
 
   const fetchReport = async () => {
     setL('report', true);
+    clearE('report');
     try {
       const res = await api.getReport();
       setReport(res.data);
     } catch (e: unknown) {
-      toast({ title: 'Report error', description: getErrorMessage(e), variant: 'destructive' });
+      const msg = getErrorMessage(e);
+      setE('report', msg);
+      toast({ title: 'Report error', description: msg, variant: 'destructive' });
     } finally { setL('report', false); }
   };
 
@@ -160,7 +166,7 @@ export function useAnalysis() {
   };
 
   return {
-    attackPath, blastRadius, cycles, criticalNodes, simulation, report, threatScore, loading,
+    attackPath, blastRadius, cycles, criticalNodes, simulation, report, threatScore, loading, errors,
     findAttackPath, autoAttackPath, analyzeBlast, fetchCycles, fetchCriticalNodes,
     runSimulation, fetchReport, fetchFullAnalysis, setAttackPath, setBlastRadius, setCycles, setSimulation,
   };

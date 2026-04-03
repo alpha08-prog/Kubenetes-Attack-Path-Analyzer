@@ -18,10 +18,10 @@ def calculate_threat_score(analysis_result: dict) -> dict:
     - CVE counts
     """
 
-    attack_path = analysis_result.get("attack_path", {})
-    cycles = analysis_result.get("cycles", {})
-    critical_nodes = analysis_result.get("critical_nodes", {})
-    blast_radius = analysis_result.get("blast_radius", {})
+    attack_path = analysis_result.get("attack_path") or {}
+    cycles = analysis_result.get("cycles") or {}
+    critical_nodes = analysis_result.get("critical_nodes") or {}
+    blast_radius = analysis_result.get("blast_radius") or {}
 
     score = 5.0  # Baseline: neutral risk
 

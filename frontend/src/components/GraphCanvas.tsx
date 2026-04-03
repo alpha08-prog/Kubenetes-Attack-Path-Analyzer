@@ -198,10 +198,15 @@ export default function GraphCanvas({
             'text-outline-color': '#0f1117',
             'text-outline-width': 2,
             'border-width': 2,
-            'border-color': '#ffffff44',
+            'border-color': (ele: any) => riskToColor(ele.data('risk_score') || 5),
             width: (ele: any) => riskToSize(ele.data('risk_score') || 5),
             height: (ele: any) => riskToSize(ele.data('risk_score') || 5),
-            'background-color': (ele: any) => NODE_COLORS[ele.data('type')] || '#8b8fa8',
+            'background-color': (ele: any) => {
+              const risk = ele.data('risk_score') || 5;
+              const typeColor = NODE_COLORS[ele.data('type')];
+              // Blend: high-risk nodes get risk color, low-risk keep type color
+              return risk >= 7 ? riskToColor(risk) : (typeColor || '#8b8fa8');
+            },
             shape: (ele: any) => NODE_SHAPES[ele.data('type')] || 'ellipse',
           } as any,
         },
@@ -411,13 +416,28 @@ export default function GraphCanvas({
       <div className="relative flex-1 min-h-0">
         <div ref={containerRef} className="w-full h-full" />
 
-        <div className="absolute bottom-3 left-3 bg-card/90 backdrop-blur border border-border rounded-lg p-3 text-xs space-y-1">
-          {LEGEND_ITEMS.map((item) => (
-            <div key={item.type} className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-sm flex-shrink-0" style={{ backgroundColor: NODE_COLORS[item.type] }} />
+        <div className="absolute bottom-3 left-3 bg-card/90 backdrop-blur border border-border rounded-lg p-3 text-xs space-y-2">
+          <p className="text-xs font-semibold text-foreground">Risk Level</p>
+          {[
+            { color: '#E24B4A', label: 'Critical (≥8)' },
+            { color: '#EF9F27', label: 'High (6-7.9)' },
+            { color: '#378ADD', label: 'Medium (4-5.9)' },
+            { color: '#1D9E75', label: 'Low (<4)' },
+          ].map((item) => (
+            <div key={item.label} className="flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
               <span className="text-muted-foreground">{item.label}</span>
             </div>
           ))}
+          <div className="border-t border-border pt-1 mt-1 space-y-1">
+            <p className="text-xs font-semibold text-foreground">Node Type</p>
+            {LEGEND_ITEMS.map((item) => (
+              <div key={item.type} className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-sm flex-shrink-0" style={{ backgroundColor: NODE_COLORS[item.type] }} />
+                <span className="text-muted-foreground">{item.label}</span>
+              </div>
+            ))}
+          </div>
         </div>
 
         {contextMenu && (

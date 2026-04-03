@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Shield, RefreshCw, Play, Network, GitBranch, AlertTriangle, RotateCcw } from 'lucide-react';
 import { useGraph } from '@/hooks/useGraph';
@@ -48,6 +48,13 @@ export default function Dashboard() {
     const result = await analysis.runSimulation(nodeId, src, tgt);
     if (result) setSimModal(result);
   };
+
+  // Auto-load full analysis (threat score + remediations) when graph loads
+  useEffect(() => {
+    if (summary && summary.total_nodes > 0 && !analysis.threatScore) {
+      analysis.fetchFullAnalysis();
+    }
+  }, [summary]);
 
   const tabs: { key: Tab; label: string }[] = [
     { key: 'attack', label: 'Attack Path' },
@@ -207,6 +214,7 @@ export default function Dashboard() {
         report={analysis.report}
         loading={analysis.loading.report}
         onFetchReport={analysis.fetchReport}
+        error={analysis.errors.report}
       />
 
       {/* Simulation Modal */}

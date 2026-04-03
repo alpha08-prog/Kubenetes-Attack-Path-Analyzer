@@ -10,6 +10,7 @@ from app.core.graph_builder import get_graph
 from app.utils.helpers import timed
 from app.utils.logger import get_logger, log_algorithm_run
 from app.services.threat_score_service import calculate_threat_score
+from app.services.remediation_service import analyze_attack_path_for_remediation, analyze_cycles_for_remediation
 
 logger = get_logger(__name__)
 
@@ -108,6 +109,20 @@ def get_full_analysis() -> dict:
     has_ai_report = False,
     triggered_by  = "analysis",
 )
+
+    # NEW: Add remediations to attack path
+    if attack_path and attack_path.get("found"):
+        path_rems = analyze_attack_path_for_remediation(attack_path)
+        cycle_rems = analyze_cycles_for_remediation(cycles)
+        all_rems = path_rems + cycle_rems
+        # Deduplicate and sort
+        seen_titles = set()
+        unique_rems = []
+        for r in sorted(all_rems, key=lambda x: (-x.impact_count, x.difficulty != "low")):
+            if r.title not in seen_titles:
+                seen_titles.add(r.title)
+                unique_rems.append(r)
+        attack_path["remediations"] = [r.to_dict() for r in unique_rems[:5]]
 
     # NEW: Calculate threat score
     analysis_result = {

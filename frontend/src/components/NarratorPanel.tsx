@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Loader2, ChevronUp, ChevronDown, Download, FileText } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Loader2, ChevronUp, ChevronDown, Download, FileText, AlertCircle } from 'lucide-react';
 import FindingCard from './FindingCard';
 import { SEVERITY_ORDER } from '@/styles/nodeColors';
 import { getReportPdf } from '@/api/graphApi';
@@ -8,11 +8,29 @@ interface Props {
   report: any;
   loading: boolean;
   onFetchReport: () => void;
+  error?: string;
 }
 
-export default function NarratorPanel({ report, loading, onFetchReport }: Props) {
+const LOADING_MESSAGES = [
+  'Analyzing attack graph with AI...',
+  'Running kill chain analysis...',
+  'Generating remediation narrative...',
+  'Almost there...',
+];
+
+export default function NarratorPanel({ report, loading, onFetchReport, error }: Props) {
   const [expanded, setExpanded] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const [loadingMsgIdx, setLoadingMsgIdx] = useState(0);
+
+  // Cycle through loading messages so judges know it's working
+  useEffect(() => {
+    if (!loading) { setLoadingMsgIdx(0); return; }
+    const timer = setInterval(() => {
+      setLoadingMsgIdx(i => (i + 1) % LOADING_MESSAGES.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [loading]);
 
   const findings = report?.findings || report || [];
   const sorted = [...(Array.isArray(findings) ? findings : [])].sort(
@@ -57,13 +75,25 @@ export default function NarratorPanel({ report, loading, onFetchReport }: Props)
       {expanded && (
         <div className="px-6 pb-6 max-h-[50vh] overflow-y-auto scrollbar-thin">
           {loading && (
-            <div className="flex items-center justify-center py-12 gap-3">
+            <div className="flex flex-col items-center justify-center py-12 gap-3">
               <Loader2 className="w-6 h-6 animate-spin text-primary" />
-              <span className="text-sm text-muted-foreground animate-pulse-glow">Analyzing attack graph with AI...</span>
+              <span className="text-sm text-muted-foreground">{LOADING_MESSAGES[loadingMsgIdx]}</span>
+              <span className="text-xs text-muted-foreground/60">This takes 10–20 seconds (LLM analysis)</span>
             </div>
           )}
 
-          {!loading && sorted.length > 0 && (
+          {!loading && error && (
+            <div className="flex items-start gap-3 p-4 bg-destructive/10 rounded border border-destructive/30 text-sm text-destructive">
+              <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="font-medium">Report generation failed</p>
+                <p className="text-xs mt-1 text-destructive/80">{error}</p>
+                <button onClick={onFetchReport} className="text-xs underline mt-2">Try again</button>
+              </div>
+            </div>
+          )}
+
+          {!loading && !error && sorted.length > 0 && (
             <>
               <div className="flex justify-end mb-4">
                 <button
@@ -83,8 +113,8 @@ export default function NarratorPanel({ report, loading, onFetchReport }: Props)
             </>
           )}
 
-          {!loading && sorted.length === 0 && !report && (
-            <p className="text-sm text-muted-foreground text-center py-8">Click to generate the report</p>
+          {!loading && !error && sorted.length === 0 && !report && (
+            <p className="text-sm text-muted-foreground text-center py-8">Click to generate the AI security report</p>
           )}
         </div>
       )}
