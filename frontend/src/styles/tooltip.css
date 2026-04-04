@@ -1,0 +1,51 @@
+/* Tooltip Styling */
+.graph-tooltip {
+  background-color: rgba(15, 17, 23, 0.95);
+  color: #e6edf3;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.4;
+  border: 1px solid rgba(230, 237, 243, 0.1);
+  white-space: nowrap;
+  z-index: 1000;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  animation: tooltipFadeIn 0.15s ease-out;
+}
+
+.graph-tooltip[data-popper-placement^='top'] > #arrow {
+  bottom: -8px;
+}
+
+.graph-tooltip[data-popper-placement^='bottom'] > #arrow {
+  top: -8px;
+}
+
+.graph-tooltip[data-popper-placement^='left'] > #arrow {
+  right: -8px;
+}
+
+.graph-tooltip[data-popper-placement^='right'] > #arrow {
+  left: -8px;
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Dark theme compatibility */
+@media (prefers-color-scheme: dark) {
+  .graph-tooltip {
+    background-color: rgba(15, 17, 23, 0.98);
+    color: #e6edf3;
+  }
+}

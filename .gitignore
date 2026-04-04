@@ -1,0 +1,17 @@
+# Node modules
+node_modules/
+*/node_modules/
+.npm-cache/
+*/.npm-cache/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+env/
+.env
+
+# OS files
+.DS_Store
+Thumbs.db

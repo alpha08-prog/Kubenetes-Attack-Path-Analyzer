@@ -1,12 +1,16 @@
 import { useEffect, useRef, useCallback, useState, useMemo } from 'react';
 import cytoscape from 'cytoscape';
 import dagre from 'cytoscape-dagre';
+import CytoscapePopper from 'cytoscape-popper';
+import 'popper.js';
+import '@/styles/tooltip.css';
 import { NODE_COLORS, NODE_SHAPES } from '@/styles/nodeColors';
 import { riskToColor, riskToSize, riskToWidth } from '@/styles/riskGradient';
 import type { GraphData, GraphNode } from '@/hooks/useGraph';
 import NodeSidebar from './NodeSidebar';
 
 cytoscape.use(dagre);
+cytoscape.use(CytoscapePopper);
 
 interface Props {
   graphData: GraphData | null;
@@ -91,6 +95,31 @@ function buildFocusNodeIds(attackPath: any, blastRadius: any): Set<string> {
 
   return ids;
 }
+
+const createTooltipContent = (node: any) => {
+  const label = node.data('label') || node.data('id');
+  const type = node.data('type') || 'unknown';
+  const risk = Number(node.data('risk_score')) || 0;
+
+  // Format: "node-label\n(type)\nRisk: X.X/10"
+  return `${label}\n(${type})\nRisk: ${risk.toFixed(1)}/10`;
+};
+
+const createTooltipElement = (content: string): HTMLElement => {
+  const tooltip = document.createElement('div');
+  tooltip.className = 'graph-tooltip';
+  tooltip.innerText = content;
+  // Ensure it's not interactive
+  tooltip.style.pointerEvents = 'none';
+  document.body.appendChild(tooltip);
+  return tooltip;
+};
+
+const destroyTooltip = (tooltip: HTMLElement | null) => {
+  if (tooltip?.parentElement) {
+    tooltip.parentElement.removeChild(tooltip);
+  }
+};
 
 export default function GraphCanvas({
   graphData,
@@ -276,6 +305,59 @@ export default function GraphCanvas({
       layout,
       wheelSensitivity: 0.3,
     });
+
+    // ===== TOOLTIP IMPLEMENTATION START =====
+    let currentTooltip: { element: HTMLElement; popper: any } | null = null;
+
+    cy.on('mouseover', 'node', (e) => {
+      const node = e.target;
+
+      // Clean up any existing tooltip
+      if (currentTooltip) {
+        destroyTooltip(currentTooltip.element);
+        if (currentTooltip.popper?.destroy) {
+          currentTooltip.popper.destroy();
+        }
+        currentTooltip = null;
+      }
+
+      // Create new tooltip
+      const content = createTooltipContent(node);
+      const tooltipElement = createTooltipElement(content);
+
+      // Position using Popper
+      const popper = node.popper({
+        content: () => tooltipElement,
+        popper: {
+          placement: 'top',
+          modifiers: [
+            {
+              name: 'offset',
+              options: {
+                offset: [0, 10],
+              },
+            },
+          ],
+        },
+      });
+
+      tooltipElement.style.display = 'block';
+      currentTooltip = {
+        element: tooltipElement,
+        popper: popper,
+      };
+    });
+
+    cy.on('mouseout', 'node', () => {
+      if (currentTooltip) {
+        destroyTooltip(currentTooltip.element);
+        if (currentTooltip.popper?.destroy) {
+          currentTooltip.popper.destroy();
+        }
+        currentTooltip = null;
+      }
+    });
+    // ===== TOOLTIP IMPLEMENTATION END =====
 
     cy.on('tap', 'node', (e) => {
       const data = e.target.data();
