@@ -9,7 +9,28 @@
       "Bash(timeout 120 python main.py --input data/mock-cluster-graph.json --full-report --report-mode dijkstra)",
       "Bash(timeout 60 python main.py --input data/mock-cluster-graph.json --full-report)",
       "Bash(grep -n \"web-frontend\\\\|api-server\\\\|return \\\\[\" backend/app/algorithm/*.py)",
-      "Read(//tmp/**)"
+      "Read(//tmp/**)",
+      "Bash(python main.py --input data/mock-cluster-graph.json --cycles)",
+      "Bash(python main.py --input data/mock-cluster-graph.json --full-report)",
+      "Bash(python -m json.tool)",
+      "Bash(python -c \"import json; data = json.loads\\(''{\"\"chain\"\": \"\"service-a \\\\u2192 service-b \\\\u2192 service-a\"\"}''\\); print\\(data[''chain'']\\)\")",
+      "Bash(python main.py --input data/mock-cluster-graph.json --blast-radius --source internet --hops 3)",
+      "Bash(python main.py --input data/mock-cluster-graph.json --full-report 2)",
+      "Bash(python main.py --input data/mock-cluster-graph.json --source unknown-node --target db-production)",
+      "Bash(echo \"Exit code: $?\")",
+      "Bash(python main.py --input data/mock-cluster-graph.json --source user-dev1 --target unknown-target)",
+      "Bash(python main.py --input data/mock-cluster-graph.json --blast-radius --source unknown-source)",
+      "Bash(python main.py --input data/mock-cluster-graph.json --source user-dev1 --target db-production)",
+      "Bash(echo \"Exit code on success: $?\")",
+      "Bash(python main.py --input data/mock-cluster-graph.json --source invalid)",
+      "Bash(python main.py --input data/mock-cluster-graph.json --full-report --output /tmp/verify_report.txt)",
+      "Bash(python main.py --full-report --output data/report_verify.txt)",
+      "Bash(python -c \":*)",
+      "Bash(python main.py --source internet --target ns-kube-system)",
+      "Bash(python main.py --source internet --target sa-cicd)",
+      "Bash(echo \"exit: $?\")",
+      "Bash(python main.py --cycles)",
+      "Bash(python main.py --critical-node)"
     ]
   }
 }

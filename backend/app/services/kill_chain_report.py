@@ -216,6 +216,11 @@ def generate_full_report(G: nx.DiGraph, options: KillChainReportOptions | None =
             lines.append("  " + "─" * 60)
             for pl in _format_path_line(G, p_nodes).split("\n"):
                 lines.append("  " + pl)
+            rem = _remediation_lines_for_path(G, p_nodes)
+            if rem:
+                lines.append("  Remediation:")
+                for r in rem:
+                    lines.append(r)
             lines.append("")
 
     lines.append(f"[ SECTION 2 — BLAST RADIUS ANALYSIS (BFS, depth={opts.blast_radius_hops}) ]")

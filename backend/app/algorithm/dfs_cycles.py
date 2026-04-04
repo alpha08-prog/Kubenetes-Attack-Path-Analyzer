@@ -43,8 +43,13 @@ def detect_cycles(G: nx.DiGraph) -> dict:
 
     cycles = []
     for idx, cycle in enumerate(raw_cycles):
+        # Normalize cycle to start with lexicographically smallest node
+        # (so service-a ↔ service-b is always [service-a, service-b], never [service-b, service-a])
+        min_idx = cycle.index(min(cycle))
+        normalized_cycle = cycle[min_idx:] + cycle[:min_idx]
+
         node_details = []
-        for node_id in cycle:
+        for node_id in normalized_cycle:
             node_data = G.nodes[node_id]
             node_details.append({
                 "id": node_id,
@@ -59,13 +64,13 @@ def detect_cycles(G: nx.DiGraph) -> dict:
         severity = _classify_severity(len(cycle), max_risk)
 
         # Build readable chain e.g. "sa-backend → role-admin → secret-master → sa-backend"
-        labels = [G.nodes[n].get("label", n) for n in cycle]
+        labels = [G.nodes[n].get("label", n) for n in normalized_cycle]
         chain = " → ".join(labels) + f" → {labels[0]}"
 
         cycles.append({
             "id": idx,
-            "length": len(cycle),
-            "nodes": cycle,
+            "length": len(normalized_cycle),
+            "nodes": normalized_cycle,
             "node_details": node_details,
             "severity": severity,
             "max_risk": max_risk,

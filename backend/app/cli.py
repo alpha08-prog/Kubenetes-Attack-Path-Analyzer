@@ -30,6 +30,17 @@ from app.core.cluster_graph_loader import load_cluster_graph_file
 from app.services.kill_chain_report import KillChainReportOptions, generate_full_report
 
 
+def _resolve_node(G, name: str) -> str:
+    """Return the graph node ID for *name*, which may be an ID or a label."""
+    if name in G:
+        return name
+    # Try label match (case-insensitive)
+    for nid, data in G.nodes(data=True):
+        if data.get("label", "").lower() == name.lower():
+            return nid
+    raise ValueError(f"Node '{name}' not found in graph (checked IDs and labels)")
+
+
 def _default_input_path() -> Path | None:
     """../docs/mock-cluster-graph.json relative to repository root."""
     # app/cli.py -> parents[2] == repo root
@@ -191,17 +202,23 @@ def main(argv: list[str] | None = None) -> int:
     if args.blast_radius:
         assert args.source is not None
         try:
-            br = blast_radius(G, args.source, max_hops=args.hops)
+            source_id = _resolve_node(G, args.source)
+            br = blast_radius(G, source_id, max_hops=args.hops)
         except ValueError as exc:
             _die(str(exc), 1)
         _write_output(json.dumps(br, indent=2, default=str))
 
     if dijkstra_ok:
         assert args.source is not None and args.target is not None
-        res = shortest_attack_path(G, args.source, args.target)
-        _write_output(json.dumps(res, indent=2, default=str))
-        if not res.get("found"):
-            print(res.get("message", "No path found"), file=sys.stderr)
+        try:
+            source_id = _resolve_node(G, args.source)
+            target_id = _resolve_node(G, args.target)
+            res = shortest_attack_path(G, source_id, target_id)
+            _write_output(json.dumps(res, indent=2, default=str))
+            if not res.get("found"):
+                print(res.get("message", "No path found"), file=sys.stderr)
+        except ValueError as exc:
+            _die(f"error: {exc}", 1)
 
     if args.cycles:
         _write_output(json.dumps(detect_cycles(G), indent=2, default=str))
