@@ -103,7 +103,7 @@ def _format_path_line(G: nx.DiGraph, path_nodes: list[str]) -> str:
         parts.append(part)
         
     parts.append(G.nodes[path_nodes[-1]].get("label", path_nodes[-1]))
-    return " → ".join(parts)
+    return " -> ".join(parts)
 
 
 def _remediation_lines_for_path(G: nx.DiGraph, path_nodes: list[str]) -> list[str]:
@@ -153,7 +153,7 @@ def generate_full_report(G: nx.DiGraph, options: KillChainReportOptions | None =
     me = meta.get("edge_count")
     if mn is not None or me is not None:
         lines.append(
-            f"  (JSON metadata node_count/edge_count: {mn!s}/{me!s} — "
+            f"  (JSON metadata node_count/edge_count: {mn!s}/{me!s} - "
             "counts above are NetworkX after parsing + synthetic edges.)",
         )
     lines.append(sep)
@@ -222,7 +222,7 @@ def generate_full_report(G: nx.DiGraph, options: KillChainReportOptions | None =
         label = G.nodes[src].get("label", src)
         nreach = br["total_reachable"]
         total_blast_nodes += nreach
-        lines.append(f"  Source: {label}  →  {nreach} reachable resource(s) within {opts.blast_radius_hops} hops")
+        lines.append(f"  Source: {label}  ->  {nreach} reachable resource(s) within {opts.blast_radius_hops} hops")
         for hop in sorted(br["zones"].keys()):
             names = [n["label"] for n in br["zones"][hop]]
             lines.append(f"    Hop {hop}: {', '.join(names)}")
