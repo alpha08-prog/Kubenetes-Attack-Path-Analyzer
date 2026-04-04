@@ -1,9 +1,11 @@
 """
 routes_cve.py — CVE Live Feed Endpoints
-GET /api/cves/             → recent Kubernetes CVEs from NVD
-GET /api/cves/search       → search CVEs by keyword
-GET /api/cves/{cve_id}     → single CVE detail
-GET /api/cves/node/{id}    → CVEs relevant to a specific node type
+GET  /api/cves/             → recent Kubernetes CVEs from NVD
+GET  /api/cves/search       → search CVEs by keyword
+GET  /api/cves/images/{id}  → container image CVSS scores for a Pod node (B2)
+POST /api/cves/refresh      → refresh CVSS scores for all Pod nodes (B2)
+GET  /api/cves/{cve_id}     → single CVE detail
+GET  /api/cves/node/{id}    → CVEs relevant to a specific node type
 """
 
 from fastapi import APIRouter, HTTPException, Query
@@ -64,6 +66,44 @@ def search(
         return search_cves(keyword=q, limit=limit)
     except Exception as e:
         raise HTTPException(status_code=503, detail=str(e))
+
+
+@router.get("/images/{pod_id:path}")
+def get_pod_image_cvss(pod_id: str):
+    """
+    B2: Get container images and live CVSS scores for a specific Pod node.
+
+    pod_id: full node ID e.g. pod:default:web-server
+    Returns per-image CVSS scores fetched from NVD API (with fallback).
+    """
+    try:
+        from app.services.analysis_service import get_pod_image_cvss_data
+        result = get_pod_image_cvss_data(pod_id)
+        if result is None:
+            raise HTTPException(status_code=404, detail=f"Pod '{pod_id}' not found in graph")
+        return result
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error("Image CVSS fetch failed for %s: %s", pod_id, e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/refresh")
+def refresh_pod_cvss():
+    """
+    B2: Force-refresh CVSS scores for all Pod nodes in the graph.
+    Clears the in-memory cache and re-queries NVD for each image.
+    Returns count of pods updated.
+    """
+    try:
+        from app.services.analysis_service import refresh_all_pod_cvss
+        result = refresh_all_pod_cvss()
+        logger.info("Manual CVSS refresh: %d pods updated", result.get("pods_updated", 0))
+        return result
+    except Exception as e:
+        logger.error("CVSS refresh failed: %s", e)
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/node/{node_type}")

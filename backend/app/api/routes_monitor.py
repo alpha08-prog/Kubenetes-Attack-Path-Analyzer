@@ -571,6 +571,176 @@ async def run_scenario(cleanup: bool = False):
 
 # ── Recent events (REST) ───────────────────────────────────────────────────────
 
+@router.post("/demo-flow")
+async def demo_full_flow():
+    """
+    One-click demo: record baseline → simulate risk increase → broadcast SSE.
+
+    Perfect for judges demo. Shows:
+    1. Baseline snapshot created
+    2. Risk change detected
+    3. SSE event broadcast
+    4. B3 temporal diff shows changes
+
+    Works in both MOCK_MODE and real K8s. Auto-reloads graph if empty.
+    """
+    try:
+        from app.core.graph_builder import get_graph
+        from app.services.snapshot_service import create_snapshot, diff_snapshots, get_latest_snapshot_id
+        from app.services.ingestion_service import fetch_and_build
+
+        # Auto-reload graph if empty
+        try:
+            G = get_graph()
+        except RuntimeError:
+            logger.info("Demo: Graph empty, auto-reloading from K8s...")
+            loop = asyncio.get_running_loop()
+            await loop.run_in_executor(None, fetch_and_build)
+            G = get_graph()
+
+        # Step 1: Record baseline if none exists
+        latest_id = get_latest_snapshot_id()
+        if not latest_id:
+            baseline = create_snapshot(G, trigger_source="demo", trigger_desc="Demo baseline")
+            latest_id = baseline.snapshot_id
+            logger.info("Demo: Baseline recorded %s", latest_id[:8])
+
+        # Step 2: Increase risk on all pods (simulate vulnerability discovered)
+        for node_id in list(G.nodes()):
+            if G.nodes[node_id].get("type") == "pod":
+                current_risk = G.nodes[node_id].get("risk", 0.0)
+                G.nodes[node_id]["risk"] = min(10.0, current_risk + 2.5)
+
+        # Step 3: Create new snapshot with changes
+        new_snap = create_snapshot(G, trigger_source="demo", trigger_desc="Demo after risk increase")
+        logger.info("Demo: Change snapshot created %s", new_snap.snapshot_id[:8])
+
+        # Step 4: Diff to get changes
+        diff = diff_snapshots(latest_id, new_snap.snapshot_id)
+        logger.info("Demo: Diff complete - risk_delta=%.2f", diff.overall_risk_delta)
+
+        # Step 5: Broadcast SSE event
+        from app.services.broadcast_service import broadcast_graph_update
+        broadcast_graph_update({
+            "event": "DEMO_CHANGE",
+            "severity": diff.severity,
+            "risk_delta": diff.overall_risk_delta,
+            "message": f"Demo change: Risk increased by {diff.overall_risk_delta:.1f}. Check B3 for snapshot diff."
+        })
+        logger.info("Demo: SSE broadcast sent")
+
+        return {
+            "status": "success",
+            "baseline_snapshot_id": latest_id[:8],
+            "change_snapshot_id": new_snap.snapshot_id[:8],
+            "risk_delta": diff.overall_risk_delta,
+            "severity": diff.severity,
+            "message": (
+                f"Demo Complete!\n"
+                f"Baseline: {latest_id[:8]}\n"
+                f"After Change: {new_snap.snapshot_id[:8]}\n"
+                f"Risk Delta: {diff.overall_risk_delta:.1f}\n"
+                f"Severity: {diff.severity}"
+            )
+        }
+    except Exception as exc:
+        logger.error("demo_full_flow failed: %s", exc, exc_info=True)
+        raise HTTPException(500, str(exc)) from exc
+
+
+@router.post("/simulate-change")
+async def simulate_graph_change(action: str = "increase_risk", node_type: str = "pod"):
+    """
+    Simulate a graph change for DEMO purposes (works in MOCK_MODE).
+
+    Actions:
+    - increase_risk: Increase risk scores of nodes (simulating vulnerability discovered)
+    - add_nodes: Add new nodes to graph (simulating new deployments)
+    - add_edges: Add new edges (simulating new RBAC bindings)
+
+    This triggers a graph update → diff against previous → SSE broadcast.
+    Perfect for judges demo without needing a real K8s cluster.
+    """
+    try:
+        from app.core.graph_builder import get_graph, ingest_and_build
+        from app.services.analysis_service import get_full_analysis
+        from app.services.snapshot_service import create_snapshot, diff_snapshots, get_latest_snapshot_id
+
+        # Get current graph
+        G = get_graph()
+        latest_id = get_latest_snapshot_id()
+
+        if action == "increase_risk":
+            # Increase risk scores of all pods to simulate vulnerabilities found
+            for node_id in list(G.nodes()):
+                if G.nodes[node_id].get("type") == "pod":
+                    current_risk = G.nodes[node_id].get("risk", 0.0)
+                    G.nodes[node_id]["risk"] = min(10.0, current_risk + 2.0)
+            logger.info("Simulated risk increase for all pods")
+
+        elif action == "add_nodes":
+            # Add a new high-risk pod node with RBAC bindings
+            import uuid
+            new_pod_id = f"pod:demo:rogue-{str(uuid.uuid4())[:8]}"
+            G.add_node(
+                new_pod_id,
+                label="rogue-pod",
+                type="pod",
+                risk=8.5,
+                namespace="demo",
+            )
+            # Connect it to admin role (privilege escalation path)
+            for node_id in G.nodes():
+                if "admin" in node_id.lower():
+                    G.add_edge(new_pod_id, node_id, relation="uses", risk=8.0)
+            logger.info("Simulated new high-risk pod with admin bindings")
+
+        elif action == "add_edges":
+            # Add new privilege escalation edges
+            pods = [n for n in G.nodes() if G.nodes[n].get("type") == "pod"]
+            roles = [n for n in G.nodes() if G.nodes[n].get("type") == "role"]
+            if pods and roles:
+                G.add_edge(pods[0], roles[-1], relation="escalates_to", risk=7.5)
+                logger.info("Simulated new privilege escalation edge")
+
+        # Create snapshot of modified graph
+        new_snapshot = create_snapshot(G, trigger_source="demo", trigger_desc=f"Simulated {action}")
+
+        # Diff against latest snapshot
+        if latest_id:
+            diff = diff_snapshots(latest_id, new_snapshot.snapshot_id)
+            logger.info(
+                "Simulated change: %d new nodes, %d new paths, severity=%s",
+                diff.nodes_added_count,
+                diff.new_attack_paths_count,
+                diff.severity,
+            )
+
+            # Broadcast SSE event
+            if diff.nodes_added_count > 0 or diff.new_attack_paths_count > 0:
+                from app.services.broadcast_service import broadcast_graph_update
+                broadcast_graph_update({
+                    "event": "GRAPH_CHANGE",
+                    "severity": diff.severity,
+                    "changes": {
+                        "nodes_added": diff.nodes_added_count,
+                        "new_paths": diff.new_attack_paths_count,
+                    }
+                })
+                logger.info("SSE broadcast sent for simulated change")
+
+        return {
+            "status": "change_simulated",
+            "action": action,
+            "snapshot_id": new_snapshot.snapshot_id,
+            "message": f"Graph {action} simulated. Check Monitor tab for SSE event and B3 for snapshot diff."
+        }
+
+    except Exception as exc:
+        logger.error("simulate_graph_change failed: %s", exc, exc_info=True)
+        raise HTTPException(500, str(exc)) from exc
+
+
 @router.get("/events")
 def recent_events(limit: int = 20):
     """

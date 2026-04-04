@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Dashboard from "./pages/Dashboard";
 import DemoMode from "./pages/DemoMode";
 import LiveCveFeedPage from "./pages/LiveCveFeedPage";
+import TemporalAnalysisPage from "./pages/TemporalAnalysisPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -18,6 +19,7 @@ const App = () => (
           <Route path="/" element={<Dashboard />} />
           <Route path="/demo" element={<DemoMode />} />
           <Route path="/cve-feed" element={<LiveCveFeedPage />} />
+          <Route path="/temporal" element={<TemporalAnalysisPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

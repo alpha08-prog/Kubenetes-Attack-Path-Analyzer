@@ -187,6 +187,7 @@ from app.api.routes_slack import router as slack_router
 from app.api.routes_diff import router as diff_router
 from app.api.routes_analysis import router as analysis_router
 from app.api.routes_monitor  import router as monitor_router
+from app.api.routes_snapshot import router as snapshot_router   # B3
 
 app.include_router(graph_router,    prefix="/api/graph",    tags=["Graph"])
 app.include_router(attack_router,   prefix="/api/attack",   tags=["Attack Path"])
@@ -202,6 +203,7 @@ app.include_router(slack_router, prefix="/api/slack", tags=["Slack Alerts"])
 app.include_router(diff_router, prefix="/api/diff", tags=["Graph Diff"])
 app.include_router(analysis_router, prefix="/api/analysis", tags=["Analysis"])
 app.include_router(monitor_router,  prefix="/api/monitor",  tags=["Monitoring"])
+app.include_router(snapshot_router, prefix="/api/snapshots", tags=["Temporal Analysis"])  # B3
 
 
 # ─── Health & info endpoints ───────────────────────────────────────────────────

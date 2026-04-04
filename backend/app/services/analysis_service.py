@@ -55,13 +55,10 @@ def get_critical_nodes(top_n: int = 10) -> dict:
     return result
 
 
-
-    return result
-
-
 def enrich_nodes_with_cves(G=None) -> int:
     """
     Post-process the graph to add CVE scores to Pod nodes.
+    Stores per-image CVSS scores, container images list, and aggregate score.
     Returns the number of pods enriched.
     """
     if G is None:
@@ -76,27 +73,109 @@ def enrich_nodes_with_cves(G=None) -> int:
         if not images:
             continue
 
-        # Get highest score across all containers in the pod
+        # Get per-image CVSS scores
+        cvss_scores: dict = {}
         max_cve_score = 0.0
         for img in images:
             score = get_cve_score_for_image(img)
+            cvss_scores[img] = score
             if score > max_cve_score:
                 max_cve_score = score
 
         if max_cve_score > 0:
-            # Update the risk score to include the CVE vulnerability
-            # We add it as a bonus to the existing risk (from misconfigs)
-            # but cap it at 10.0
             old_risk = attrs.get("risk", 0.0)
-            new_risk = min(10.0, old_risk + (max_cve_score * 0.2)) # Weight CVE score at 20% influence
-            
+            new_risk = min(10.0, old_risk + (max_cve_score * 0.2))
+
             G.nodes[node_id]["risk"] = round(new_risk, 1)
             G.nodes[node_id]["metadata"]["cve_score"] = max_cve_score
+            G.nodes[node_id]["metadata"]["cvss_scores"] = cvss_scores
+            G.nodes[node_id]["metadata"]["container_images"] = list(images)
             count += 1
 
     if count:
         logger.info("Enriched %d Pod nodes with live CVE scores", count)
     return count
+
+
+def get_pod_image_cvss_data(pod_id: str) -> dict | None:
+    """
+    Return detailed CVE/CVSS data for a specific Pod node.
+    Used by the /api/cves/images/{pod_id} endpoint.
+    """
+    G = get_graph()
+    if pod_id not in G.nodes:
+        return None
+
+    attrs = G.nodes[pod_id]
+    if attrs.get("type") != "pod":
+        return None
+
+    images = attrs.get("metadata", {}).get("image", [])
+    if not images:
+        images = []
+
+    cvss_scores = attrs.get("metadata", {}).get("cvss_scores", {})
+    image_data = []
+    for img in images:
+        score = cvss_scores.get(img)
+        if score is None:
+            score = get_cve_score_for_image(img)
+            cvss_scores[img] = score
+            G.nodes[pod_id]["metadata"]["cvss_scores"] = cvss_scores
+
+        image_data.append({
+            "image": img,
+            "cvss_score": score,
+            "severity": _score_to_severity(score),
+            "source": "nist_nvd" if score > 0 else "not_found",
+        })
+
+    aggregate_risk = max((d["cvss_score"] for d in image_data), default=0.0)
+    from app.utils.helpers import utc_now
+    return {
+        "pod_id": pod_id,
+        "pod_label": attrs.get("label", pod_id),
+        "images": image_data,
+        "aggregate_risk": aggregate_risk,
+        "aggregate_severity": _score_to_severity(aggregate_risk),
+        "timestamp": utc_now(),
+    }
+
+
+def refresh_all_pod_cvss(G=None) -> dict:
+    """
+    Force-refresh CVSS scores for all Pod nodes by clearing cache and re-enriching.
+    Returns a summary of what was updated.
+    """
+    if G is None:
+        G = get_graph()
+
+    # Clear existing CVE metadata so scores are re-fetched
+    for node_id, attrs in G.nodes(data=True):
+        if attrs.get("type") == "pod":
+            md = attrs.get("metadata", {})
+            md.pop("cve_score", None)
+            md.pop("cvss_scores", None)
+
+    pods_updated = enrich_nodes_with_cves(G)
+    from app.utils.helpers import utc_now
+    return {
+        "status": "completed",
+        "pods_updated": pods_updated,
+        "timestamp": utc_now(),
+    }
+
+
+def _score_to_severity(score: float) -> str:
+    if score >= 9.0:
+        return "critical"
+    elif score >= 7.0:
+        return "high"
+    elif score >= 4.0:
+        return "medium"
+    elif score > 0.0:
+        return "low"
+    return "none"
 
 
 def get_full_analysis() -> dict:

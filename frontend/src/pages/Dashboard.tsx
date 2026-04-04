@@ -150,6 +150,14 @@ export default function Dashboard() {
             <AlertTriangle className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-orange-400" />
             <span className="hidden sm:inline">CVE Feed</span>
           </button>
+          <button
+            onClick={() => navigate('/temporal')}
+            className="flex items-center gap-1 sm:gap-1.5 bg-secondary hover:bg-surface-hover text-foreground px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-medium transition-colors"
+            title="Temporal Analysis — track graph changes over time"
+          >
+            <Activity className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-blue-400" />
+            <span className="hidden sm:inline">Temporal</span>
+          </button>
           {/* Real-time monitoring status */}
           <div
             className={`hidden sm:flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium border ${
