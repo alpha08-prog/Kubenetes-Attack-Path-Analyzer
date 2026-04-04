@@ -101,18 +101,49 @@ async def analyze_changes(events: List[Dict[str, Any]]) -> None:
 # ── Private helpers ───────────────────────────────────────────────────────────
 
 def _rebuild_and_record() -> str | None:
-    """Rebuild attack graph and persist a new history run. Returns run_id."""
+    """
+    Rebuild attack graph, run cycle detection + attack path analysis,
+    and persist a new history run with REAL values.
+
+    Previously this always stored attack_paths=0 and cycles=0 (the defaults),
+    which made path_delta and cycle_delta always 0 — so no alert ever fired.
+    Now the actual algorithms run before recording so the DB reflects reality.
+    """
     try:
         summary = ingest_and_build()
+
+        # ── Run real analysis algorithms ──────────────────────────────────────
+        attack_paths = 0
+        cycle_count  = 0
+
+        try:
+            from app.services.attack_service import get_auto_attack_path
+            path_result  = get_auto_attack_path()
+            attack_paths = 1 if path_result.get("found") else 0
+        except Exception as exc:  # noqa: BLE001
+            logger.debug("Attack path detection skipped during rebuild: %s", exc)
+
+        try:
+            from app.services.analysis_service import get_cycles
+            cycles_result = get_cycles()
+            cycle_count   = cycles_result.get("cycle_count", 0)
+        except Exception as exc:  # noqa: BLE001
+            logger.debug("Cycle detection skipped during rebuild: %s", exc)
+
+        # ── Persist run with real values ──────────────────────────────────────
         run_id = record_analysis_run(
             cluster_name=settings.CLUSTER_NAME,
             source=summary.get("source", "watch_api"),
             triggered_by="watch_event",
+            attack_paths=attack_paths,
+            cycles=cycle_count,
         )
         logger.info(
-            "Rebuilt graph — %d nodes, %d edges (run=%s)",
+            "Rebuilt graph — %d nodes, %d edges, %d path(s), %d cycle(s) (run=%s)",
             summary["node_count"],
             summary["edge_count"],
+            attack_paths,
+            cycle_count,
             run_id,
         )
         return run_id
@@ -196,6 +227,33 @@ def _check_and_fire_alerts(
             triggered_alerts=["slack", "websocket", "history"],
         )
         triggered.append("NEW_CYCLES")
+
+    # ── Alert 4: New nodes added to cluster ───────────────────────────────────
+    # Fires when kubectl reports new pods / serviceaccounts / roles / secrets
+    # even if the overall average risk barely moves (diluted by many existing nodes).
+    # This catches the scenario-deploy case reliably.
+    new_nodes_val = (diff.get("node_changes") or {}).get("new_count", 0)
+    if new_nodes_val > 0 and not triggered:
+        # Only fire this if no stronger alert already fired — avoids double noise.
+        new_node_labels = [
+            n.get("label", n.get("node_id", ""))
+            for n in (diff.get("node_changes", {}).get("new_nodes") or [])[:5]
+        ]
+        summary_txt = (
+            f"{new_nodes_val} new K8s resource(s) detected: "
+            f"{', '.join(new_node_labels)}"
+        )
+        logger.warning("ALERT NEW_RESOURCES: %s", summary_txt)
+
+        record_monitoring_event(
+            run_id=new_run_id,
+            event_type="NEW_RESOURCES",
+            severity="medium",
+            summary=summary_txt,
+            details=diff.get("node_changes"),
+            triggered_alerts=["websocket", "history"],
+        )
+        triggered.append("NEW_RESOURCES")
 
     return triggered
 

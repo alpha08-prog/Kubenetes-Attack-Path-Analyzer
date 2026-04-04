@@ -18,6 +18,7 @@ import SimulationModal from '@/components/SimulationModal';
 import NarratorPanel from '@/components/NarratorPanel';
 import DiffPanel from '@/components/DiffPanel';
 import MonitoringPanel from '@/components/MonitoringPanel';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { useMonitoring, type GraphUpdateEvent } from '@/hooks/useMonitoring';
 
 type OverlayMode = 'default' | 'attack' | 'blast' | 'cycle';
@@ -161,6 +162,8 @@ export default function Dashboard() {
             <Radio className={`w-3 h-3 ${monitorConnected ? 'animate-pulse' : 'opacity-40'}`} />
             <span>{monitorConnected ? 'Monitoring' : 'Monitor off'}</span>
           </div>
+
+          <ThemeToggle />
 
           <button
             onClick={() => navigate('/demo')}

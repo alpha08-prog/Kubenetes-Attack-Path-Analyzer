@@ -147,9 +147,13 @@ export function useMonitoring(): UseMonitoringResult {
  * Thin wrapper around the monitor control REST endpoints.
  */
 export const monitoringApi = {
-  start:      () => client.post('/api/monitor/start'),
-  stop:       () => client.post('/api/monitor/stop'),
-  status:     () => client.get('/api/monitor/status'),
-  events:     (limit = 20) => client.get('/api/monitor/events', { params: { limit } }),
-  testEvent:  () => client.post('/api/monitor/test-event'),
+  start:           () => client.post('/api/monitor/start'),
+  stop:            () => client.post('/api/monitor/stop'),
+  status:          () => client.get('/api/monitor/status'),
+  events:          (limit = 20) => client.get('/api/monitor/events', { params: { limit } }),
+  recordBaseline:  () => client.post('/api/monitor/record-baseline'),
+  triggerAnalysis: () => client.post('/api/monitor/trigger-analysis'),
+  // Script can take up to 2 min to deploy K8s resources — override global 45s timeout
+  runScenario:     () => client.post('/api/monitor/run-scenario', null, { timeout: 140_000 }),
+  cleanupScenario: () => client.post('/api/monitor/run-scenario', null, { params: { cleanup: true }, timeout: 60_000 }),
 };

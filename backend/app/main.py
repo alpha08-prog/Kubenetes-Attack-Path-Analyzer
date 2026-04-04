@@ -44,11 +44,32 @@ async def lifespan(app: FastAPI):
             summary["edge_count"],
             summary["source"],
         )
+        # Run real algorithms before recording so the startup baseline has
+        # accurate attack_paths / cycles values — not zeros. This prevents
+        # a false NEW_ATTACK_PATHS alert when the Watch API's initial K8s
+        # event flood diffs against a zeroed-out baseline on every restart.
+        startup_paths  = 0
+        startup_cycles = 0
+        try:
+            from app.services.attack_service import get_auto_attack_path
+            _ap = get_auto_attack_path()
+            startup_paths = 1 if _ap.get("found") else 0
+        except Exception:
+            pass
+        try:
+            from app.services.analysis_service import get_cycles
+            _cy = get_cycles()
+            startup_cycles = _cy.get("cycle_count", 0)
+        except Exception:
+            pass
+
         from app.services.history_service import record_analysis_run
         record_analysis_run(
             cluster_name=settings.CLUSTER_NAME,
             source=summary["source"],
             triggered_by="startup",
+            attack_paths=startup_paths,
+            cycles=startup_cycles,
         )
     except Exception as e:
         logger.error("Startup graph load failed: %s", e)

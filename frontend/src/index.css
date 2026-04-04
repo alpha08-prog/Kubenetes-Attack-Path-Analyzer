@@ -4,6 +4,60 @@
 
 @layer base {
   :root {
+    /* Premium Light Mode */
+    --background: 0 0% 98%;
+    --foreground: 228 16% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 228 16% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 228 16% 15%;
+
+    --primary: 210 80% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 228 15% 94%;
+    --secondary-foreground: 228 16% 25%;
+
+    --muted: 228 15% 94%;
+    --muted-foreground: 228 16% 40%;
+
+    --accent: 160 67% 40%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 73% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 228 16% 90%;
+    --input: 228 16% 90%;
+    --ring: 210 80% 50%;
+
+    --radius: 0.5rem;
+
+    --node-pod: 210 70% 54%;
+    --node-sa: 160 67% 37%;
+    --node-role: 249 55% 67%;
+    --node-secret: 36 78% 41%;
+    --node-db: 0 73% 59%;
+    --node-user: 16 67% 52%;
+
+    --severity-critical: 0 73% 59%;
+    --severity-high: 33 85% 55%;
+    --severity-medium: 210 70% 54%;
+    --severity-low: 160 67% 37%;
+
+    --surface: 0 0% 100%;
+    --surface-hover: 228 15% 96%;
+    --border-subtle: 228 16% 90%;
+
+    /* Glow colors */
+    --glow-critical: 0 73% 59%;
+    --glow-primary: 210 80% 50%;
+  }
+
+  .dark {
+    /* Rich Dark Mode */
     --background: 228 16% 6%;
     --foreground: 0 0% 100%;
 
