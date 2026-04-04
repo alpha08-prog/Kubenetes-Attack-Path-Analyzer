@@ -11,7 +11,7 @@ interface Props {
 export default function StatCard({ title, value, icon, color = 'hsl(var(--primary))', loading }: Props) {
   return (
     <div
-      className="relative flex flex-col justify-between rounded-xl bg-card border border-border px-2 sm:px-4 py-1.5 overflow-hidden h-full"
+      className="relative flex flex-col justify-between rounded-xl bg-card border border-border px-2 sm:px-3 py-1 overflow-hidden min-h-[46px]"
       style={{ borderLeftColor: color, borderLeftWidth: '3px' }}
     >
       {/* Subtle background tint */}
@@ -33,9 +33,9 @@ export default function StatCard({ title, value, icon, color = 'hsl(var(--primar
 
       {/* Value */}
       {loading ? (
-        <Loader2 className="w-3.5 h-3.5 animate-spin text-muted-foreground" />
+        <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />
       ) : (
-        <p className="text-sm md:text-lg lg:text-xl font-black tabular-nums text-foreground leading-tight truncate">{value}</p>
+        <p className="text-sm md:text-base lg:text-lg font-black tabular-nums text-foreground leading-none truncate">{value}</p>
       )}
     </div>
   );

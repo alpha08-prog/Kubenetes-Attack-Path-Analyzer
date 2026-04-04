@@ -141,13 +141,17 @@ export default function GraphCanvas({
     () =>
       nodeCount > 50
         ? ({
-            name: 'concentric',
-            minNodeSpacing: 40,
-            avoidOverlap: true,
-            spacingFactor: 1.1,
-            padding: 24,
-            concentric: (node: any) => Number(node.data('risk_score') ?? 0),
-            levelWidth: () => 2,
+            name: 'cose',
+            idealEdgeLength: 100,
+            nodeOverlap: 20,
+            refresh: 20,
+            fit: true,
+            padding: 30,
+            randomize: false,
+            componentSpacing: 100,
+            nodeRepulsion: 400000,
+            edgeElasticity: 100,
+            nestingFactor: 5,
             animate: false,
           } as any)
         : ({

@@ -94,14 +94,14 @@ export default function ThreatScoreCard({ threatScore, loading = false }: Props)
   const label = riskLevel.charAt(0).toUpperCase() + riskLevel.slice(1);
 
   return (
-    <div className={`rounded-xl border bg-card p-2 sm:p-2.5 flex flex-col gap-2 ${cfg.borderColor} ${cfg.glowClass}`}>
+    <div className={`rounded-xl border bg-card p-1.5 sm:p-2 flex flex-col gap-1 ${cfg.borderColor} ${cfg.glowClass}`}>
       {/* Header row */}
       <div className="flex items-center justify-between gap-1">
-        <span className="text-[8px] md:text-[9px] font-semibold tracking-widest text-muted-foreground uppercase">
+        <span className="text-[8px] font-semibold tracking-widest text-muted-foreground uppercase">
           Threat
         </span>
-        <span className={`flex items-center gap-0.5 text-[9px] md:text-[10px] font-semibold px-1.5 md:px-2 py-0.5 rounded-full flex-shrink-0 ${cfg.badgeBg} ${cfg.badgeText}`}>
-          <Icon className="w-3 h-3" />
+        <span className={`flex items-center gap-0.5 text-[8px] font-semibold px-1.5 py-0.5 rounded-full flex-shrink-0 ${cfg.badgeBg} ${cfg.badgeText}`}>
+          <Icon className="w-2.5 h-2.5" />
           <span className="hidden sm:inline">{label}</span>
           <span className="sm:hidden">{label.charAt(0)}</span>
         </span>
@@ -109,10 +109,10 @@ export default function ThreatScoreCard({ threatScore, loading = false }: Props)
 
       {/* Score + bar row */}
       <div className="flex items-center gap-1 sm:gap-2">
-        <span className={`text-xl md:text-2xl lg:text-3xl font-black tabular-nums leading-tight flex-shrink-0 ${cfg.scoreColor}`}>
+        <span className={`text-lg md:text-xl lg:text-2xl font-black tabular-nums leading-none flex-shrink-0 ${cfg.scoreColor}`}>
           {loading ? '—' : score.toFixed(1)}
         </span>
-        <div className="h-1.5 rounded-full bg-secondary overflow-hidden flex-1">
+        <div className="h-1 rounded-full bg-secondary overflow-hidden flex-1">
           <div
             className={`h-full rounded-full animate-fill-bar ${cfg.barColor}`}
             style={{ width: loading ? '0%' : `${pct}%` }}

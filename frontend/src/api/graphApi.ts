@@ -31,3 +31,14 @@ export const getReportPdf = (clusterName = 'nokia-telecom-cluster') =>
   });
 
 export const getFullAnalysis = () => client.get('/api/analysis/');
+
+// History
+export const getRunHistory = (limit = 20) =>
+  client.get('/api/history/', { params: { limit } });
+
+// Diff
+export const getDiffLatest = () => client.get('/api/diff/latest');
+export const compareDiffRuns = (run_id_before: string, run_id_after: string) =>
+  client.post('/api/diff/compare', { run_id_before, run_id_after });
+export const getDiffVsCurrent = (runId: string) =>
+  client.get(`/api/diff/vs-current/${runId}`);

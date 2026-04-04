@@ -16,9 +16,10 @@ import CriticalNodeTable from '@/components/CriticalNodeTable';
 import SimulationPanel from '@/components/SimulationPanel';
 import SimulationModal from '@/components/SimulationModal';
 import NarratorPanel from '@/components/NarratorPanel';
+import DiffPanel from '@/components/DiffPanel';
 
 type OverlayMode = 'default' | 'attack' | 'blast' | 'cycle';
-type Tab = 'attack' | 'blast' | 'cycles' | 'simulation';
+type Tab = 'attack' | 'blast' | 'cycles' | 'simulation' | 'diff';
 
 const OVERLAY_MODES: { mode: OverlayMode; label: string }[] = [
   { mode: 'default', label: 'Default' },
@@ -32,6 +33,7 @@ const TABS: { key: Tab; label: string }[] = [
   { key: 'blast',      label: 'Blast Radius' },
   { key: 'cycles',     label: 'Cycles & Critical' },
   { key: 'simulation', label: 'Simulation' },
+  { key: 'diff',       label: 'Diff' },
 ];
 
 export default function Dashboard() {
@@ -75,7 +77,7 @@ export default function Dashboard() {
     <div className="h-screen flex flex-col bg-background overflow-hidden">
 
       {/* ── Header ─────────────────────────────────────────────── */}
-      <header className="flex-shrink-0 flex flex-wrap items-center justify-between gap-2 px-3 sm:px-4 md:px-6 py-2 sm:py-3 border-b border-border bg-card/80">
+      <header className="flex-shrink-0 flex flex-wrap items-center justify-between gap-2 px-3 sm:px-4 md:px-6 py-1.5 border-b border-border bg-card/80">
         {/* Left: branding */}
         <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 min-w-0 flex-1">
           {/* Live indicator */}
@@ -126,7 +128,7 @@ export default function Dashboard() {
       </header>
 
       {/* ── Metrics Bar ────────────────────────────────────────── */}
-      <div className="flex-shrink-0 flex gap-2 px-3 sm:px-6 py-2 border-b border-border/60 overflow-x-auto scrollbar-thin">
+      <div className="flex-shrink-0 flex gap-2 px-3 sm:px-6 py-1 border-b border-border/60 overflow-x-auto scrollbar-thin text-xs">
         {/* Threat Score — responsive width */}
         <div className="w-32 sm:w-36 md:w-40 flex-shrink-0">
           <ThreatScoreCard threatScore={analysis.threatScore} loading={graphLoading} />
@@ -291,6 +293,7 @@ export default function Dashboard() {
                   onSimulate={analysis.runSimulation}
                 />
               )}
+              {activeTab === 'diff' && <DiffPanel />}
             </div>
           </div>
         </div>
