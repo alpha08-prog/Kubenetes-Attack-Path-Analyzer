@@ -9,6 +9,7 @@ export interface GraphNode {
   risk_score: number;
   namespace?: string;
   properties?: Record<string, any>;
+  metadata?: Record<string, any>;
 }
 
 export interface GraphEdge {
@@ -50,7 +51,8 @@ function normalizeGraphData(raw: unknown): GraphData {
       type: String(data.type ?? 'unknown'),
       risk_score: Number(data.risk_score ?? data.risk ?? 0),
       namespace: data.namespace,
-      properties: data.metadata ?? data.properties ?? {},
+      properties: data.properties ?? {},
+      metadata: data.metadata ?? {},
     } as GraphNode;
   });
 

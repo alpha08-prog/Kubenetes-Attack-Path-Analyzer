@@ -11,6 +11,7 @@ from app.utils.helpers import timed
 from app.utils.logger import get_logger, log_algorithm_run
 from app.services.threat_score_service import calculate_threat_score
 from app.services.remediation_service import analyze_attack_path_for_remediation, analyze_cycles_for_remediation
+from app.services.cve_service import get_cve_score_for_image
 
 logger = get_logger(__name__)
 
@@ -54,6 +55,50 @@ def get_critical_nodes(top_n: int = 10) -> dict:
     return result
 
 
+
+    return result
+
+
+def enrich_nodes_with_cves(G=None) -> int:
+    """
+    Post-process the graph to add CVE scores to Pod nodes.
+    Returns the number of pods enriched.
+    """
+    if G is None:
+        G = get_graph()
+
+    count = 0
+    for node_id, attrs in G.nodes(data=True):
+        if attrs.get("type") != "pod":
+            continue
+
+        images = attrs.get("metadata", {}).get("image", [])
+        if not images:
+            continue
+
+        # Get highest score across all containers in the pod
+        max_cve_score = 0.0
+        for img in images:
+            score = get_cve_score_for_image(img)
+            if score > max_cve_score:
+                max_cve_score = score
+
+        if max_cve_score > 0:
+            # Update the risk score to include the CVE vulnerability
+            # We add it as a bonus to the existing risk (from misconfigs)
+            # but cap it at 10.0
+            old_risk = attrs.get("risk", 0.0)
+            new_risk = min(10.0, old_risk + (max_cve_score * 0.2)) # Weight CVE score at 20% influence
+            
+            G.nodes[node_id]["risk"] = round(new_risk, 1)
+            G.nodes[node_id]["metadata"]["cve_score"] = max_cve_score
+            count += 1
+
+    if count:
+        logger.info("Enriched %d Pod nodes with live CVE scores", count)
+    return count
+
+
 def get_full_analysis() -> dict:
     """
     Run all four algorithms in one call and return a combined report dict.
@@ -61,6 +106,7 @@ def get_full_analysis() -> dict:
     Called internally — not directly exposed as a route.
     """
     G = get_graph()
+    enrich_nodes_with_cves(G)
 
     from app.algorithm.dijkstra import shortest_attack_path
     from app.algorithm.bfs import blast_radius

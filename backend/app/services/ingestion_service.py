@@ -79,6 +79,11 @@ def ingest_and_build() -> dict:
         "edge_count": graph.number_of_edges(),
         "status": "ok",
     }
+
+    # B2: Live CVE Scoring enrichment
+    from app.services.analysis_service import enrich_nodes_with_cves
+    enrich_nodes_with_cves(graph)
+
     if not settings.MOCK_MODE:
         summary["fallback_count"] = fetch_meta["fallback_count"]
         summary["live_resource_count"] = fetch_meta["live_resource_count"]

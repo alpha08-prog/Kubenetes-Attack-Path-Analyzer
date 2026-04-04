@@ -62,6 +62,17 @@ def init_db() -> None:
             FOREIGN KEY (run_id) REFERENCES analysis_runs(run_id)
         );
 
+        CREATE TABLE IF NOT EXISTS edge_snapshots (
+            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            run_id       TEXT    NOT NULL,
+            source_id    TEXT    NOT NULL,
+            target_id    TEXT    NOT NULL,
+            relation     TEXT    NOT NULL,
+            risk_score   REAL    NOT NULL,
+            created_at   TEXT    NOT NULL,
+            FOREIGN KEY (run_id) REFERENCES analysis_runs(run_id)
+        );
+
         CREATE TABLE IF NOT EXISTS findings_log (
             id             INTEGER PRIMARY KEY AUTOINCREMENT,
             run_id         TEXT    NOT NULL,

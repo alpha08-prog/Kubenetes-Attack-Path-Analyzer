@@ -10,6 +10,7 @@ We cache results for 30 minutes to stay well within limits.
 
 import time
 import httpx
+from app.config import settings
 from app.utils.helpers import severity_label, utc_now
 from app.utils.logger import get_logger
 
@@ -17,6 +18,7 @@ logger = get_logger(__name__)
 
 NVD_BASE    = "https://services.nvd.nist.gov/rest/json/cves/2.0"
 NVD_TIMEOUT = 15
+NVD_DELAY_SEC = 2.0  # seconds to wait between hits if unauthenticated
 
 # ── In-memory cache ───────────────────────────────────────────────────────────
 # { cache_key: {"data": [...], "fetched_at": timestamp} }
@@ -229,6 +231,52 @@ def get_cves_for_node_type(node_type: str) -> dict:
     return result
 
 
+def get_cve_score_for_image(image_str: str) -> float:
+    """
+    Fetch the highest CVSS score for a container image.
+    Example: "nginx:1.21.1" or "bitnami/postgresql:14"
+    Returns 0.0 if not found or on error.
+    """
+    if not image_str or image_str == "latest":
+        return 0.0
+
+    cache_key = f"image_score:{image_str}"
+    cached = _get_cache(cache_key)
+    if cached is not None:
+        return float(cached)
+
+    # Simplified parsing: "repo/image:tag" -> "image", "tag"
+    # Take everything after last '/' and split by ':'
+    base_name = image_str.split("/")[-1].split(":")[0]
+    tag = image_str.split(":")[-1] if ":" in image_str else ""
+
+    # Heuristic: if tag looks like a version (has dots/numbers), use it.
+    # Otherwise just use the image name.
+    query = f"{base_name} {tag}" if any(c.isdigit() for c in tag) else base_name
+    logger.info("Scoring image vulnerabilities: %s (query: %s)", image_str, query)
+
+    try:
+        data = get_recent_cves(keyword=query, limit=5)
+        cves = data.get("cves", [])
+
+        if not cves and tag:
+            # Try again without the tag if no hits
+            data = get_recent_cves(keyword=base_name, limit=5)
+            cves = data.get("cves", [])
+
+        if not cves:
+            _set_cache(cache_key, 0.0)
+            return 0.0
+
+        max_score = max((c.get("cvss_score") or 0.0) for c in cves)
+        _set_cache(cache_key, max_score)
+        return max_score
+
+    except Exception as e:
+        logger.warning("Image CVE scoring failed for %s: %s", image_str, e)
+        return 0.0
+
+
 def get_cve_summary() -> dict:
     """
     Aggregated stats for the dashboard header CVE card.
@@ -284,11 +332,26 @@ def _fetch_from_nvd(keyword: str, limit: int) -> list:
 
 
 def _nvd_get(url: str) -> dict:
+    headers = {"User-Agent": "AttackPathAnalyzer/1.0"}
+    if settings.NVD_API_KEY:
+        headers["apiKey"] = settings.NVD_API_KEY
+
     with httpx.Client(timeout=NVD_TIMEOUT) as client:
-        resp = client.get(url, headers={"User-Agent": "AttackPathAnalyzer/1.0"})
-    if resp.status_code != 200:
-        raise RuntimeError(f"NVD returned HTTP {resp.status_code}")
-    return resp.json()
+        for attempt in range(3):
+            resp = client.get(url, headers=headers)
+
+            if resp.status_code == 200:
+                return resp.json()
+
+            if resp.status_code == 429:
+                wait = (attempt + 1) * 5
+                logger.warning("NVD Rate limited (429). Waiting %ds...", wait)
+                time.sleep(wait)
+                continue
+
+            raise RuntimeError(f"NVD returned HTTP {resp.status_code}")
+
+    raise RuntimeError("NVD API unreachable after retries")
 
 
 def _parse_cve(cve: dict) -> dict:

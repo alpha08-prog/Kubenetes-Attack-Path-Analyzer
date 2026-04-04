@@ -88,6 +88,21 @@ def record_analysis_run(
                 now,
             ))
 
+        # Insert edge-level snapshot
+        for u, v, attrs in G.edges(data=True):
+            conn.execute("""
+                INSERT INTO edge_snapshots
+                    (run_id, source_id, target_id, relation, risk_score, created_at)
+                VALUES (?,?,?,?,?,?)
+            """, (
+                run_id,
+                u,
+                v,
+                attrs.get("relation", "accesses"),
+                attrs.get("risk", 5.0),
+                now,
+            ))
+
         # Insert individual findings if provided
         if findings:
             for f in findings:

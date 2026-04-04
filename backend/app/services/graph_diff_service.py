@@ -53,6 +53,7 @@ def diff_runs(run_id_before: str, run_id_after: str) -> dict:
         "path_delta":        _diff_paths(before, after),
         "cycle_delta":       _diff_cycles(before, after),
         "finding_delta":     _diff_findings(before, after),
+        "edge_changes":      _diff_edges(before, after),
         "top_new_risks":     _top_new_risks(before, after),
         "top_improved":      _top_improved(before, after),
         "recommendation":    _generate_recommendation(before, after),
@@ -130,6 +131,10 @@ def _load_run(run_id: str) -> dict | None:
             SELECT * FROM risk_snapshots WHERE run_id = ?
         """, (run_id,)).fetchall()
 
+        edges = conn.execute("""
+            SELECT * FROM edge_snapshots WHERE run_id = ?
+        """, (run_id,)).fetchall()
+
         findings = conn.execute("""
             SELECT * FROM findings_log WHERE run_id = ?
         """, (run_id,)).fetchall()
@@ -137,6 +142,7 @@ def _load_run(run_id: str) -> dict | None:
     return {
         "run":       dict(run),
         "nodes":     {r["node_id"]: dict(r) for r in snapshots},
+        "edges":     [dict(e) for e in edges],
         "findings":  [dict(f) for f in findings],
     }
 
@@ -234,6 +240,42 @@ def _diff_nodes(before: dict, after: dict) -> dict:
         "removed_nodes":   list(removed_nodes),
         "risk_increased":  risk_increased[:10],
         "risk_decreased":  risk_decreased[:10],
+    }
+
+
+def _diff_edges(before: dict, after: dict) -> dict:
+    """Compare edges before vs after."""
+    b_edges_list = before.get("edges", [])
+    a_edges_list = after.get("edges", [])
+
+    # Create keys for easier comparison
+    def edge_key(e): return f"{e['source_id']}->{e['target_id']}:{e['relation']}"
+    
+    b_edges = {edge_key(e): e for e in b_edges_list}
+    a_edges = {edge_key(e): e for e in a_edges_list}
+
+    b_keys = set(b_edges.keys())
+    a_keys = set(a_edges.keys())
+
+    added_keys   = a_keys - b_keys
+    removed_keys = b_keys - a_keys
+
+    added = []
+    for k in added_keys:
+        e = a_edges[k]
+        added.append({
+            "source": e["source_id"],
+            "target": e["target_id"],
+            "relation": e["relation"],
+            "risk": e["risk_score"]
+        })
+
+    return {
+        "added_count":   len(added),
+        "removed_count": len(removed_keys),
+        "total_before":  len(b_edges),
+        "total_after":   len(a_edges),
+        "new_edges":     added[:10],
     }
 
 
@@ -396,23 +438,36 @@ def _generate_recommendation(before: dict, after: dict) -> str:
 
     if risk_delta > 2.0 or path_delta > 0 or cycle_delta > 0:
         parts = []
+        alert_level = "info"
         if path_delta > 0:
             parts.append(f"{path_delta} new attack path(s) were introduced")
+            alert_level = "critical"
         if cycle_delta > 0:
             parts.append(f"{cycle_delta} new privilege escalation loop(s) detected")
+            if alert_level != "critical": alert_level = "high"
         if risk_delta > 1.0:
             parts.append(f"overall risk increased by {round(risk_delta, 1)} points")
+            if alert_level == "info": alert_level = "medium"
 
-        return (
-            f"Security posture has degraded: {', '.join(parts)}. "
-            "Review newly added roles and service account bindings immediately. "
-            "Use the simulate removal feature to identify which node to harden first."
-        )
+        return {
+            "text": (
+                f"Security posture has degraded: {', '.join(parts)}. "
+                "Review newly added roles and service account bindings immediately. "
+                "Use the simulate removal feature to identify which node to harden first."
+            ),
+            "alert_level": alert_level
+        }
     elif risk_delta < -1.0 or path_delta < 0:
-        return (
-            "Security posture has improved. "
-            f"Risk decreased by {abs(round(risk_delta, 1))} points"
-            + (f" and {abs(path_delta)} attack path(s) were eliminated." if path_delta < 0 else ".")
-        )
+        return {
+            "text": (
+                "Security posture has improved. "
+                f"Risk decreased by {abs(round(risk_delta, 1))} points"
+                + (f" and {abs(path_delta)} attack path(s) were eliminated." if path_delta < 0 else ".")
+            ),
+            "alert_level": "success"
+        }
     else:
-        return "No significant security changes detected between these two runs."
+        return {
+            "text": "No significant security changes detected between these two runs.",
+            "alert_level": "info"
+        }

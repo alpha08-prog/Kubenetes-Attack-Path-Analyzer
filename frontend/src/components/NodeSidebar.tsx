@@ -1,4 +1,4 @@
-import { X } from 'lucide-react';
+import { X, AlertTriangle } from 'lucide-react';
 import NodeTypeBadge from './NodeTypeBadge';
 import SeverityBadge from './SeverityBadge';
 import { riskToColor } from '@/styles/riskGradient';
@@ -64,9 +64,27 @@ export default function NodeSidebar({ node, onClose }: Props) {
               {Object.entries(node.properties).map(([k, v]) => (
                 <div key={k} className="flex justify-between text-sm">
                   <span className="text-muted-foreground">{k}</span>
-                  <span className="text-foreground font-mono">{String(v)}</span>
+                  <span className="text-foreground font-mono truncate ml-4" title={String(v)}>{String(v)}</span>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {node.metadata?.cve_score > 0 && (
+          <div className="mt-4 pt-4 border-t border-border/60">
+            <div className="flex items-center gap-2 mb-2">
+              <AlertTriangle className="w-4 h-4 text-orange-400" />
+              <p className="text-sm font-semibold text-foreground">CVE Vulnerabilities</p>
+            </div>
+            <div className="bg-secondary/30 rounded-lg p-3">
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-muted-foreground">Max CVSS Score</span>
+                <span className="text-sm font-bold text-orange-400">{node.metadata.cve_score}</span>
+              </div>
+              <p className="text-[10px] text-muted-foreground mt-2 leading-relaxed">
+                This pod is running images with known vulnerabilities. The risk score has been adjusted to reflect live CVE data from the NIST NVD API.
+              </p>
             </div>
           </div>
         )}

@@ -33,6 +33,12 @@ class Settings(BaseSettings):
         description="Groq model used for narration",
     )
 
+    # NVD API
+    NVD_API_KEY: str = Field(
+        default="",
+        description="Optional API key for NIST NVD (increases rate limit)",
+    )
+
     # App
     APP_NAME: str = Field(default="Attack Path Analyzer")
     APP_VERSION: str = Field(default="1.0.0")

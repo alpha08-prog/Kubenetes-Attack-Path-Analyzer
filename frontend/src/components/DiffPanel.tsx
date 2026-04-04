@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { GitCompare, Loader2, TrendingUp, TrendingDown, Minus, AlertTriangle, CheckCircle } from 'lucide-react';
 import { getDiffLatest, compareDiffRuns, getDiffVsCurrent, getRunHistory } from '@/api/graphApi';
+import { cn } from '@/lib/utils';
 
 type DiffMode = 'latest' | 'compare' | 'vs-current';
 
@@ -202,6 +203,12 @@ export default function DiffPanel() {
                 after={diff.node_changes?.total_after ?? 0}
                 delta={(diff.node_changes?.total_after ?? 0) - (diff.node_changes?.total_before ?? 0)}
               />
+              <MetricRow
+                label="Total Edges"
+                before={diff.edge_changes?.total_before ?? 0}
+                after={diff.edge_changes?.total_after ?? 0}
+                delta={(diff.edge_changes?.total_after ?? 0) - (diff.edge_changes?.total_before ?? 0)}
+              />
             </div>
           </div>
 
@@ -293,11 +300,49 @@ export default function DiffPanel() {
             </div>
           )}
 
-          {/* Recommendation */}
+          {/* Recommendation & Alerts */}
           {diff.recommendation && (
-            <blockquote className="border-l-2 border-primary pl-3 text-xs text-muted-foreground italic">
-              {diff.recommendation}
-            </blockquote>
+            <div className={cn(
+              "rounded-lg p-4 border-l-4",
+              diff.recommendation.alert_level === 'critical' ? "bg-red-500/10 border-red-500 text-red-200" :
+              diff.recommendation.alert_level === 'high'     ? "bg-orange-500/10 border-orange-500 text-orange-200" :
+              diff.recommendation.alert_level === 'success'  ? "bg-emerald-500/10 border-emerald-500 text-emerald-200" :
+              "bg-secondary/40 border-primary text-muted-foreground"
+            )}>
+              <div className="flex items-start gap-3">
+                {diff.recommendation.alert_level === 'critical' && <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 animate-pulse" />}
+                {diff.recommendation.alert_level === 'high'     && <AlertTriangle className="w-5 h-5 text-orange-500 shrink-0" />}
+                {diff.recommendation.alert_level === 'success'  && <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />}
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wider mb-1">
+                    {diff.recommendation.alert_level === 'critical' ? 'Security Alert: Critical Regression' : 
+                     diff.recommendation.alert_level === 'high'     ? 'Security Warning' : 
+                     diff.recommendation.alert_level === 'success'  ? 'Security Improvement' : 'Analysis Summary'}
+                  </p>
+                  <p className="text-xs leading-relaxed italic opacity-90">
+                    {typeof diff.recommendation === 'string' ? diff.recommendation : diff.recommendation.text}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Top New Edges */}
+          {diff.edge_changes?.new_edges?.length > 0 && (
+            <div>
+              <p className="text-xs font-semibold text-foreground mb-2">New Connections (Edges)</p>
+              <div className="space-y-1">
+                {diff.edge_changes.new_edges.map((e: any, i: number) => (
+                  <div key={i} className="bg-secondary/20 rounded-lg px-3 py-2 text-[10px] space-y-1">
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground font-mono truncate max-w-[100px]">{e.source.split(':').pop()}</span>
+                      <span className="text-primary font-bold">-{e.relation}→</span>
+                      <span className="text-muted-foreground font-mono truncate max-w-[100px]">{e.target.split(':').pop()}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
         </div>
       )}
