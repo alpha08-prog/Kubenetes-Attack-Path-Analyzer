@@ -110,11 +110,6 @@
     "relation": "bound-to"
   },
   {
-    "source": "role:kube-system:system:controller:bootstrap-signer",
-    "target": "secret:kube-system:bootstrap-token-7zk80k",
-    "relation": "can-read"
-  },
-  {
     "source": "service_account:kube-system:cloud-provider",
     "target": "role:kube-system:system:controller:cloud-provider",
     "relation": "bound-to"
@@ -123,11 +118,6 @@
     "source": "service_account:kube-system:token-cleaner",
     "target": "role:kube-system:system:controller:token-cleaner",
     "relation": "bound-to"
-  },
-  {
-    "source": "role:kube-system:system:controller:token-cleaner",
-    "target": "secret:kube-system:bootstrap-token-7zk80k",
-    "relation": "can-read"
   },
   {
     "source": "service_account:kube-system:storage-provisioner",
@@ -166,11 +156,6 @@
   },
   {
     "source": "role:cluster:cluster-admin",
-    "target": "secret:kube-system:bootstrap-token-7zk80k",
-    "relation": "can-read"
-  },
-  {
-    "source": "role:cluster:cluster-admin",
     "target": "secret:nokia-demo:api-token",
     "relation": "can-read"
   },
@@ -193,11 +178,6 @@
     "source": "user:cluster:ci-bot",
     "target": "role:cluster:nokia-demo-cluster",
     "relation": "bound-to"
-  },
-  {
-    "source": "role:cluster:nokia-demo-cluster",
-    "target": "secret:kube-system:bootstrap-token-7zk80k",
-    "relation": "can-read"
   },
   {
     "source": "role:cluster:nokia-demo-cluster",
@@ -281,11 +261,6 @@
   },
   {
     "source": "role:cluster:system:controller:generic-garbage-collector",
-    "target": "secret:kube-system:bootstrap-token-7zk80k",
-    "relation": "can-read"
-  },
-  {
-    "source": "role:cluster:system:controller:generic-garbage-collector",
     "target": "secret:nokia-demo:api-token",
     "relation": "can-read"
   },
@@ -298,11 +273,6 @@
     "source": "service_account:kube-system:horizontal-pod",
     "target": "role:cluster:system:controller:horizontal-pod",
     "relation": "bound-to"
-  },
-  {
-    "source": "role:cluster:system:controller:horizontal-pod",
-    "target": "secret:kube-system:bootstrap-token-7zk80k",
-    "relation": "can-read"
   },
   {
     "source": "role:cluster:system:controller:horizontal-pod",
@@ -328,11 +298,6 @@
     "source": "service_account:kube-system:namespace-controller",
     "target": "role:cluster:system:controller:namespace-controller",
     "relation": "bound-to"
-  },
-  {
-    "source": "role:cluster:system:controller:namespace-controller",
-    "target": "secret:kube-system:bootstrap-token-7zk80k",
-    "relation": "can-read"
   },
   {
     "source": "role:cluster:system:controller:namespace-controller",
@@ -388,11 +353,6 @@
     "source": "service_account:kube-system:resourcequota-controller",
     "target": "role:cluster:system:controller:resourcequota-controller",
     "relation": "bound-to"
-  },
-  {
-    "source": "role:cluster:system:controller:resourcequota-controller",
-    "target": "secret:kube-system:bootstrap-token-7zk80k",
-    "relation": "can-read"
   },
   {
     "source": "role:cluster:system:controller:resourcequota-controller",
@@ -471,11 +431,6 @@
   },
   {
     "source": "role:cluster:system:kube-controller-manager",
-    "target": "secret:kube-system:bootstrap-token-7zk80k",
-    "relation": "can-read"
-  },
-  {
-    "source": "role:cluster:system:kube-controller-manager",
     "target": "secret:nokia-demo:api-token",
     "relation": "can-read"
   },
@@ -493,11 +448,6 @@
     "source": "user:cluster:system:kube-scheduler",
     "target": "role:cluster:system:kube-scheduler",
     "relation": "bound-to"
-  },
-  {
-    "source": "role:cluster:system:node",
-    "target": "secret:kube-system:bootstrap-token-7zk80k",
-    "relation": "can-read"
   },
   {
     "source": "role:cluster:system:node",

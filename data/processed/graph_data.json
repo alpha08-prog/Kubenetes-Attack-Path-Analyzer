@@ -1,9 +1,9 @@
 {
   "meta": {
     "source": "kubectl",
-    "generated": "2026-04-02T17:14:05.919445Z",
-    "node_count": 163,
-    "edge_count": 104
+    "generated": "2026-04-04T06:35:59.891106Z",
+    "node_count": 162,
+    "edge_count": 94
   },
   "nodes": [
     {
@@ -7389,19 +7389,6 @@
       }
     },
     {
-      "id": "secret:kube-system:bootstrap-token-7zk80k",
-      "label": "bootstrap-token-7zk80k",
-      "type": "secret",
-      "risk": 4.0,
-      "namespace": "kube-system",
-      "metadata": {
-        "secret_type": "bootstrap.kubernetes.io/token",
-        "is_db_creds": false,
-        "is_tls": false,
-        "is_token": false
-      }
-    },
-    {
       "id": "secret:nokia-demo:api-token",
       "label": "api-token",
       "type": "secret",
@@ -7739,13 +7726,6 @@
       "weight": 5.5
     },
     {
-      "source": "role:kube-system:system:controller:bootstrap-signer",
-      "target": "secret:kube-system:bootstrap-token-7zk80k",
-      "relation": "can-read",
-      "risk": 4.5,
-      "weight": 5.5
-    },
-    {
       "source": "service_account:kube-system:cloud-provider",
       "target": "role:kube-system:system:controller:cloud-provider",
       "relation": "bound-to",
@@ -7756,13 +7736,6 @@
       "source": "service_account:kube-system:token-cleaner",
       "target": "role:kube-system:system:controller:token-cleaner",
       "relation": "bound-to",
-      "risk": 4.5,
-      "weight": 5.5
-    },
-    {
-      "source": "role:kube-system:system:controller:token-cleaner",
-      "target": "secret:kube-system:bootstrap-token-7zk80k",
-      "relation": "can-read",
       "risk": 4.5,
       "weight": 5.5
     },
@@ -7817,13 +7790,6 @@
     },
     {
       "source": "role:cluster:cluster-admin",
-      "target": "secret:kube-system:bootstrap-token-7zk80k",
-      "relation": "can-read",
-      "risk": 9.5,
-      "weight": 0.5
-    },
-    {
-      "source": "role:cluster:cluster-admin",
       "target": "secret:nokia-demo:api-token",
       "relation": "can-read",
       "risk": 9.5,
@@ -7856,13 +7822,6 @@
       "relation": "bound-to",
       "risk": 4.0,
       "weight": 6.0
-    },
-    {
-      "source": "role:cluster:nokia-demo-cluster",
-      "target": "secret:kube-system:bootstrap-token-7zk80k",
-      "relation": "can-read",
-      "risk": 7.0,
-      "weight": 3.0
     },
     {
       "source": "role:cluster:nokia-demo-cluster",
@@ -7978,13 +7937,6 @@
     },
     {
       "source": "role:cluster:system:controller:generic-garbage-collector",
-      "target": "secret:kube-system:bootstrap-token-7zk80k",
-      "relation": "can-read",
-      "risk": 7.0,
-      "weight": 3.0
-    },
-    {
-      "source": "role:cluster:system:controller:generic-garbage-collector",
       "target": "secret:nokia-demo:api-token",
       "relation": "can-read",
       "risk": 7.0,
@@ -8001,13 +7953,6 @@
       "source": "service_account:kube-system:horizontal-pod",
       "target": "role:cluster:system:controller:horizontal-pod",
       "relation": "bound-to",
-      "risk": 7.0,
-      "weight": 3.0
-    },
-    {
-      "source": "role:cluster:system:controller:horizontal-pod",
-      "target": "secret:kube-system:bootstrap-token-7zk80k",
-      "relation": "can-read",
       "risk": 7.0,
       "weight": 3.0
     },
@@ -8043,13 +7988,6 @@
       "source": "service_account:kube-system:namespace-controller",
       "target": "role:cluster:system:controller:namespace-controller",
       "relation": "bound-to",
-      "risk": 7.0,
-      "weight": 3.0
-    },
-    {
-      "source": "role:cluster:system:controller:namespace-controller",
-      "target": "secret:kube-system:bootstrap-token-7zk80k",
-      "relation": "can-read",
       "risk": 7.0,
       "weight": 3.0
     },
@@ -8127,13 +8065,6 @@
       "source": "service_account:kube-system:resourcequota-controller",
       "target": "role:cluster:system:controller:resourcequota-controller",
       "relation": "bound-to",
-      "risk": 7.0,
-      "weight": 3.0
-    },
-    {
-      "source": "role:cluster:system:controller:resourcequota-controller",
-      "target": "secret:kube-system:bootstrap-token-7zk80k",
-      "relation": "can-read",
       "risk": 7.0,
       "weight": 3.0
     },
@@ -8244,13 +8175,6 @@
     },
     {
       "source": "role:cluster:system:kube-controller-manager",
-      "target": "secret:kube-system:bootstrap-token-7zk80k",
-      "relation": "can-read",
-      "risk": 9.0,
-      "weight": 1.0
-    },
-    {
-      "source": "role:cluster:system:kube-controller-manager",
       "target": "secret:nokia-demo:api-token",
       "relation": "can-read",
       "risk": 9.0,
@@ -8276,13 +8200,6 @@
       "relation": "bound-to",
       "risk": 4.0,
       "weight": 6.0
-    },
-    {
-      "source": "role:cluster:system:node",
-      "target": "secret:kube-system:bootstrap-token-7zk80k",
-      "relation": "can-read",
-      "risk": 5.0,
-      "weight": 5.0
     },
     {
       "source": "role:cluster:system:node",

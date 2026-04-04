@@ -24,7 +24,7 @@
                         "uid": "bd6c2118-490f-434f-be82-cd3d728a7402"
                     }
                 ],
-                "resourceVersion": "11004",
+                "resourceVersion": "13798",
                 "uid": "6db97f74-cfe7-4019-89c6-66bc466a50aa"
             },
             "spec": {
@@ -242,7 +242,7 @@
                 "conditions": [
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:30Z",
+                        "lastTransitionTime": "2026-04-04T06:31:15Z",
                         "observedGeneration": 1,
                         "status": "True",
                         "type": "PodReadyToStartContainers"
@@ -256,14 +256,14 @@
                     },
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:54Z",
+                        "lastTransitionTime": "2026-04-04T06:31:39Z",
                         "observedGeneration": 1,
                         "status": "True",
                         "type": "Ready"
                     },
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:54Z",
+                        "lastTransitionTime": "2026-04-04T06:31:39Z",
                         "observedGeneration": 1,
                         "status": "True",
                         "type": "ContainersReady"
@@ -282,16 +282,16 @@
                             "cpu": "100m",
                             "memory": "70Mi"
                         },
-                        "containerID": "docker://106a17a627f086168d9daf4725d6cea2b38b7f4257319c902c564dea2eda8519",
+                        "containerID": "docker://377cb32b85f6fb412a30a533c3a20d3bcf9ff873cc788af4757a80d8f3b802d6",
                         "image": "registry.k8s.io/coredns/coredns:v1.13.1",
                         "imageID": "docker-pullable://registry.k8s.io/coredns/coredns@sha256:9b9128672209474da07c91439bf15ed704ae05ad918dd6454e5b6ae14e35fee6",
                         "lastState": {
                             "terminated": {
-                                "containerID": "docker://f167bdd0b15d2437376e4518e0b16aff3c2c2a0ef7d33f25fd2fce8651995aee",
+                                "containerID": "docker://e84a9e3d3b1cdf425cf0184bf4083ff20842dc8f7095c9b19828911ea34d80d5",
                                 "exitCode": 255,
-                                "finishedAt": "2026-04-02T17:10:11Z",
+                                "finishedAt": "2026-04-04T06:30:55Z",
                                 "reason": "Error",
-                                "startedAt": "2026-04-02T08:45:51Z"
+                                "startedAt": "2026-04-04T05:24:33Z"
                             }
                         },
                         "name": "coredns",
@@ -305,11 +305,11 @@
                                 "memory": "70Mi"
                             }
                         },
-                        "restartCount": 4,
+                        "restartCount": 6,
                         "started": true,
                         "state": {
                             "running": {
-                                "startedAt": "2026-04-02T17:10:28Z"
+                                "startedAt": "2026-04-04T06:31:15Z"
                             }
                         },
                         "volumeMounts": [
@@ -336,10 +336,10 @@
                 ],
                 "observedGeneration": 1,
                 "phase": "Running",
-                "podIP": "10.244.0.11",
+                "podIP": "10.244.0.24",
                 "podIPs": [
                     {
-                        "ip": "10.244.0.11"
+                        "ip": "10.244.0.24"
                     }
                 ],
                 "qosClass": "Burstable",
@@ -374,7 +374,7 @@
                         "uid": "eadaa194-4a1f-4e46-af05-f20849dd4889"
                     }
                 ],
-                "resourceVersion": "10986",
+                "resourceVersion": "13789",
                 "uid": "79ac49e5-0ccf-4ae0-aa15-cafa78e1e364"
             },
             "spec": {
@@ -513,31 +513,31 @@
                 "conditions": [
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:22Z",
+                        "lastTransitionTime": "2026-04-04T06:31:08Z",
                         "status": "True",
                         "type": "PodReadyToStartContainers"
                     },
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:20Z",
+                        "lastTransitionTime": "2026-04-04T06:31:07Z",
                         "status": "True",
                         "type": "Initialized"
                     },
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:32Z",
+                        "lastTransitionTime": "2026-04-04T06:31:24Z",
                         "status": "True",
                         "type": "Ready"
                     },
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:32Z",
+                        "lastTransitionTime": "2026-04-04T06:31:24Z",
                         "status": "True",
                         "type": "ContainersReady"
                     },
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:20Z",
+                        "lastTransitionTime": "2026-04-04T06:31:07Z",
                         "status": "True",
                         "type": "PodScheduled"
                     }
@@ -548,16 +548,16 @@
                             "cpu": "100m",
                             "memory": "100Mi"
                         },
-                        "containerID": "docker://e589a4a5d18244669befc3d0fbb502cd56bdcd5794ac9155a84e7533e9290f2e",
+                        "containerID": "docker://f41a2db4d9e7472a0feb4e97669425dc6c8a80c9971c86665ded76e76a07decc",
                         "image": "registry.k8s.io/etcd:3.6.6-0",
                         "imageID": "docker-pullable://registry.k8s.io/etcd@sha256:60a30b5d81b2217555e2cfb9537f655b7ba97220b99c39ee2e162a7127225890",
                         "lastState": {
                             "terminated": {
-                                "containerID": "docker://0b5c103033fae0f766e358e23aeb31ddeaeab109c7a0b8de9fb70bbbb9345cc3",
+                                "containerID": "docker://a2ec02a4223046adf8eeeb09f0f4f640bfece8b8662508b723adbdbf3e8b4140",
                                 "exitCode": 255,
-                                "finishedAt": "2026-04-02T17:10:11Z",
+                                "finishedAt": "2026-04-04T06:30:55Z",
                                 "reason": "Error",
-                                "startedAt": "2026-04-02T08:45:53Z"
+                                "startedAt": "2026-04-04T05:24:27Z"
                             }
                         },
                         "name": "etcd",
@@ -568,11 +568,11 @@
                                 "memory": "100Mi"
                             }
                         },
-                        "restartCount": 4,
+                        "restartCount": 6,
                         "started": true,
                         "state": {
                             "running": {
-                                "startedAt": "2026-04-02T17:10:21Z"
+                                "startedAt": "2026-04-04T06:31:08Z"
                             }
                         }
                     }
@@ -591,7 +591,7 @@
                     }
                 ],
                 "qosClass": "Burstable",
-                "startTime": "2026-04-02T17:10:20Z"
+                "startTime": "2026-04-04T06:31:07Z"
             }
         },
         {
@@ -622,7 +622,7 @@
                         "uid": "eadaa194-4a1f-4e46-af05-f20849dd4889"
                     }
                 ],
-                "resourceVersion": "10993",
+                "resourceVersion": "13783",
                 "uid": "0bbbae13-c35f-4aad-b135-df8d1aa2fc40"
             },
             "spec": {
@@ -806,31 +806,31 @@
                 "conditions": [
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:23Z",
+                        "lastTransitionTime": "2026-04-04T06:31:10Z",
                         "status": "True",
                         "type": "PodReadyToStartContainers"
                     },
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:20Z",
+                        "lastTransitionTime": "2026-04-04T06:31:07Z",
                         "status": "True",
                         "type": "Initialized"
                     },
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:36Z",
+                        "lastTransitionTime": "2026-04-04T06:31:21Z",
                         "status": "True",
                         "type": "Ready"
                     },
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:36Z",
+                        "lastTransitionTime": "2026-04-04T06:31:21Z",
                         "status": "True",
                         "type": "ContainersReady"
                     },
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:20Z",
+                        "lastTransitionTime": "2026-04-04T06:31:07Z",
                         "status": "True",
                         "type": "PodScheduled"
                     }
@@ -840,16 +840,16 @@
                         "allocatedResources": {
                             "cpu": "250m"
                         },
-                        "containerID": "docker://c045ee481646f9268a8647c4dfbaef2ec2c5eca8a06ac6f4d5b0da7734bbfade",
+                        "containerID": "docker://072ee47313789b7c4031afc7fce4dfce257336c0cdbcfd4961e9498e4e25526e",
                         "image": "registry.k8s.io/kube-apiserver:v1.35.1",
                         "imageID": "docker-pullable://registry.k8s.io/kube-apiserver@sha256:011838b85f65454b95a013b2b902dd506789fd07f9abc84e52eb2b6a044cd392",
                         "lastState": {
                             "terminated": {
-                                "containerID": "docker://308cff8a7e0bee2cef355f7282be482a453608ede2648db50bc422a550463aa1",
+                                "containerID": "docker://ae326e56bb08542434c2b922eaab2e6ff201825cd9dcc8e68dd5bc000d4f7ab9",
                                 "exitCode": 255,
-                                "finishedAt": "2026-04-02T17:10:11Z",
+                                "finishedAt": "2026-04-04T06:30:55Z",
                                 "reason": "Error",
-                                "startedAt": "2026-04-02T08:45:56Z"
+                                "startedAt": "2026-04-04T05:24:27Z"
                             }
                         },
                         "name": "kube-apiserver",
@@ -860,11 +860,11 @@
                                 "memory": "0"
                             }
                         },
-                        "restartCount": 4,
+                        "restartCount": 6,
                         "started": true,
                         "state": {
                             "running": {
-                                "startedAt": "2026-04-02T17:10:22Z"
+                                "startedAt": "2026-04-04T06:31:08Z"
                             }
                         }
                     }
@@ -883,7 +883,7 @@
                     }
                 ],
                 "qosClass": "Burstable",
-                "startTime": "2026-04-02T17:10:20Z"
+                "startTime": "2026-04-04T06:31:07Z"
             }
         },
         {
@@ -913,7 +913,7 @@
                         "uid": "eadaa194-4a1f-4e46-af05-f20849dd4889"
                     }
                 ],
-                "resourceVersion": "10995",
+                "resourceVersion": "13786",
                 "uid": "9692946b-7881-4316-b26c-6880964b552f"
             },
             "spec": {
@@ -1098,31 +1098,31 @@
                 "conditions": [
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:22Z",
+                        "lastTransitionTime": "2026-04-04T06:31:10Z",
                         "status": "True",
                         "type": "PodReadyToStartContainers"
                     },
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:21Z",
+                        "lastTransitionTime": "2026-04-04T06:31:07Z",
                         "status": "True",
                         "type": "Initialized"
                     },
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:37Z",
+                        "lastTransitionTime": "2026-04-04T06:31:23Z",
                         "status": "True",
                         "type": "Ready"
                     },
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:37Z",
+                        "lastTransitionTime": "2026-04-04T06:31:23Z",
                         "status": "True",
                         "type": "ContainersReady"
                     },
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:21Z",
+                        "lastTransitionTime": "2026-04-04T06:31:07Z",
                         "status": "True",
                         "type": "PodScheduled"
                     }
@@ -1132,16 +1132,16 @@
                         "allocatedResources": {
                             "cpu": "200m"
                         },
-                        "containerID": "docker://948abcab88c8e541c3994a3bf1ad8eac0b9a90664610f73bf26eb39c3526c621",
+                        "containerID": "docker://12c16398e43c397b363e363acc9ecc1f74ac9e55fe65164a4184227ed0ce5a59",
                         "image": "registry.k8s.io/kube-controller-manager:v1.35.1",
                         "imageID": "docker-pullable://registry.k8s.io/kube-controller-manager@sha256:9fb295baa9d68543d7bbecc23e16fcdf85c8c06680f91e628535aa6fbe180dbd",
                         "lastState": {
                             "terminated": {
-                                "containerID": "docker://eb19be463fbc188a20a6ad1fc4e6256b4dd4481ec45dcbd8a5ba2f8d636837f6",
-                                "exitCode": 255,
-                                "finishedAt": "2026-04-02T17:10:11Z",
+                                "containerID": "docker://3c343fbc7abcbd89f393d8737156c56443d47ba2a3f69e524b48e471e577c818",
+                                "exitCode": 2,
+                                "finishedAt": "2026-04-04T06:10:12Z",
                                 "reason": "Error",
-                                "startedAt": "2026-04-02T08:45:49Z"
+                                "startedAt": "2026-04-04T05:24:27Z"
                             }
                         },
                         "name": "kube-controller-manager",
@@ -1152,11 +1152,11 @@
                                 "memory": "0"
                             }
                         },
-                        "restartCount": 4,
+                        "restartCount": 6,
                         "started": true,
                         "state": {
                             "running": {
-                                "startedAt": "2026-04-02T17:10:21Z"
+                                "startedAt": "2026-04-04T06:31:08Z"
                             }
                         }
                     }
@@ -1175,7 +1175,7 @@
                     }
                 ],
                 "qosClass": "Burstable",
-                "startTime": "2026-04-02T17:10:21Z"
+                "startTime": "2026-04-04T06:31:07Z"
             }
         },
         {
@@ -1202,7 +1202,7 @@
                         "uid": "d72ed519-8716-4744-b441-c5758c10e68a"
                     }
                 ],
-                "resourceVersion": "10963",
+                "resourceVersion": "13697",
                 "uid": "6ab6af55-2b91-41dc-9958-45b73aaa79fe"
             },
             "spec": {
@@ -1396,7 +1396,7 @@
                 "conditions": [
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:30Z",
+                        "lastTransitionTime": "2026-04-04T06:31:15Z",
                         "observedGeneration": 1,
                         "status": "True",
                         "type": "PodReadyToStartContainers"
@@ -1410,14 +1410,14 @@
                     },
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:30Z",
+                        "lastTransitionTime": "2026-04-04T06:31:15Z",
                         "observedGeneration": 1,
                         "status": "True",
                         "type": "Ready"
                     },
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:30Z",
+                        "lastTransitionTime": "2026-04-04T06:31:15Z",
                         "observedGeneration": 1,
                         "status": "True",
                         "type": "ContainersReady"
@@ -1432,26 +1432,26 @@
                 ],
                 "containerStatuses": [
                     {
-                        "containerID": "docker://44071c47ba146c64634053af1a34dc4c69b0cdd5213858b62d41afe0eeccc411",
+                        "containerID": "docker://cf5fc8cf61272de06a3cdb6b323b41a8689ee4fa7d4beb3dd9854da56eb51076",
                         "image": "registry.k8s.io/kube-proxy:v1.35.1",
                         "imageID": "docker-pullable://registry.k8s.io/kube-proxy@sha256:a832f1cece7252b2e52294be5a59b7579ccde35202ad63e09e9f4f04c5676435",
                         "lastState": {
                             "terminated": {
-                                "containerID": "docker://3d09561b87bf87572fb1bb7c7f1ca30f1bf07055e7343302eb563dd688b6445b",
-                                "exitCode": 255,
-                                "finishedAt": "2026-04-02T17:10:11Z",
+                                "containerID": "docker://652403ae94ba295785de1ce3a2af7ac3ccb7611e175ade3b69eea52506b62a7a",
+                                "exitCode": 2,
+                                "finishedAt": "2026-04-04T06:10:12Z",
                                 "reason": "Error",
-                                "startedAt": "2026-04-02T08:45:49Z"
+                                "startedAt": "2026-04-04T05:24:32Z"
                             }
                         },
                         "name": "kube-proxy",
                         "ready": true,
                         "resources": {},
-                        "restartCount": 4,
+                        "restartCount": 6,
                         "started": true,
                         "state": {
                             "running": {
-                                "startedAt": "2026-04-02T17:10:27Z"
+                                "startedAt": "2026-04-04T06:31:14Z"
                             }
                         },
                         "volumeMounts": [
@@ -1523,7 +1523,7 @@
                         "uid": "eadaa194-4a1f-4e46-af05-f20849dd4889"
                     }
                 ],
-                "resourceVersion": "10997",
+                "resourceVersion": "13791",
                 "uid": "20d5a6d9-52ec-42b4-bdc9-db8d960d9f49"
             },
             "spec": {
@@ -1637,31 +1637,31 @@
                 "conditions": [
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:23Z",
+                        "lastTransitionTime": "2026-04-04T06:31:09Z",
                         "status": "True",
                         "type": "PodReadyToStartContainers"
                     },
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:20Z",
+                        "lastTransitionTime": "2026-04-04T06:31:07Z",
                         "status": "True",
                         "type": "Initialized"
                     },
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:39Z",
+                        "lastTransitionTime": "2026-04-04T06:31:25Z",
                         "status": "True",
                         "type": "Ready"
                     },
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:39Z",
+                        "lastTransitionTime": "2026-04-04T06:31:25Z",
                         "status": "True",
                         "type": "ContainersReady"
                     },
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:20Z",
+                        "lastTransitionTime": "2026-04-04T06:31:07Z",
                         "status": "True",
                         "type": "PodScheduled"
                     }
@@ -1671,16 +1671,16 @@
                         "allocatedResources": {
                             "cpu": "100m"
                         },
-                        "containerID": "docker://537b678ca4a76da4669d3454005c325713684c632a24eba9bb06329111587a56",
+                        "containerID": "docker://7eedafffd43e167317a1dcc5dfb2fa25961d708f9183cfcf19b4161cdf15452a",
                         "image": "registry.k8s.io/kube-scheduler:v1.35.1",
                         "imageID": "docker-pullable://registry.k8s.io/kube-scheduler@sha256:fc251ed4b8a03830bb8f75fb5fe983b3b0b5cc15a9c066d8f6c5d2e547deece8",
                         "lastState": {
                             "terminated": {
-                                "containerID": "docker://cc46353e07e2edcc820092f5593d9e929a57b3db2357b90d02062a14aff095a6",
-                                "exitCode": 255,
-                                "finishedAt": "2026-04-02T17:10:11Z",
+                                "containerID": "docker://da4f36baf0ce11b8d4940aaaf28ba630504981bfdfe8c9118506e9eef25d1d5b",
+                                "exitCode": 1,
+                                "finishedAt": "2026-04-04T06:10:12Z",
                                 "reason": "Error",
-                                "startedAt": "2026-04-02T08:45:51Z"
+                                "startedAt": "2026-04-04T05:24:27Z"
                             }
                         },
                         "name": "kube-scheduler",
@@ -1691,11 +1691,11 @@
                                 "memory": "0"
                             }
                         },
-                        "restartCount": 4,
+                        "restartCount": 6,
                         "started": true,
                         "state": {
                             "running": {
-                                "startedAt": "2026-04-02T17:10:22Z"
+                                "startedAt": "2026-04-04T06:31:08Z"
                             }
                         }
                     }
@@ -1714,7 +1714,7 @@
                     }
                 ],
                 "qosClass": "Burstable",
-                "startTime": "2026-04-02T17:10:20Z"
+                "startTime": "2026-04-04T06:31:07Z"
             }
         },
         {
@@ -1732,7 +1732,7 @@
                 },
                 "name": "storage-provisioner",
                 "namespace": "kube-system",
-                "resourceVersion": "11016",
+                "resourceVersion": "13810",
                 "uid": "f1e36e61-32c0-49e4-993c-d7cb6753d368"
             },
             "spec": {
@@ -1838,7 +1838,7 @@
                 "conditions": [
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:29Z",
+                        "lastTransitionTime": "2026-04-04T06:31:15Z",
                         "observedGeneration": 1,
                         "status": "True",
                         "type": "PodReadyToStartContainers"
@@ -1852,14 +1852,14 @@
                     },
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:11:04Z",
+                        "lastTransitionTime": "2026-04-04T06:31:50Z",
                         "observedGeneration": 1,
                         "status": "True",
                         "type": "Ready"
                     },
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:11:04Z",
+                        "lastTransitionTime": "2026-04-04T06:31:50Z",
                         "observedGeneration": 1,
                         "status": "True",
                         "type": "ContainersReady"
@@ -1874,26 +1874,26 @@
                 ],
                 "containerStatuses": [
                     {
-                        "containerID": "docker://dbe77d45847734610aed94acea7e8f00492c154c9ebbcf2a6326426a360cc5d1",
+                        "containerID": "docker://a715b64374f220051fc8ed11f234895de066286121a9f33cb34536d25102d907",
                         "image": "gcr.io/k8s-minikube/storage-provisioner:v5",
                         "imageID": "docker-pullable://gcr.io/k8s-minikube/storage-provisioner@sha256:18eb69d1418e854ad5a19e399310e52808a8321e4c441c1dddad8977a0d7a944",
                         "lastState": {
                             "terminated": {
-                                "containerID": "docker://43242567f47b4c163cf3001171b0fd4865079199642cce0dfa381100c55ceaca",
+                                "containerID": "docker://3de9179a85a379935bd54005acd5cc726b53ceeaebb2cba74f7d57aba9c419c5",
                                 "exitCode": 1,
-                                "finishedAt": "2026-04-02T17:10:49Z",
+                                "finishedAt": "2026-04-04T06:31:36Z",
                                 "reason": "Error",
-                                "startedAt": "2026-04-02T17:10:27Z"
+                                "startedAt": "2026-04-04T06:31:13Z"
                             }
                         },
                         "name": "storage-provisioner",
                         "ready": true,
                         "resources": {},
-                        "restartCount": 9,
+                        "restartCount": 13,
                         "started": true,
                         "state": {
                             "running": {
-                                "startedAt": "2026-04-02T17:11:03Z"
+                                "startedAt": "2026-04-04T06:31:50Z"
                             }
                         },
                         "volumeMounts": [
@@ -1943,7 +1943,7 @@
                 },
                 "name": "api-server",
                 "namespace": "nokia-demo",
-                "resourceVersion": "10937",
+                "resourceVersion": "13703",
                 "uid": "0b17f209-11fa-4f2f-a91e-eb32efe96325"
             },
             "spec": {
@@ -2050,7 +2050,7 @@
                 "conditions": [
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:29Z",
+                        "lastTransitionTime": "2026-04-04T06:31:16Z",
                         "observedGeneration": 1,
                         "status": "True",
                         "type": "PodReadyToStartContainers"
@@ -2064,14 +2064,14 @@
                     },
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:29Z",
+                        "lastTransitionTime": "2026-04-04T06:31:16Z",
                         "observedGeneration": 1,
                         "status": "True",
                         "type": "Ready"
                     },
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:29Z",
+                        "lastTransitionTime": "2026-04-04T06:31:16Z",
                         "observedGeneration": 1,
                         "status": "True",
                         "type": "ContainersReady"
@@ -2086,26 +2086,26 @@
                 ],
                 "containerStatuses": [
                     {
-                        "containerID": "docker://958c67ea9fe64e8b530dd51e3cb9b247117bb6095be25df60e0ee990451e45c6",
+                        "containerID": "docker://843f4faa7d9b2cb06809e9e47afe82a7c612e220449b36a0a40f60a5bbf5215a",
                         "image": "node:18-alpine",
                         "imageID": "docker-pullable://node@sha256:8d6421d663b4c28fd3ebc498332f249011d118945588d0a35cb9bc4b8ca09d9e",
                         "lastState": {
                             "terminated": {
-                                "containerID": "docker://f3aa473101b454687f601b28520266baaa037f52326514503429d181e54b3d8a",
+                                "containerID": "docker://ecc2d822dc50a8ac8fdc4c259decff64942b5d32163365f79340fc2a58ff5ab1",
                                 "exitCode": 255,
-                                "finishedAt": "2026-04-02T17:10:11Z",
+                                "finishedAt": "2026-04-04T06:30:55Z",
                                 "reason": "Error",
-                                "startedAt": "2026-04-02T09:04:39Z"
+                                "startedAt": "2026-04-04T05:24:33Z"
                             }
                         },
                         "name": "api-server",
                         "ready": true,
                         "resources": {},
-                        "restartCount": 1,
+                        "restartCount": 3,
                         "started": true,
                         "state": {
                             "running": {
-                                "startedAt": "2026-04-02T17:10:28Z"
+                                "startedAt": "2026-04-04T06:31:14Z"
                             }
                         },
                         "volumeMounts": [
@@ -2126,10 +2126,10 @@
                 ],
                 "observedGeneration": 1,
                 "phase": "Running",
-                "podIP": "10.244.0.10",
+                "podIP": "10.244.0.22",
                 "podIPs": [
                     {
-                        "ip": "10.244.0.10"
+                        "ip": "10.244.0.22"
                     }
                 ],
                 "qosClass": "BestEffort",
@@ -2152,7 +2152,7 @@
                 },
                 "name": "billing-db",
                 "namespace": "nokia-demo",
-                "resourceVersion": "10969",
+                "resourceVersion": "13706",
                 "uid": "4fee6539-f344-4119-aaab-4bf10fbe753f"
             },
             "spec": {
@@ -2263,7 +2263,7 @@
                 "conditions": [
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:30Z",
+                        "lastTransitionTime": "2026-04-04T06:31:16Z",
                         "observedGeneration": 1,
                         "status": "True",
                         "type": "PodReadyToStartContainers"
@@ -2277,14 +2277,14 @@
                     },
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:30Z",
+                        "lastTransitionTime": "2026-04-04T06:31:16Z",
                         "observedGeneration": 1,
                         "status": "True",
                         "type": "Ready"
                     },
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:30Z",
+                        "lastTransitionTime": "2026-04-04T06:31:16Z",
                         "observedGeneration": 1,
                         "status": "True",
                         "type": "ContainersReady"
@@ -2299,26 +2299,26 @@
                 ],
                 "containerStatuses": [
                     {
-                        "containerID": "docker://638a1b84267909e95b28fe18d5d5ee1c392c9f816406fbe6f75e4976247e1990",
+                        "containerID": "docker://451be1894da187744294288c840d956dd947509dbf6d9d4a36d2312e01b448ea",
                         "image": "postgres:14-alpine",
                         "imageID": "docker-pullable://postgres@sha256:64ce25a0bb68e598edc3944f2f58f39d1e8641755baa4ba5f7ddfa142ed85c63",
                         "lastState": {
                             "terminated": {
-                                "containerID": "docker://ace1ef68a7af3bd87a5573cbe31616e6305ac55a4b1844345f5b738c1c61453e",
-                                "exitCode": 255,
-                                "finishedAt": "2026-04-02T17:10:11Z",
-                                "reason": "Error",
-                                "startedAt": "2026-04-02T09:05:25Z"
+                                "containerID": "docker://2630eb5607616f5d57203fa8d65f491acba78c930c41ee6d2c6e661e9cbbda76",
+                                "exitCode": 0,
+                                "finishedAt": "2026-04-04T06:10:13Z",
+                                "reason": "Completed",
+                                "startedAt": "2026-04-04T05:24:33Z"
                             }
                         },
                         "name": "postgres",
                         "ready": true,
                         "resources": {},
-                        "restartCount": 1,
+                        "restartCount": 3,
                         "started": true,
                         "state": {
                             "running": {
-                                "startedAt": "2026-04-02T17:10:28Z"
+                                "startedAt": "2026-04-04T06:31:15Z"
                             }
                         },
                         "volumeMounts": [
@@ -2339,10 +2339,10 @@
                 ],
                 "observedGeneration": 1,
                 "phase": "Running",
-                "podIP": "10.244.0.14",
+                "podIP": "10.244.0.23",
                 "podIPs": [
                     {
-                        "ip": "10.244.0.14"
+                        "ip": "10.244.0.23"
                     }
                 ],
                 "qosClass": "BestEffort",
@@ -2364,7 +2364,7 @@
                 },
                 "name": "metrics-collector",
                 "namespace": "nokia-demo",
-                "resourceVersion": "10949",
+                "resourceVersion": "13712",
                 "uid": "a7aaa62c-e222-4f03-981c-50f3752094fa"
             },
             "spec": {
@@ -2460,7 +2460,7 @@
                 "conditions": [
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:29Z",
+                        "lastTransitionTime": "2026-04-04T06:31:17Z",
                         "observedGeneration": 1,
                         "status": "True",
                         "type": "PodReadyToStartContainers"
@@ -2474,14 +2474,14 @@
                     },
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:29Z",
+                        "lastTransitionTime": "2026-04-04T06:31:17Z",
                         "observedGeneration": 1,
                         "status": "True",
                         "type": "Ready"
                     },
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:29Z",
+                        "lastTransitionTime": "2026-04-04T06:31:17Z",
                         "observedGeneration": 1,
                         "status": "True",
                         "type": "ContainersReady"
@@ -2496,26 +2496,26 @@
                 ],
                 "containerStatuses": [
                     {
-                        "containerID": "docker://454b6d240f7e6285cfb1a39607b7265837c627b2a906a79992131d81a9741fd7",
+                        "containerID": "docker://71ca847ba77903d31732016c7edc51163f5916c6a7a4b4251b9ccb05f99f13fb",
                         "image": "busybox:1.35",
                         "imageID": "docker-pullable://busybox@sha256:98ad9d1a2be345201bb0709b0d38655eb1b370145c7d94ca1fe9c421f76e245a",
                         "lastState": {
                             "terminated": {
-                                "containerID": "docker://95533ae1d8aa27d55fd2f5ee955f9f9aa2adbba33bc396325e6b2e2fa85e2cf8",
+                                "containerID": "docker://be0bca44d890985fd0fc5013e8c46878e26d27ccaba8489fc63f40857a58107d",
                                 "exitCode": 255,
-                                "finishedAt": "2026-04-02T17:10:11Z",
+                                "finishedAt": "2026-04-04T06:30:55Z",
                                 "reason": "Error",
-                                "startedAt": "2026-04-02T09:05:31Z"
+                                "startedAt": "2026-04-04T05:24:33Z"
                             }
                         },
                         "name": "metrics",
                         "ready": true,
                         "resources": {},
-                        "restartCount": 1,
+                        "restartCount": 3,
                         "started": true,
                         "state": {
                             "running": {
-                                "startedAt": "2026-04-02T17:10:28Z"
+                                "startedAt": "2026-04-04T06:31:15Z"
                             }
                         },
                         "volumeMounts": [
@@ -2536,10 +2536,10 @@
                 ],
                 "observedGeneration": 1,
                 "phase": "Running",
-                "podIP": "10.244.0.13",
+                "podIP": "10.244.0.20",
                 "podIPs": [
                     {
-                        "ip": "10.244.0.13"
+                        "ip": "10.244.0.20"
                     }
                 ],
                 "qosClass": "BestEffort",
@@ -2562,7 +2562,7 @@
                 },
                 "name": "web-server",
                 "namespace": "nokia-demo",
-                "resourceVersion": "10943",
+                "resourceVersion": "13698",
                 "uid": "279d9305-3bf2-45bc-aad4-e1f311b3c46c"
             },
             "spec": {
@@ -2670,7 +2670,7 @@
                 "conditions": [
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:29Z",
+                        "lastTransitionTime": "2026-04-04T06:31:15Z",
                         "observedGeneration": 1,
                         "status": "True",
                         "type": "PodReadyToStartContainers"
@@ -2684,14 +2684,14 @@
                     },
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:29Z",
+                        "lastTransitionTime": "2026-04-04T06:31:15Z",
                         "observedGeneration": 1,
                         "status": "True",
                         "type": "Ready"
                     },
                     {
                         "lastProbeTime": null,
-                        "lastTransitionTime": "2026-04-02T17:10:29Z",
+                        "lastTransitionTime": "2026-04-04T06:31:15Z",
                         "observedGeneration": 1,
                         "status": "True",
                         "type": "ContainersReady"
@@ -2706,26 +2706,26 @@
                 ],
                 "containerStatuses": [
                     {
-                        "containerID": "docker://3fe0348a4958bd75a6f4827699eb723660cf0e754e3fadf9bcfda4eb20d6e171",
+                        "containerID": "docker://439a19976ae85665a1d1701a09fd8f859f173e1ecfb5aea1fc6c059cbe3598e6",
                         "image": "nginx:1.19",
                         "imageID": "docker-pullable://nginx@sha256:df13abe416e37eb3db4722840dd479b00ba193ac6606e7902331dcea50f4f1f2",
                         "lastState": {
                             "terminated": {
-                                "containerID": "docker://c08a52e7a63f50cc600a4c9c725a42c8a98da5356d4ffabb0365925dbadb4b5e",
-                                "exitCode": 255,
-                                "finishedAt": "2026-04-02T17:10:11Z",
-                                "reason": "Error",
-                                "startedAt": "2026-04-02T09:04:56Z"
+                                "containerID": "docker://c73f47ac3645080a8e099f80a5114d1171891f0110307fd64a887d77cd9b1d6d",
+                                "exitCode": 0,
+                                "finishedAt": "2026-04-04T06:10:12Z",
+                                "reason": "Completed",
+                                "startedAt": "2026-04-04T05:24:33Z"
                             }
                         },
                         "name": "web-server",
                         "ready": true,
                         "resources": {},
-                        "restartCount": 1,
+                        "restartCount": 3,
                         "started": true,
                         "state": {
                             "running": {
-                                "startedAt": "2026-04-02T17:10:28Z"
+                                "startedAt": "2026-04-04T06:31:14Z"
                             }
                         },
                         "volumeMounts": [
@@ -2746,10 +2746,10 @@
                 ],
                 "observedGeneration": 1,
                 "phase": "Running",
-                "podIP": "10.244.0.12",
+                "podIP": "10.244.0.21",
                 "podIPs": [
                     {
-                        "ip": "10.244.0.12"
+                        "ip": "10.244.0.21"
                     }
                 ],
                 "qosClass": "BestEffort",
