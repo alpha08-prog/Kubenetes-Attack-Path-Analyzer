@@ -1,5 +1,5 @@
 # Demo Script — Attack Path Analyzer
-## Nokia Hackathon 2024 | Presentation Guide
+## Hack2Future 2.0 | Presentation Guide
 
 > **Total time: 7 minutes** (strict — judges will cut you off)
 > Read everything in this document the night before. Practice at least twice.
