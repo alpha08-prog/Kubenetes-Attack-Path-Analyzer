@@ -44,7 +44,7 @@ def shortest_attack_path(G: nx.DiGraph, source: str, target: str) -> dict | None
 
     try:
         path = nx.dijkstra_path(G, source, target, weight="weight")
-        cost = nx.dijkstra_path_length(G, source, target, weight="weight")
+        cost = sum(G[path[i]][path[i + 1]].get("risk", 0.0) for i in range(len(path) - 1))
     except nx.NetworkXNoPath:
         return {
             "source": source,
@@ -110,7 +110,7 @@ def all_attack_paths(G: nx.DiGraph, source: str, target: str, max_paths: int = 5
     results = []
     for path in raw_paths:
         total_cost = sum(
-            G[path[i]][path[i + 1]].get("weight", 1.0)
+            G[path[i]][path[i + 1]].get("risk", 0.0)
             for i in range(len(path) - 1)
         )
         results.append({

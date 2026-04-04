@@ -41,8 +41,9 @@ def build_attack_path_result(G: nx.DiGraph, path_nodes: list[str]) -> dict:
     for i in range(len(path_nodes) - 1):
         u, v = path_nodes[i], path_nodes[i + 1]
         ed = G[u][v]
-        w = float(ed.get("weight", 0.0))
-        total += w
+        r = float(ed.get("risk", 0.0))
+        w = float(ed.get("weight", r))
+        total += r
         hop = {
             "step": i + 1,
             "from": u,
@@ -52,7 +53,7 @@ def build_attack_path_result(G: nx.DiGraph, path_nodes: list[str]) -> dict:
             "from_type": G.nodes[u].get("type", "unknown"),
             "to_type": G.nodes[v].get("type", "unknown"),
             "relation": ed.get("relation", "accesses"),
-            "edge_risk": float(ed.get("risk", w)),
+            "edge_risk": r,
             "edge_weight": w,
         }
         if ed.get("cve") is not None:
@@ -75,35 +76,34 @@ def build_attack_path_result(G: nx.DiGraph, path_nodes: list[str]) -> dict:
 
 
 def path_weight_severity(total_weight: float) -> str:
-    """Match sample-output.txt style bands (cumulative edge weight)."""
-    if total_weight >= 20.0:
+    """Match sample-output.txt style bands (cumulative risk score)."""
+    if total_weight >= 25.0:
         return "CRITICAL"
-    if total_weight >= 11.0:
+    if total_weight >= 15.0:
         return "HIGH"
-    if total_weight >= 8.0:
+    if total_weight >= 10.0:
         return "MEDIUM"
     return "LOW"
 
 
 def _format_path_line(G: nx.DiGraph, path_nodes: list[str]) -> str:
-    """One line per hop, matching docs/sample-output.txt layout."""
-    out_lines: list[str] = []
+    """Single line representation of the chain matching Expected Path #1 layout."""
+    parts = []
     for i in range(len(path_nodes) - 1):
         u, v = path_nodes[i], path_nodes[i + 1]
-        ed = G[u][v]
         ul = G.nodes[u].get("label", u)
-        vl = G.nodes[v].get("label", v)
-        ut = _type_pretty(str(G.nodes[u].get("type", "unknown")))
-        vt = _type_pretty(str(G.nodes[v].get("type", "unknown")))
-        rel = ed.get("relation", "accesses")
-        line = f"{ul} ({ut})  --[{rel}]-->  {vl} ({vt})"
+        ed = G[u][v]
+        
+        part = ul
         if ed.get("cve"):
-            line += f"  [{ed['cve']}"
+            cve_str = ed["cve"]
             if ed.get("cvss") is not None:
-                line += f", CVSS {ed['cvss']}"
-            line += "]"
-        out_lines.append(line)
-    return "\n".join(out_lines)
+                cve_str += f", CVSS {ed['cvss']}"
+            part += f" [{cve_str}]"
+        parts.append(part)
+        
+    parts.append(G.nodes[path_nodes[-1]].get("label", path_nodes[-1]))
+    return " → ".join(parts)
 
 
 def _remediation_lines_for_path(G: nx.DiGraph, path_nodes: list[str]) -> list[str]:
@@ -178,7 +178,7 @@ def generate_full_report(G: nx.DiGraph, options: KillChainReportOptions | None =
                 continue
             seen.add(key)
             cost = sum(
-                float(G[p[i]][p[i + 1]].get("weight", 0.0))
+                float(G[p[i]][p[i + 1]].get("risk", 0.0))
                 for i in range(len(p) - 1)
             )
             path_entries.append((p, round(cost, 2)))

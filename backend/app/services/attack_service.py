@@ -36,9 +36,16 @@ def get_attack_path(source: str, target: str) -> dict:
     for hop in result.get("hops", []):
         hop["severity"] = severity_label(hop["edge_risk"])
 
-    # Overall path severity = worst single hop
-    max_risk = max((h["edge_risk"] for h in result.get("hops", [])), default=0.0)
-    result["severity"] = severity_label(max_risk)
+    # Overall path severity = threshold on total cost
+    total_cost = result.get("total_cost", 0.0)
+    if total_cost >= 25.0:
+        result["severity"] = "CRITICAL"
+    elif total_cost >= 15.0:
+        result["severity"] = "HIGH"
+    elif total_cost >= 10.0:
+        result["severity"] = "MEDIUM"
+    else:
+        result["severity"] = "LOW"
 
     # NEW: Add remediation suggestions
     remediations = analyze_attack_path_for_remediation(result)

@@ -113,6 +113,13 @@ def main(argv: list[str] | None = None) -> int:
         help="Path enumeration mode for --full-report (default: all_paths)",
     )
     parser.add_argument(
+        "--output",
+        type=Path,
+        metavar="FILE",
+        default=None,
+        help="Optional file path to write output instead of stdout",
+    )
+    parser.add_argument(
         "--path-cutoff",
         type=int,
         default=None,
@@ -170,31 +177,42 @@ def main(argv: list[str] | None = None) -> int:
     meta = built.file_metadata
     exit_code = 0
 
+    out_file = args.output
+    def _write_output(content: str) -> None:
+        if out_file:
+            with out_file.open("a", encoding="utf-8") as f:
+                f.write(content + "\n")
+        else:
+            _print_utf8(content)
+
+    if out_file and out_file.exists():
+        out_file.unlink()
+
     if args.blast_radius:
         assert args.source is not None
         try:
             br = blast_radius(G, args.source, max_hops=args.hops)
         except ValueError as exc:
             _die(str(exc), 1)
-        print(json.dumps(br, indent=2, default=str))
+        _write_output(json.dumps(br, indent=2, default=str))
 
     if dijkstra_ok:
         assert args.source is not None and args.target is not None
         res = shortest_attack_path(G, args.source, args.target)
-        print(json.dumps(res, indent=2, default=str))
+        _write_output(json.dumps(res, indent=2, default=str))
         if not res.get("found"):
             print(res.get("message", "No path found"), file=sys.stderr)
 
     if args.cycles:
-        print(json.dumps(detect_cycles(G), indent=2, default=str))
+        _write_output(json.dumps(detect_cycles(G), indent=2, default=str))
 
     if args.critical_node:
-        print(
+        _write_output(
             json.dumps(
                 critical_node_by_path_elimination(G, path_cutoff=args.path_cutoff),
                 indent=2,
                 default=str,
-            ),
+            )
         )
 
     if args.full_report:
@@ -210,7 +228,7 @@ def main(argv: list[str] | None = None) -> int:
                 metadata=meta,
             ),
         )
-        _print_utf8(text)
+        _write_output(text)
 
     return exit_code
 
