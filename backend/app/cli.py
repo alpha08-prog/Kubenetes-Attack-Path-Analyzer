@@ -109,8 +109,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--report-mode",
         choices=["dijkstra", "all_paths"],
-        default="all_paths",
-        help="Path enumeration mode for --full-report (default: all_paths)",
+        default="dijkstra",
+        help="Path enumeration mode for --full-report (default: dijkstra)",
     )
     parser.add_argument(
         "--output",

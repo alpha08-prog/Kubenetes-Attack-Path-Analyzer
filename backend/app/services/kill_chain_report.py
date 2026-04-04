@@ -37,11 +37,17 @@ def _type_pretty(t: str) -> str:
         "service_account": "ServiceAccount",
         "role": "Role",
         "clusterrole": "ClusterRole",
+        "cluster_role": "ClusterRole",
         "node": "Node",
         "secret": "Secret",
         "configmap": "ConfigMap",
         "database": "Database",
-        "namespace": "Namespace"
+        "namespace": "Namespace",
+        "external_actor": "ExternalActor",
+        "externalactor": "ExternalActor",
+        "user": "User",
+        "persistentvolume": "PersistentVolume",
+        "persistent_volume": "PersistentVolume",
     }
     return t_map.get(t.lower(), t.replace("_", " ").title())
 
@@ -141,7 +147,7 @@ def _dedupe_cycles(cycles_payload: dict) -> list[dict]:
 
 @dataclass
 class KillChainReportOptions:
-    report_mode: Literal["dijkstra", "all_paths"] = "all_paths"
+    report_mode: Literal["dijkstra", "all_paths"] = "dijkstra"
     blast_radius_hops: int = 3
     """Cutoff for all_simple_paths (None = unlimited; large graphs need a cap)."""
     path_cutoff: int | None = None
@@ -158,9 +164,9 @@ def generate_full_report(G: nx.DiGraph, options: KillChainReportOptions | None =
     lines: list[str] = []
 
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
-    sep = "=" * 66
+    sep = "═" * 66
     lines.append(sep)
-    lines.append(f"  KILL CHAIN REPORT  -  {now}")
+    lines.append(f"  KILL CHAIN REPORT  —  {now}")
     lines.append(f"  Cluster : {opts.cluster_name}")
     lines.append(f"  Nodes   : {G.number_of_nodes()}  |  Edges: {G.number_of_edges()}")
     lines.append(sep)
@@ -170,7 +176,7 @@ def generate_full_report(G: nx.DiGraph, options: KillChainReportOptions | None =
     sinks = find_graph_sinks(G)
 
     # --- Section 1: Attack paths ---
-    lines.append(f"[ SECTION 1 - ATTACK PATH DETECTION (Dijkstra) ]")
+    lines.append(f"[ SECTION 1 — ATTACK PATH DETECTION (Dijkstra) ]")
 
     path_entries: list[tuple[list[str], float]] = []
 
@@ -202,17 +208,17 @@ def generate_full_report(G: nx.DiGraph, options: KillChainReportOptions | None =
     if not path_entries:
         lines.append("  No attack paths detected for configured sources/sinks.")
     else:
-        lines.append(f"  !  {len(path_entries)} attack path(s) detected")
+        lines.append(f"  ⚠  {len(path_entries)} attack path(s) detected")
         lines.append("")
         for idx, (p_nodes, score) in enumerate(path_entries, start=1):
             sev = path_weight_severity(score)
             lines.append(f"  Path #{idx}  |  {len(p_nodes) - 1} hops  |  Risk Score: {score}  [{sev}]")
-            lines.append("  " + "-" * 60)
+            lines.append("  " + "─" * 60)
             for pl in _format_path_line(G, p_nodes).split("\n"):
                 lines.append("  " + pl)
             lines.append("")
 
-    lines.append(f"[ SECTION 2 - BLAST RADIUS ANALYSIS (BFS, depth={opts.blast_radius_hops}) ]")
+    lines.append(f"[ SECTION 2 — BLAST RADIUS ANALYSIS (BFS, depth={opts.blast_radius_hops}) ]")
     lines.append("")
     total_blast_nodes = 0
     
@@ -233,33 +239,33 @@ def generate_full_report(G: nx.DiGraph, options: KillChainReportOptions | None =
         label = G.nodes[src].get("label", src)
         nreach = br["total_reachable"]
         total_blast_nodes += nreach
-        lines.append(f"  Source: {label}  ->  {nreach} reachable resource(s) within {opts.blast_radius_hops} hops")
+        lines.append(f"  Source: {label}  →  {nreach} reachable resource(s) within {opts.blast_radius_hops} hops")
         for hop in sorted(br["zones"].keys()):
             names = [n["label"] for n in br["zones"][hop]]
             lines.append(f"    Hop {hop}: {', '.join(names)}")
         lines.append("")
 
     # --- Section 3: Cycles ---
-    lines.append("[ SECTION 3 - CIRCULAR PERMISSION DETECTION (DFS) ]")
+    lines.append("[ SECTION 3 — CIRCULAR PERMISSION DETECTION (DFS) ]")
     cres = detect_cycles(G)
     uniq = _dedupe_cycles(cres)
     if not uniq:
         lines.append("  No cycles detected.")
     else:
-        lines.append(f"  !  {len(uniq)} cycle(s) detected")
+        lines.append(f"  ⚠  {len(uniq)} cycle(s) detected")
         lines.append("")
         for idx, c in enumerate(uniq, start=1):
             nodes_c = c.get("nodes") or []
             labs = [G.nodes[n].get("label", n) for n in nodes_c]
             if labs:
-                chain = " <-> ".join(labs + [labs[0]])
+                chain = " ↔ ".join(labs + [labs[0]])
             else:
                 chain = c.get("chain", "")
             lines.append(f"  Cycle #{idx}: {chain}")
     lines.append("")
 
     # --- Section 4: Critical node ---
-    lines.append("[ SECTION 4 - CRITICAL NODE ANALYSIS ]")
+    lines.append("[ SECTION 4 — CRITICAL NODE ANALYSIS ]")
     lines.append("  Computing... (removing each node and recounting paths)")
     lines.append("")
     cna = critical_node_by_path_elimination(
@@ -274,7 +280,7 @@ def generate_full_report(G: nx.DiGraph, options: KillChainReportOptions | None =
     lines.append("")
     top = cna["ranking"][0] if cna["ranking"] else None
     if top:
-        lines.append("  *  RECOMMENDATION:")
+        lines.append("  ★  RECOMMENDATION:")
         lines.append(
             f"     Remove permission binding '{top['label']}' ({_type_pretty(top['type'])}) "
             f"to eliminate {top['paths_eliminated']} of {baseline} attack paths.",
@@ -282,7 +288,7 @@ def generate_full_report(G: nx.DiGraph, options: KillChainReportOptions | None =
         lines.append("")
         lines.append("  Top 5 highest-impact nodes to remove:")
         for row in cna["ranking"]:
-            bar = "#" * min(20, max(1, int(20 * row["paths_eliminated"] / max(baseline, 1))))
+            bar = "█" * min(20, max(1, row["paths_eliminated"]))
             pretty_type = _type_pretty(row['type'])
             lines.append(
                 f"    {row['label']:<30} ({pretty_type:<16})  "

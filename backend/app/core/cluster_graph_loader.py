@@ -16,7 +16,7 @@ from typing import Any
 
 import networkx as nx
 
-from app.core.graph_builder import add_shared_service_account_lateral_edges, create_graph
+from app.core.graph_builder import create_graph
 from app.utils.helpers import load_json
 
 _TYPE_ALIASES: dict[str, str] = {
@@ -152,7 +152,6 @@ def load_cluster_graph_file(path: str | Path) -> ClusterGraphBuildResult:
     nodes = parsed.get("nodes", [])
     edges = parsed.get("edges", [])
     G = create_graph({"nodes": nodes, "edges": edges})
-    add_shared_service_account_lateral_edges(G)
     meta = parsed.get("metadata") if isinstance(parsed.get("metadata"), dict) else {}
     return ClusterGraphBuildResult(
         graph=G,

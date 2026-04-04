@@ -6,7 +6,10 @@
       "Bash(python main.py --help)",
       "Bash(timeout 120 python main.py --input data/mock-cluster-graph.json --full-report)",
       "Bash(tee /tmp/actual_output.txt)",
-      "Bash(timeout 120 python main.py --input data/mock-cluster-graph.json --full-report --report-mode dijkstra)"
+      "Bash(timeout 120 python main.py --input data/mock-cluster-graph.json --full-report --report-mode dijkstra)",
+      "Bash(timeout 60 python main.py --input data/mock-cluster-graph.json --full-report)",
+      "Bash(grep -n \"web-frontend\\\\|api-server\\\\|return \\\\[\" backend/app/algorithm/*.py)",
+      "Read(//tmp/**)"
     ]
   }
 }
