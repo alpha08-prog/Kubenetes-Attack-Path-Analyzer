@@ -93,8 +93,12 @@ export function useGraph() {
       const [graphRes, summaryRes] = await Promise.all([getGraph(), getGraphSummary()]);
       const normalizedGraph = normalizeGraphData(graphRes.data);
       const normalizedSummary = normalizeSummary(summaryRes.data, normalizedGraph);
-      setGraphData(normalizedGraph);
-      setSummary(normalizedSummary);
+      // Only update graphData when there are actually nodes — prevents the canvas
+      // from going blank if the backend is mid-rebuild and momentarily returns empty.
+      if (normalizedGraph.nodes.length > 0) {
+        setGraphData(normalizedGraph);
+        setSummary(normalizedSummary);
+      }
     } catch (e: unknown) {
       toast({ title: 'Error loading graph', description: getErrorMessage(e), variant: 'destructive' });
     } finally {

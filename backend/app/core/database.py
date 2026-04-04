@@ -390,6 +390,19 @@ def get_latest_snapshot_id() -> str | None:
     return row[0] if row else None
 
 
+def get_latest_snapshot_meta() -> dict | None:
+    """Return lightweight metrics of the most recent snapshot (no nodes/edges JSON)."""
+    with get_conn() as conn:
+        row = conn.execute(
+            """
+            SELECT snapshot_id, node_count, edge_count, aggregate_risk, cycles_detected
+            FROM graph_snapshots
+            ORDER BY timestamp DESC LIMIT 1
+            """
+        ).fetchone()
+    return dict(row) if row else None
+
+
 def save_snapshot_diff(diff: dict) -> None:
     """Persist a computed SnapshotDiff to the database."""
     import json

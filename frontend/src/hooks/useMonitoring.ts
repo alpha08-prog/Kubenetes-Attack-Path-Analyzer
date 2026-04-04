@@ -36,10 +36,11 @@ export interface PathDelta {
 }
 
 export interface GraphUpdateEvent {
-  type:      'GRAPH_UPDATE';
-  run_id:    string;
+  type:      string;   // 'GRAPH_UPDATE' | 'ANALYSIS_TRIGGERED' | ...
+  run_id?:   string;
   timestamp: string;
-  diff: {
+  message?:  string;
+  diff?: {
     meta:           Record<string, string>;
     risk_delta:     RiskDelta;
     path_delta:     PathDelta;
@@ -107,6 +108,10 @@ export function useMonitoring(): UseMonitoringResult {
           window.dispatchEvent(
             new CustomEvent<GraphUpdateEvent>('graphUpdate', { detail: update })
           );
+        } else {
+          // All other event types (ANALYSIS_TRIGGERED, NEW_RESOURCES, etc.)
+          // appear in Session Events.
+          setLiveEvents(prev => [...prev, update].slice(-100));
         }
       } catch {
         // Malformed JSON — ignore quietly

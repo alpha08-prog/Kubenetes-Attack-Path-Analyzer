@@ -51,6 +51,31 @@ def record_analysis_run(
     critical_count = sum(1 for r in all_risks if r >= 9.0)
     high_count     = sum(1 for r in all_risks if 7.0 <= r < 9.0)
 
+    # Skip recording if the graph state is identical to the most recent run.
+    # Return the EXISTING run_id so watch_decision_engine detects the skip via
+    # its `new_run_id == previous_run_id` guard and exits cleanly.
+    with get_conn() as conn:
+        prev = conn.execute(
+            """
+            SELECT run_id, overall_risk, node_count, edge_count, attack_paths, cycles
+            FROM analysis_runs
+            ORDER BY created_at DESC LIMIT 1
+            """
+        ).fetchone()
+
+    if prev and (
+        abs(prev["overall_risk"] - overall_risk) < 0.01
+        and prev["node_count"] == G.number_of_nodes()
+        and prev["edge_count"] == G.number_of_edges()
+        and prev["attack_paths"] == attack_paths
+        and prev["cycles"] == cycles
+    ):
+        logger.info(
+            "Analysis run skipped — identical to previous (risk=%.1f paths=%d cycles=%d)",
+            overall_risk, attack_paths, cycles,
+        )
+        return prev["run_id"]  # existing ID, not in doubt — caller will skip diff
+
     with get_conn() as conn:
 
         # Insert the run summary

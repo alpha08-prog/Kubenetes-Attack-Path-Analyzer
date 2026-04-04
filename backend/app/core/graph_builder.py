@@ -225,22 +225,36 @@ def get_high_risk_nodes(G: nx.DiGraph, threshold: float = 7.0) -> list:
 def find_graph_sources(G: nx.DiGraph) -> list:
     """
     Nodes marked is_source=True, sorted by id.
-    If no node has is_source set, fall back to heuristic entry points
-    (in-degree 0, attacker-facing types, risk threshold).
+    If no node has is_source set, fall back to heuristic entry points.
+
+    Resolution order:
+      1. is_source=True flag  (mock + hackathon data)
+      2. In-degree-0 attacker-facing nodes (case-insensitive type match)
+      3. Any attacker-facing node with high risk (if nothing has in_degree 0)
     """
     flagged = [n for n, d in G.nodes(data=True) if d.get("is_source") is True]
     if flagged:
         return sorted(flagged)
 
-    entry_types = {
-        "pod", "user", "service_account", "external_actor", "service",
-    }
-    return sorted(
-        n for n in G.nodes
-        if G.in_degree(n) == 0
-        and G.nodes[n].get("type") in entry_types
-        and G.nodes[n].get("risk", 0) >= 3.0
+    # Normalise type strings for comparison (handles "ExternalActor", "Pod", etc.)
+    entry_types = {"pod", "user", "service_account", "externalactor", "external_actor", "service"}
+
+    def _matches_entry_type(n: str) -> bool:
+        raw = G.nodes[n].get("type", "")
+        return raw.lower().replace("-", "_") in entry_types or raw.lower() in entry_types
+
+    def _risk(n: str) -> float:
+        return G.nodes[n].get("risk", G.nodes[n].get("risk_score", 0))
+
+    # Prefer true in-degree-0 nodes
+    zero_in = sorted(
+        (n for n in G.nodes if G.in_degree(n) == 0 and _matches_entry_type(n) and _risk(n) >= 3.0)
     )
+    if zero_in:
+        return zero_in
+
+    # Fallback: any attacker-facing node with meaningful risk
+    return sorted(n for n in G.nodes if _matches_entry_type(n) and _risk(n) >= 3.0)
 
 
 def find_graph_sinks(G: nx.DiGraph) -> list:
@@ -263,15 +277,40 @@ def find_entry_points(G: nx.DiGraph) -> list:
 
 def find_sensitive_targets(G: nx.DiGraph) -> list:
     """
-    Find likely target nodes — databases and high-risk secrets
-    with no outgoing edges (sinks in the graph).
+    Find likely target nodes — databases and high-risk secrets.
+
+    Resolution order (stops at the first non-empty result):
+      1. Nodes explicitly flagged is_sink=True  (works for mock + hackathon data)
+      2. Out-degree-0 nodes whose type is database/secret (case-insensitive)
+      3. Highest-risk nodes overall (last-resort fallback so demo always works)
     """
-    return [
+    # 1. Explicit sink flag — covers both capitalized mock types and real types
+    flagged = sorted(
+        [n for n, d in G.nodes(data=True) if d.get("is_sink") is True],
+        key=lambda n: G.nodes[n].get("risk", G.nodes[n].get("risk_score", 0)),
+        reverse=True,
+    )
+    if flagged:
+        return flagged
+
+    # 2. Type-based heuristic (case-insensitive) — covers live kubectl data
+    sensitive_types = {"database", "secret"}
+    type_based = [
         n for n in G.nodes
         if G.out_degree(n) == 0
-        and G.nodes[n].get("type") in ("database", "secret")
-        and G.nodes[n].get("risk", 0) >= 7.0
+        and G.nodes[n].get("type", "").lower() in sensitive_types
+        and G.nodes[n].get("risk", G.nodes[n].get("risk_score", 0)) >= 7.0
     ]
+    if type_based:
+        return type_based
+
+    # 3. Broadest fallback — top-5 highest-risk leaf nodes regardless of type
+    leaves = sorted(
+        (n for n in G.nodes if G.out_degree(n) == 0),
+        key=lambda n: G.nodes[n].get("risk", G.nodes[n].get("risk_score", 0)),
+        reverse=True,
+    )
+    return leaves[:5]
 
 
 def graph_summary(G: nx.DiGraph) -> dict:

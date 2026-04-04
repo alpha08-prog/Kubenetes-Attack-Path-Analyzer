@@ -18,11 +18,13 @@ On alert:
 
 from __future__ import annotations
 
+import json
+from datetime import datetime, timezone
 from typing import Any, Dict, List
 
 from app.config import settings
 from app.core.database import record_monitoring_event
-from app.services.broadcast_service import broadcast_graph_update
+from app.services.broadcast_service import broadcast_graph_update, broadcast_raw
 from app.services.graph_diff_service import diff_runs
 from app.services.history_service import get_run_history, record_analysis_run
 from app.services.ingestion_service import ingest_and_build
@@ -52,9 +54,16 @@ async def analyze_changes(events: List[Dict[str, Any]]) -> None:
         # ── 1. Previous run ──────────────────────────────────────────────────
         history = get_run_history(limit=1, cluster_name=settings.CLUSTER_NAME)
         if not history:
-            logger.warning("No prior analysis run — skipping diff (first run?)")
-            # Still record the current state as baseline
-            _rebuild_and_record()
+            logger.warning("No prior analysis run — recording baseline and broadcasting")
+            run_id = _rebuild_and_record()
+            # Broadcast so the frontend refreshes the graph even on first run
+            if run_id:
+                await broadcast_raw(json.dumps({
+                    "type":      "GRAPH_UPDATE",
+                    "run_id":    run_id,
+                    "diff":      {},
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                }))
             return
 
         previous_run_id: str = history[0]["run_id"]
@@ -64,10 +73,17 @@ async def analyze_changes(events: List[Dict[str, Any]]) -> None:
         if new_run_id is None:
             return
 
-        # Guard: don't diff a run against itself (can happen if record_analysis_run
-        # returns the same ID due to a UUID collision in tests)
+        # Guard: don't diff a run against itself (dedup case — graph unchanged)
+        # Still broadcast so the frontend knows the analysis completed and can
+        # refresh the canvas.
         if new_run_id == previous_run_id:
-            logger.warning("new_run_id == previous_run_id (%s) — skipping diff", new_run_id)
+            logger.info("Graph unchanged (run=%s) — broadcasting no-change update", new_run_id)
+            await broadcast_raw(json.dumps({
+                "type":      "GRAPH_UPDATE",
+                "run_id":    new_run_id,
+                "diff":      {},
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }))
             return
 
         # ── 4. Diff ──────────────────────────────────────────────────────────
@@ -80,19 +96,16 @@ async def analyze_changes(events: List[Dict[str, Any]]) -> None:
         # ── 5 + 6. Threshold checks & alerts ────────────────────────────────
         triggered_alerts = _check_and_fire_alerts(diff_result, new_run_id)
 
-        if triggered_alerts:
-            # Broadcast to frontend SSE clients
-            await broadcast_graph_update(diff_result, new_run_id)
-            logger.info(
-                "Watch cycle complete — run=%s, alerts=%s",
-                new_run_id,
-                triggered_alerts,
-            )
-        else:
-            logger.info(
-                "Watch cycle complete — run=%s, no alert thresholds exceeded",
-                new_run_id,
-            )
+        # Always broadcast to frontend SSE clients so Session Events and the
+        # Dashboard alert banner are updated even when no threshold was exceeded.
+        # (Previously this was gated on triggered_alerts, which meant the
+        # frontend never saw sub-threshold analysis results.)
+        await broadcast_graph_update(diff_result, new_run_id)
+        logger.info(
+            "Watch cycle complete — run=%s alerts=%s",
+            new_run_id,
+            triggered_alerts or "none",
+        )
 
     except Exception as exc:  # noqa: BLE001
         logger.error("analyze_changes failed: %s", exc, exc_info=True)

@@ -21,6 +21,7 @@ from app.config import settings
 from app.core.database import get_recent_monitoring_events
 from app.services.broadcast_service import (
     broadcast_graph_update,
+    broadcast_raw,
     connected_client_count,
     register_client,
     unregister_client,
@@ -443,10 +444,19 @@ async def trigger_analysis():
         raise HTTPException(400, "MOCK_MODE=true — set MOCK_MODE=false to use real kubectl data.")
 
     try:
+        import json
+        from datetime import datetime, timezone
         from app.services.watch_decision_engine import analyze_changes
 
-        # Run in a background task so the HTTP response returns immediately
-        # while the rebuild + diff + broadcast happens asynchronously.
+        # Broadcast an immediate acknowledgment so session events always shows
+        # something right away, even if analysis finds no changes.
+        await broadcast_raw(json.dumps({
+            "type":      "ANALYSIS_TRIGGERED",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "message":   "Manual analysis triggered — rebuilding graph from live kubectl data",
+        }))
+
+        # Run rebuild + diff + broadcast in a background task.
         asyncio.create_task(
             analyze_changes([{"k8s_event_type": "MANUAL_TRIGGER", "resource_type": "all", "object": None}]),
             name="manual-analysis",
@@ -542,15 +552,19 @@ async def run_scenario(cleanup: bool = False):
         logger.info("Scenario deployed successfully")
 
         # 3. Trigger real analysis → rebuilds graph from kubectl → diffs → SSE event
+        # A short delay lets K8s finish committing the resources before we
+        # re-ingest, so the diff sees the newly deployed nodes.
         from app.services.watch_decision_engine import analyze_changes
-        asyncio.create_task(
-            analyze_changes([{
+
+        async def _delayed_scenario_analysis():
+            await asyncio.sleep(4)
+            await analyze_changes([{
                 "k8s_event_type": "SCENARIO_DEPLOYED",
                 "resource_type":  "all",
                 "object":         None,
-            }]),
-            name="scenario-analysis",
-        )
+            }])
+
+        asyncio.create_task(_delayed_scenario_analysis(), name="scenario-analysis")
 
         return {
             "status":  "deployed",

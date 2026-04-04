@@ -58,9 +58,10 @@ interface ActionResult {
 }
 
 interface MonitoringPanelProps {
-  liveEvents:     GraphUpdateEvent[];
-  isConnected:    boolean;
-  monitoringError: string | null;
+  liveEvents:       GraphUpdateEvent[];
+  isConnected:      boolean;
+  monitoringError:  string | null;
+  onActionSuccess?: () => void;  // called after any action completes — lets parent switch to Monitor tab
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -93,11 +94,12 @@ function formatDateTime(iso: string | null): string {
 // ─── Badges ───────────────────────────────────────────────────────────────────
 
 const EVENT_TYPE_META: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
-  RISK_INCREASE:    { label: 'Risk ↑',        color: 'text-red-400 bg-red-500/10 border-red-500/20',         icon: <TrendingUp className="w-3 h-3" /> },
-  NEW_ATTACK_PATHS: { label: 'New Paths',     color: 'text-orange-400 bg-orange-500/10 border-orange-500/20', icon: <Zap className="w-3 h-3" /> },
-  NEW_CYCLES:       { label: 'New Cycles',    color: 'text-purple-400 bg-purple-500/10 border-purple-500/20', icon: <RotateCcw className="w-3 h-3" /> },
-  NEW_RESOURCES:    { label: 'New Resources', color: 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20', icon: <Layers className="w-3 h-3" /> },
-  GRAPH_UPDATE:     { label: 'Graph Update',  color: 'text-blue-400 bg-blue-500/10 border-blue-500/20',       icon: <GitBranch className="w-3 h-3" /> },
+  RISK_INCREASE:       { label: 'Risk ↑',          color: 'text-red-400 bg-red-500/10 border-red-500/20',           icon: <TrendingUp className="w-3 h-3" /> },
+  NEW_ATTACK_PATHS:    { label: 'New Paths',        color: 'text-orange-400 bg-orange-500/10 border-orange-500/20',  icon: <Zap className="w-3 h-3" /> },
+  NEW_CYCLES:          { label: 'New Cycles',       color: 'text-purple-400 bg-purple-500/10 border-purple-500/20',  icon: <RotateCcw className="w-3 h-3" /> },
+  NEW_RESOURCES:       { label: 'New Resources',    color: 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20',  icon: <Layers className="w-3 h-3" /> },
+  GRAPH_UPDATE:        { label: 'Graph Update',     color: 'text-blue-400 bg-blue-500/10 border-blue-500/20',        icon: <GitBranch className="w-3 h-3" /> },
+  ANALYSIS_TRIGGERED:  { label: 'Analysis Started', color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20', icon: <Cpu className="w-3 h-3" /> },
 };
 
 function EventTypeBadge({ type }: { type: string }) {
@@ -283,6 +285,21 @@ function LiveSessionEvents({ events }: { events: GraphUpdateEvent[] }) {
   return (
     <div className="space-y-2">
       {[...events].reverse().map((ev, i) => {
+        // Simple acknowledgment events (ANALYSIS_TRIGGERED, etc.)
+        if (ev.type !== 'GRAPH_UPDATE') {
+          return (
+            <div key={i} className="rounded-lg border border-border bg-card/60 p-3 space-y-1">
+              <div className="flex items-center justify-between gap-2">
+                <EventTypeBadge type={ev.type} />
+                <span className="text-[10px] text-muted-foreground flex-shrink-0">{formatTime(ev.timestamp)}</span>
+              </div>
+              {(ev as any).message && (
+                <p className="text-[11px] text-muted-foreground">{(ev as any).message}</p>
+              )}
+            </div>
+          );
+        }
+
         const rd = ev.diff?.risk_delta;
         const pd = ev.diff?.path_delta;
         const cd = ev.diff?.cycle_delta;
@@ -387,7 +404,7 @@ function DbEventHistory({ events, loading, onRefresh }: {
 
 // ─── Main panel ───────────────────────────────────────────────────────────────
 
-export default function MonitoringPanel({ liveEvents, isConnected, monitoringError }: MonitoringPanelProps) {
+export default function MonitoringPanel({ liveEvents, isConnected, monitoringError, onActionSuccess }: MonitoringPanelProps) {
   const [status,     setStatus]     = useState<MonitorStatus | null>(null);
   const [dbEvents,   setDbEvents]   = useState<DbEvent[]>([]);
   const [dbLoading,  setDbLoading]  = useState(false);
@@ -410,6 +427,11 @@ export default function MonitoringPanel({ liveEvents, isConnected, monitoringErr
   const [terminalOutput, setTerminalOutput] = useState<string | null>(null);
   const [terminalLabel,  setTerminalLabel]  = useState('');
 
+  // After Trigger Analysis fires, wait for the next GRAPH_UPDATE to auto-switch
+  // to history so the user sees what was recorded.
+  const awaitingGraphUpdate = useRef(false);
+  const seenEventCount = useRef(liveEvents.length);
+
   const fetchStatus = useCallback(async () => {
     try { setStatus((await monitoringApi.status()).data); } catch { /* backend offline */ }
   }, []);
@@ -423,7 +445,25 @@ export default function MonitoringPanel({ liveEvents, isConnected, monitoringErr
   }, []);
 
   useEffect(() => { fetchStatus(); const id = setInterval(fetchStatus, 10_000); return () => clearInterval(id); }, [fetchStatus]);
-  useEffect(() => { fetchDbEvents(); }, [fetchDbEvents, liveEvents.length]);
+
+  // Refresh DB event history whenever a new live event arrives.
+  // Also: if Trigger Analysis is pending and a GRAPH_UPDATE arrives,
+  // auto-switch to the Event History tab so the user sees what was recorded.
+  useEffect(() => {
+    if (liveEvents.length === seenEventCount.current) return;
+    const newEvents = liveEvents.slice(seenEventCount.current);
+    seenEventCount.current = liveEvents.length;
+
+    fetchDbEvents();
+
+    if (awaitingGraphUpdate.current) {
+      const hasGraphUpdate = newEvents.some(e => e.type === 'GRAPH_UPDATE');
+      if (hasGraphUpdate) {
+        awaitingGraphUpdate.current = false;
+        setActiveView('history');
+      }
+    }
+  }, [liveEvents, fetchDbEvents]);
 
   const handleStart = async () => {
     setStarting(true);
@@ -434,7 +474,12 @@ export default function MonitoringPanel({ liveEvents, isConnected, monitoringErr
     try { await monitoringApi.stop(); await fetchStatus(); } catch { /* ignore */ } finally { setStopping(false); }
   };
 
-  const runAction = async (key: ActionKey, fn: () => Promise<any>, label?: string) => {
+  const runAction = async (
+    key: ActionKey,
+    fn: () => Promise<any>,
+    label?: string,
+    opts: { awaitUpdate?: boolean } = {},
+  ) => {
     setAction(key, { loading: true, result: null, error: null });
     if (label) { setTerminalLabel(label); setTerminalOutput(null); }
     try {
@@ -442,8 +487,15 @@ export default function MonitoringPanel({ liveEvents, isConnected, monitoringErr
       const data: ActionResult = res.data;
       setAction(key, { loading: false, result: data, error: null });
       if (data.output) { setTerminalOutput(data.output); setTerminalLabel(label ?? ''); }
-      // Switch to live events so the user sees the incoming SSE update
+      // Always switch to live events so the user sees the incoming SSE immediately.
       setActiveView('live');
+      // Notify parent (Dashboard) to switch to the Monitor tab so SSE events are visible.
+      onActionSuccess?.();
+      // For Trigger Analysis: flag that the next GRAPH_UPDATE should auto-switch to history.
+      if (opts.awaitUpdate) {
+        seenEventCount.current = liveEvents.length;
+        awaitingGraphUpdate.current = true;
+      }
     } catch (err: any) {
       const msg = err?.response?.data?.detail ?? err?.message ?? 'Request failed';
       setAction(key, { loading: false, result: null, error: msg });
@@ -489,7 +541,7 @@ export default function MonitoringPanel({ liveEvents, isConnected, monitoringErr
             color="border-emerald-500/20 bg-emerald-500/5 text-emerald-400 hover:bg-emerald-500/10"
             loading={actions.analyze.loading}
             disabled={isAnyActionRunning && !actions.analyze.loading}
-            onClick={() => runAction('analyze', monitoringApi.triggerAnalysis)}
+            onClick={() => runAction('analyze', monitoringApi.triggerAnalysis, undefined, { awaitUpdate: true })}
           />
           <ActionButton
             icon={<ShieldAlert className="w-3.5 h-3.5" />}

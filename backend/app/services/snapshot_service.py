@@ -75,6 +75,34 @@ def create_snapshot(
     entry_points = find_graph_sources(G)
     sensitive_targets = find_graph_sinks(G)
 
+    # Skip saving if nothing has changed since the last snapshot
+    latest_meta = db.get_latest_snapshot_meta()
+    if latest_meta and (
+        latest_meta["node_count"] == len(nodes)
+        and latest_meta["edge_count"] == len(edges)
+        and latest_meta["cycles_detected"] == cycles_detected
+        and abs(latest_meta["aggregate_risk"] - aggregate_risk) < 0.01
+    ):
+        logger.info(
+            "Snapshot skipped — identical to previous (nodes=%d edges=%d risk=%.2f)",
+            len(nodes), len(edges), aggregate_risk,
+        )
+        # Return lightweight object pointing at the existing snapshot
+        return GraphSnapshot(
+            snapshot_id=latest_meta["snapshot_id"],
+            cluster_name=settings.CLUSTER_NAME,
+            timestamp=now,
+            trigger=SnapshotTrigger(source=trigger_source, description=trigger_desc),
+            metadata=SnapshotMeta(
+                node_count=len(nodes),
+                edge_count=len(edges),
+                entry_points=entry_points,
+                sensitive_targets=sensitive_targets,
+                cycles_detected=cycles_detected,
+                aggregate_risk=aggregate_risk,
+            ),
+        )
+
     row = {
         "snapshot_id": snapshot_id,
         "cluster_name": settings.CLUSTER_NAME,

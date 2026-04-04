@@ -42,7 +42,7 @@ const TABS: { key: Tab; label: string }[] = [
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { graphData, summary, loading: graphLoading, reload } = useGraph();
+  const { graphData, summary, loading: graphLoading, reload, fetchGraph } = useGraph();
   const analysis = useAnalysis();
   const [overlayMode, setOverlayMode] = useState<OverlayMode>('default');
   const [activeTab, setActiveTab] = useState<Tab>('attack');
@@ -92,11 +92,9 @@ export default function Dashboard() {
       if (alertTimer.current) clearTimeout(alertTimer.current);
       alertTimer.current = setTimeout(() => setLiveAlert(null), 8000);
 
-      // Auto-reload graph data
-      reload();
-
-      // Jump to diff tab so user sees what changed immediately
-      setActiveTab('diff');
+      // Fetch the rebuilt graph. A 500ms delay gives the backend a chance to
+      // finish committing any final write before we read the graph endpoint.
+      setTimeout(() => fetchGraph(), 500);
     };
 
     window.addEventListener('graphUpdate', handleGraphUpdate);
@@ -398,6 +396,7 @@ export default function Dashboard() {
                   liveEvents={liveEvents}
                   isConnected={monitorConnected}
                   monitoringError={monitoringError}
+                  onActionSuccess={() => setActiveTab('monitor')}
                 />
               )}
             </div>

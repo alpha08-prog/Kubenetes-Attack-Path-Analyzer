@@ -41,7 +41,7 @@ function normalizeAttackPath(raw: any) {
 }
 
 function normalizeBlastRadius(raw: any) {
-  if (!raw) return raw;
+  if (!raw || raw.error) return null;
   return {
     ...raw,
     total_affected: raw.total_affected ?? raw.total_reachable ?? 0,
@@ -99,10 +99,24 @@ export default function DemoMode() {
         case 1:
           data = normalizeAttackPath((await api.getAutoAttackPath()).data);
           break;
-        case 2:
-          const src = stepData[1]?.path?.[0]?.from || 'pod:default:web-server';
-          data = normalizeBlastRadius((await api.getBlastRadius(src, 3)).data);
+        case 2: {
+          // Use the first hop of the detected attack path as blast-radius source.
+          // If step 1 found no path, fall back to the highest-risk node in the graph.
+          const pathSrc = stepData[1]?.path?.[0]?.from;
+          const graphNodes: any[] = stepData[0]?.graph?.nodes ?? [];
+          const fallbackSrc = graphNodes.length
+            ? [...graphNodes].sort((a, b) => {
+                const ra = Number((a?.data ?? a)?.risk_score ?? (a?.data ?? a)?.risk ?? 0);
+                const rb = Number((b?.data ?? b)?.risk_score ?? (b?.data ?? b)?.risk ?? 0);
+                return rb - ra;
+              })[0]?.data?.id ?? graphNodes[0]?.data?.id ?? graphNodes[0]?.id
+            : null;
+          const src = pathSrc ?? fallbackSrc;
+          if (src) {
+            data = normalizeBlastRadius((await api.getBlastRadius(src, 3)).data);
+          }
           break;
+        }
         case 3:
           data = (await api.getCycles()).data;
           break;
@@ -225,23 +239,33 @@ export default function DemoMode() {
         )}
 
         {/* Step 1 - Attack path */}
-        {stepDone.has(1) && Array.isArray(attackPath?.path) && attackPath.path.length > 0 && (
+        {stepDone.has(1) && (
           <div className="animate-slide-in-right bg-card border border-border rounded-lg p-6">
             <h3 className="font-semibold mb-3 flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 text-destructive" />
-              Attack Path Detected
+              Attack Path Detection
             </h3>
-            <pre className="text-sm font-mono bg-background rounded p-3 text-destructive overflow-x-auto">
-              {attackPath.path.map((s: any) => `${s.from_label || s.from} →[${s.relation}]→ ${s.to_label || s.to}`).join('\n')}
-            </pre>
+            {Array.isArray(attackPath?.path) && attackPath.path.length > 0 ? (
+              <pre className="text-sm font-mono bg-background rounded p-3 text-destructive overflow-x-auto">
+                {attackPath.path.map((s: any) => `${s.from_label || s.from} →[${s.relation}]→ ${s.to_label || s.to}`).join('\n')}
+              </pre>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                {attackPath?.message || 'No direct attack path found between detected entry points and sensitive targets.'}
+              </p>
+            )}
           </div>
         )}
 
         {/* Step 2 - Blast */}
-        {stepDone.has(2) && blastRadius && (
+        {stepDone.has(2) && (
           <div className="animate-slide-in-right bg-card border border-border rounded-lg p-6">
             <h3 className="font-semibold mb-3">Blast Radius Analysis</h3>
-            <p className="text-2xl font-bold text-severity-high">{blastRadius.total_affected ?? 0} nodes at risk</p>
+            {blastRadius ? (
+              <p className="text-2xl font-bold text-severity-high">{blastRadius.total_affected ?? 0} nodes at risk</p>
+            ) : (
+              <p className="text-sm text-muted-foreground">Blast radius could not be computed — no reachable source node found.</p>
+            )}
           </div>
         )}
 
