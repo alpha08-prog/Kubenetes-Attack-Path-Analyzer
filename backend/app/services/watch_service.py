@@ -276,23 +276,28 @@ class KubernetesWatcher:
         logger.debug("Streaming %s…", resource_type)
 
         try:
-            # watch.stream is a blocking generator — run it in a thread pool
+            # watch.stream is a blocking generator — run it in a thread pool.
+            # Capture the running loop HERE (in async context) and pass it
+            # explicitly to _sync_stream so that the thread-pool worker never
+            # calls asyncio.get_event_loop() (which raises RuntimeError in
+            # Python 3.10+ worker threads that have no current event loop).
             loop = asyncio.get_running_loop()
             await loop.run_in_executor(
                 None,
-                lambda: self._sync_stream(resource_type, list_fn, w),
+                lambda: self._sync_stream(resource_type, list_fn, w, loop),
             )
         except Exception:
             w.stop()
             raise
 
-    def _sync_stream(self, resource_type: str, list_fn, w) -> None:
+    def _sync_stream(self, resource_type: str, list_fn, w, loop: asyncio.AbstractEventLoop) -> None:
         """
         Blocking: iterate K8s watch stream and schedule debouncer.queue_event
         on the asyncio event loop.
         This runs in a thread-pool executor so it doesn't block the loop.
+        ``loop`` must be passed in from the async caller — never call
+        asyncio.get_event_loop() here as worker threads have no event loop.
         """
-        loop = asyncio.get_event_loop()
 
         for raw_event in w.stream(list_fn, timeout_seconds=30):
             if not self.watching:

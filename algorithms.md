@@ -1,5 +1,5 @@
 # Algorithms — Technical Deep Dive
-## Attack Path Analyzer | Nokia Hackathon 2024
+## Attack Path Analyzer | Hack2Future 2.0
 
 > This document covers the four core graph algorithms, why each was chosen,
 > time and space complexity, implementation decisions, and answers to the

@@ -18,6 +18,7 @@ from fastapi.responses import StreamingResponse
 from app.config import settings
 from app.core.database import get_recent_monitoring_events
 from app.services.broadcast_service import (
+    broadcast_graph_update,
     connected_client_count,
     register_client,
     unregister_client,
@@ -145,6 +146,89 @@ async def events_stream():
             "X-Accel-Buffering": "no",   # Disable nginx buffering
         },
     )
+
+
+# ── Test / dev helper ─────────────────────────────────────────────────────────
+
+@router.post("/test-event")
+async def fire_test_event():
+    """
+    Broadcast a synthetic GRAPH_UPDATE event to all connected SSE clients.
+
+    Useful for:
+    • Verifying the SSE pipeline works end-to-end without touching K8s
+    • Testing the frontend Monitor tab locally with only minikube installed
+    • Demoing the real-time alert UI
+
+    Returns the number of SSE clients that received the message.
+    """
+    import uuid
+    from datetime import datetime, timezone
+
+    fake_run_id = uuid.uuid4().hex[:8]
+
+    fake_diff = {
+        "meta": {
+            "run_id_before":  "test-baseline",
+            "run_id_after":   fake_run_id,
+            "generated_at":   datetime.now(timezone.utc).isoformat(),
+            "cluster":        settings.CLUSTER_NAME,
+        },
+        "risk_delta": {
+            "before":          5.2,
+            "after":           6.8,
+            "delta":           1.6,
+            "delta_pct":       30.8,
+            "direction":       "increase",
+            "severity_before": "medium",
+            "severity_after":  "high",
+        },
+        "path_delta": {
+            "before":    2,
+            "after":     3,
+            "delta":     1,
+            "direction": "increase",
+            "label":     "1 new attack path introduced",
+        },
+        "cycle_delta": {
+            "before":    0,
+            "after":     1,
+            "delta":     1,
+            "direction": "increase",
+            "label":     "1 new privilege escalation cycle detected",
+        },
+        "node_changes": {
+            "added":   ["pod:default:test-nginx"],
+            "removed": [],
+            "changed": [],
+        },
+        "severity_shift": {
+            "critical": {"before": 1, "after": 2, "delta": 1},
+            "high":     {"before": 3, "after": 3, "delta": 0},
+            "medium":   {"before": 5, "after": 4, "delta": -1},
+            "low":      {"before": 2, "after": 2, "delta": 0},
+        },
+        "top_new_risks": [
+            {"node_id": "pod:default:test-nginx", "label": "test-nginx", "risk_score": 7.4, "node_type": "pod"},
+        ],
+        "top_improved": [],
+        "recommendation": (
+            "A new high-risk pod was detected. "
+            "Review the service account bound to test-nginx and check for "
+            "overly permissive role bindings. Consider applying network policies."
+        ),
+    }
+
+    clients_before = connected_client_count()
+    await broadcast_graph_update(fake_diff, fake_run_id)
+
+    return {
+        "status":          "broadcast_sent",
+        "run_id":          fake_run_id,
+        "sse_clients":     clients_before,
+        "message":         f"Test GRAPH_UPDATE sent to {clients_before} client(s). "
+                           "Check the Monitor tab → Session Events in your browser.",
+    }
 
 
 # ── Recent events (REST) ───────────────────────────────────────────────────────

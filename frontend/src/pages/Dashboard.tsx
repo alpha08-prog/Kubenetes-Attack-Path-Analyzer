@@ -17,10 +17,11 @@ import SimulationPanel from '@/components/SimulationPanel';
 import SimulationModal from '@/components/SimulationModal';
 import NarratorPanel from '@/components/NarratorPanel';
 import DiffPanel from '@/components/DiffPanel';
+import MonitoringPanel from '@/components/MonitoringPanel';
 import { useMonitoring, type GraphUpdateEvent } from '@/hooks/useMonitoring';
 
 type OverlayMode = 'default' | 'attack' | 'blast' | 'cycle';
-type Tab = 'attack' | 'blast' | 'cycles' | 'simulation' | 'diff';
+type Tab = 'attack' | 'blast' | 'cycles' | 'simulation' | 'diff' | 'monitor';
 
 const OVERLAY_MODES: { mode: OverlayMode; label: string }[] = [
   { mode: 'default', label: 'Default' },
@@ -35,6 +36,7 @@ const TABS: { key: Tab; label: string }[] = [
   { key: 'cycles',     label: 'Cycles & Critical' },
   { key: 'simulation', label: 'Simulation' },
   { key: 'diff',       label: 'Diff' },
+  { key: 'monitor',    label: 'Monitor' },
 ];
 
 export default function Dashboard() {
@@ -48,7 +50,7 @@ export default function Dashboard() {
   const [simTarget, setSimTarget] = useState('');
 
   // ── Real-time monitoring ───────────────────────────────────────────────────
-  const { isConnected: monitorConnected, monitoringError } = useMonitoring();
+  const { isConnected: monitorConnected, monitoringError, liveEvents } = useMonitoring();
   const [liveAlert, setLiveAlert]   = useState<GraphUpdateEvent | null>(null);
   const alertTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -314,7 +316,19 @@ export default function Dashboard() {
                       : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
-                  {t.label}
+                  <span className="inline-flex items-center justify-center gap-1">
+                    {t.label}
+                    {/* Live event count badge on Monitor tab */}
+                    {t.key === 'monitor' && liveEvents.length > 0 && (
+                      <span className="w-4 h-4 rounded-full bg-red-500 text-white text-[8px] font-bold flex items-center justify-center">
+                        {liveEvents.length > 9 ? '9+' : liveEvents.length}
+                      </span>
+                    )}
+                    {/* Pulse dot when monitoring is connected */}
+                    {t.key === 'monitor' && monitorConnected && liveEvents.length === 0 && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    )}
+                  </span>
                   {activeTab === t.key && (
                     <span className="absolute bottom-0 left-0 right-0 h-1 bg-primary" />
                   )}
@@ -368,6 +382,13 @@ export default function Dashboard() {
                 />
               )}
               {activeTab === 'diff' && <DiffPanel />}
+              {activeTab === 'monitor' && (
+                <MonitoringPanel
+                  liveEvents={liveEvents}
+                  isConnected={monitorConnected}
+                  monitoringError={monitoringError}
+                />
+              )}
             </div>
           </div>
         </div>

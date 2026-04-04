@@ -53,8 +53,9 @@ export interface GraphUpdateEvent {
 }
 
 interface UseMonitoringResult {
-  isConnected:    boolean;
-  lastUpdate:     GraphUpdateEvent | null;
+  isConnected:     boolean;
+  lastUpdate:      GraphUpdateEvent | null;
+  liveEvents:      GraphUpdateEvent[];   // all events received in this session
   monitoringError: string | null;
 }
 
@@ -62,8 +63,9 @@ const SSE_URL  = '/api/monitor/events/stream';
 const RECONNECT_DELAY_MS = 5_000;
 
 export function useMonitoring(): UseMonitoringResult {
-  const [isConnected, setIsConnected]     = useState(false);
-  const [lastUpdate,  setLastUpdate]      = useState<GraphUpdateEvent | null>(null);
+  const [isConnected, setIsConnected]         = useState(false);
+  const [lastUpdate,  setLastUpdate]          = useState<GraphUpdateEvent | null>(null);
+  const [liveEvents,  setLiveEvents]          = useState<GraphUpdateEvent[]>([]);
   const [monitoringError, setMonitoringError] = useState<string | null>(null);
 
   const esRef       = useRef<EventSource | null>(null);
@@ -99,6 +101,8 @@ export function useMonitoring(): UseMonitoringResult {
         const update: GraphUpdateEvent = JSON.parse(event.data);
         if (update.type === 'GRAPH_UPDATE') {
           setLastUpdate(update);
+          // Accumulate in session log (keep newest 100)
+          setLiveEvents(prev => [...prev, update].slice(-100));
           // Dispatch a DOM event so Dashboard (and any other consumer) can react
           window.dispatchEvent(
             new CustomEvent<GraphUpdateEvent>('graphUpdate', { detail: update })
@@ -136,15 +140,16 @@ export function useMonitoring(): UseMonitoringResult {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return { isConnected, lastUpdate, monitoringError };
+  return { isConnected, lastUpdate, liveEvents, monitoringError };
 }
 
 /**
  * Thin wrapper around the monitor control REST endpoints.
  */
 export const monitoringApi = {
-  start:  () => client.post('/api/monitor/start'),
-  stop:   () => client.post('/api/monitor/stop'),
-  status: () => client.get('/api/monitor/status'),
-  events: (limit = 20) => client.get('/api/monitor/events', { params: { limit } }),
+  start:      () => client.post('/api/monitor/start'),
+  stop:       () => client.post('/api/monitor/stop'),
+  status:     () => client.get('/api/monitor/status'),
+  events:     (limit = 20) => client.get('/api/monitor/events', { params: { limit } }),
+  testEvent:  () => client.post('/api/monitor/test-event'),
 };
