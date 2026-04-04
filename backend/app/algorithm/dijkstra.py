@@ -62,7 +62,7 @@ def shortest_attack_path(G: nx.DiGraph, source: str, target: str) -> dict | None
         to = path[i + 1]
         edge_data = G[frm][to]
 
-        hops.append({
+        hop: dict = {
             "step": i + 1,
             "from": frm,
             "from_label": G.nodes[frm].get("label", frm),
@@ -73,7 +73,12 @@ def shortest_attack_path(G: nx.DiGraph, source: str, target: str) -> dict | None
             "to_type": G.nodes[to].get("type", "unknown"),
             "edge_risk": edge_data.get("risk", 0.0),
             "edge_weight": edge_data.get("weight", 0.0),
-        })
+        }
+        if "cve" in edge_data:
+            hop["cve"] = edge_data["cve"]
+        if "cvss" in edge_data:
+            hop["cvss"] = edge_data["cvss"]
+        hops.append(hop)
 
     return {
         "source": source,

@@ -133,6 +133,64 @@ When `MOCK_MODE=true`, backend startup uses `MOCK_SCENARIO`
 (default: `data/scenarios/nokia_telecom.json`).
 `seed_graph.py` is used to generate artifacts under `data/processed`.
 
+Scenarios that use organizer-style fields (`risk_score`, `name`, `relationship`) are normalized automatically on load.
+
+---
+
+## CLI (rubric / judges — no web UI)
+
+Primary entrypoint is [`backend/main.py`](backend/main.py). Run from the `backend` directory after `pip install -r requirements.txt`.
+
+If `--input` is omitted, the CLI defaults to `docs/mock-cluster-graph.json` at the **repository root** (when that file exists).
+
+```bash
+cd backend
+
+python main.py --help
+
+# Rubric-style flags (Deliverable 1.2)
+python main.py --blast-radius --source pod-webfront --hops 3
+python main.py --source user-dev1 --target db-production
+python main.py --cycles
+python main.py --critical-node
+python main.py --full-report
+
+# Explicit graph file
+python main.py --input ../docs/mock-cluster-graph.json --full-report
+
+# Dijkstra-style path listing inside the full report
+python main.py --full-report --report-mode dijkstra
+
+# Same as above via module
+python -m app.cli --full-report
+```
+
+Graph loading uses [`backend/app/core/cluster_graph_loader.py`](backend/app/core/cluster_graph_loader.py) (official `cluster-graph.json` schema, not kubectl).
+
+**Snippet (beginning of `--full-report`):**
+
+```text
+==================================================================
+  KILL CHAIN REPORT  -  2026-04-04 12:48:15
+  Cluster : mock-prod-cluster
+  Nodes   : 41  |  Edges: 48
+==================================================================
+
+[ SECTION 1 - ATTACK PATH DETECTION (All simple paths) ]
+  !  46 attack path(s) detected
+
+  Path #1  |  3 hops  |  Risk Score: 9.5  [MEDIUM]
+  ------------------------------------------------------------
+  loadbalancer-svc (Service)  --[routes-to]-->  api-server (Pod)
+  ...
+```
+
+Optional: `--path-cutoff N` limits `all_simple_paths` length for very large graphs.
+
+**Schema:** see [docs/CLUSTER_GRAPH_SCHEMA.md](docs/CLUSTER_GRAPH_SCHEMA.md).
+
+**Tests:** `cd backend && python -m pytest tests -v`
+
 ---
 
 ## Quick Start

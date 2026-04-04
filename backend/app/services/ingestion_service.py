@@ -60,7 +60,11 @@ def ingest_and_build() -> dict:
         processed_source = fetch_meta["source"]
 
     _save_processed(parsed, source=processed_source)
-    graph = build_graph(parsed)
+    nodes = parsed.get("nodes") or []
+    hackathon_cluster_graph = bool(
+        nodes and isinstance(nodes[0], dict) and "risk_score" in nodes[0],
+    )
+    graph = build_graph(parsed, add_sa_lateral=hackathon_cluster_graph)
 
     log_graph_event(
         "ingest_complete",
@@ -198,6 +202,12 @@ def _load_mock() -> dict:
 
     with open(MOCK_SCENARIO_PATH, encoding="utf-8") as file_handle:
         scenario = json.load(file_handle)
+
+    nodes = scenario.get("nodes") or []
+    if nodes and isinstance(nodes[0], dict) and "risk_score" in nodes[0]:
+        from app.core.cluster_graph_loader import parse_cluster_graph_document
+
+        scenario = parse_cluster_graph_document(scenario)
 
     logger.info(
         "Loaded mock scenario: %d nodes, %d edges",

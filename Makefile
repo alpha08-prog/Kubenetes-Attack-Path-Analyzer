@@ -76,7 +76,7 @@ test:
 	cd backend && python -m pytest tests/ -v
 
 test-quick:
-	cd backend && python -m pytest tests/test_algorithms.py -v
+	cd backend && python -m pytest tests/test_rubric_algorithms.py -v
 
 # ── Cleanup ───────────────────────────────────────────────────────────────────
 
