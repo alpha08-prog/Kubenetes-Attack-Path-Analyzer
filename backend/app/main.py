@@ -54,9 +54,45 @@ async def lifespan(app: FastAPI):
         logger.error("Startup graph load failed: %s", e)
         logger.warning("App will start but graph is empty — call POST /api/graph/reload")
 
+    # ── Auto-start K8s Watch API monitoring ─────────────────────────────────
+    if settings.ENABLE_WATCH_API and not settings.MOCK_MODE:
+        try:
+            from app.services.watch_service import start_watching
+            watch_result = await start_watching()
+            logger.info("K8s Watch API started: %s", watch_result.get("message"))
+        except Exception as exc:
+            logger.warning(
+                "Watch API failed to start (%s). "
+                "Activating fallback poller (every %ds).",
+                exc,
+                settings.FALLBACK_POLL_INTERVAL_SEC,
+            )
+            try:
+                from app.services.fallback_poller import get_poller
+                await get_poller().start()
+            except Exception as poll_exc:
+                logger.error("Fallback poller also failed: %s", poll_exc)
+    elif settings.MOCK_MODE:
+        logger.info("MOCK_MODE=true — K8s Watch API disabled")
+    else:
+        logger.info("ENABLE_WATCH_API=false — real-time monitoring disabled")
+
     yield  # app runs here
 
     logger.info("Shutting down %s", settings.APP_NAME)
+
+    # ── Graceful shutdown of monitoring ─────────────────────────────────────
+    if settings.ENABLE_WATCH_API and not settings.MOCK_MODE:
+        try:
+            from app.services.watch_service import stop_watching
+            await stop_watching()
+        except Exception:
+            pass
+        try:
+            from app.services.fallback_poller import get_poller
+            await get_poller().stop()
+        except Exception:
+            pass
 
 
 # ─── App instance ─────────────────────────────────────────────────────────────
@@ -129,6 +165,7 @@ from app.api.routes_history import router as history_router
 from app.api.routes_slack import router as slack_router
 from app.api.routes_diff import router as diff_router
 from app.api.routes_analysis import router as analysis_router
+from app.api.routes_monitor  import router as monitor_router
 
 app.include_router(graph_router,    prefix="/api/graph",    tags=["Graph"])
 app.include_router(attack_router,   prefix="/api/attack",   tags=["Attack Path"])
@@ -143,6 +180,7 @@ app.include_router(history_router, prefix="/api/history", tags=["History"])
 app.include_router(slack_router, prefix="/api/slack", tags=["Slack Alerts"])
 app.include_router(diff_router, prefix="/api/diff", tags=["Graph Diff"])
 app.include_router(analysis_router, prefix="/api/analysis", tags=["Analysis"])
+app.include_router(monitor_router,  prefix="/api/monitor",  tags=["Monitoring"])
 
 
 # ─── Health & info endpoints ───────────────────────────────────────────────────

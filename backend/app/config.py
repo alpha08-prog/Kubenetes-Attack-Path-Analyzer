@@ -67,6 +67,36 @@ class Settings(BaseSettings):
     MAX_ATTACK_PATHS: int = Field(default=5)
     RISK_HIGH_THRESHOLD: float = Field(default=7.0)
 
+    # ── Real-time monitoring ──────────────────────────────────────────────────
+    ENABLE_WATCH_API: bool = Field(
+        default=True,
+        description="Enable K8s Watch API for real-time monitoring (ignored in MOCK_MODE)",
+    )
+    WATCH_DEBOUNCE_MS: int = Field(
+        default=2000,
+        description="Debounce window for K8s events (ms). Prevents analysis thrashing on burst changes.",
+    )
+    ALERT_RISK_DELTA_THRESHOLD: float = Field(
+        default=1.0,
+        description="Minimum risk score delta to trigger a watch alert (e.g. 6.2→7.5 = 1.3 > 1.0 → alert)",
+    )
+    ALERT_ON_NEW_PATHS: bool = Field(
+        default=True,
+        description="Send alert when new attack paths are detected by Watch API",
+    )
+    ALERT_ON_NEW_CYCLES: bool = Field(
+        default=True,
+        description="Send alert when new privilege escalation cycles are detected",
+    )
+    WATCH_RECONNECT_DELAY_SEC: int = Field(
+        default=5,
+        description="Seconds to wait before reconnecting Watch API after a failure",
+    )
+    FALLBACK_POLL_INTERVAL_SEC: int = Field(
+        default=300,
+        description="Fallback polling interval (seconds) when Watch API is unavailable",
+    )
+
     # CORS
     CORS_ORIGINS: list[str] = Field(
         default=[

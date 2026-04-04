@@ -22,7 +22,10 @@ python-dotenv==1.0.1
 tenacity==8.3.0          # retry logic for Groq API + kubectl calls
 reportlab==4.2.2         # PDF export for report downloads
 
+# ─── Real-time K8s Monitoring ─────────────────────────────────────────────────
+kubernetes>=30.1.0       # Official K8s Python client with Watch API support
+aiodns>=3.1.0            # Async DNS resolution (better K8s API performance)
+
 # ─── Testing ──────────────────────────────────────────────────────────────────
 pytest==8.2.0
 pytest-asyncio==0.23.6
-httpx==0.27.0            # also used as async test client for FastAPI

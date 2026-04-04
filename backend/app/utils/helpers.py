@@ -8,7 +8,7 @@ import json
 import time
 from pathlib import Path
 from functools import wraps
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.utils.logger import get_logger
 
@@ -173,8 +173,8 @@ def timed(func):
 # ─── Timestamp ────────────────────────────────────────────────────────────────
 
 def utc_now() -> str:
-    """Return current UTC time as ISO 8601 string."""
-    return datetime.utcnow().isoformat() + "Z"
+    """Return current UTC time as ISO 8601 string (timezone-aware)."""
+    return datetime.now(timezone.utc).isoformat()
 
 
 def timestamp_filename(prefix: str, ext: str = "json") -> str:
@@ -183,5 +183,5 @@ def timestamp_filename(prefix: str, ext: str = "json") -> str:
 
     timestamp_filename("report") → "report_2024-03-15_14-32-07.json"
     """
-    ts = datetime.utcnow().strftime("%Y-%m-%d_%H-%M-%S")
+    ts = datetime.now(timezone.utc).strftime("%Y-%m-%d_%H-%M-%S")
     return f"{prefix}_{ts}.{ext}"

@@ -1,8 +1,8 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Shield, RefreshCw, Play, Network, GitBranch,
-  AlertTriangle, RotateCcw, Activity,
+  AlertTriangle, RotateCcw, Activity, Radio,
 } from 'lucide-react';
 import { useGraph } from '@/hooks/useGraph';
 import { useAnalysis } from '@/hooks/useAnalysis';
@@ -17,6 +17,7 @@ import SimulationPanel from '@/components/SimulationPanel';
 import SimulationModal from '@/components/SimulationModal';
 import NarratorPanel from '@/components/NarratorPanel';
 import DiffPanel from '@/components/DiffPanel';
+import { useMonitoring, type GraphUpdateEvent } from '@/hooks/useMonitoring';
 
 type OverlayMode = 'default' | 'attack' | 'blast' | 'cycle';
 type Tab = 'attack' | 'blast' | 'cycles' | 'simulation' | 'diff';
@@ -46,6 +47,11 @@ export default function Dashboard() {
   const [simSource, setSimSource] = useState('');
   const [simTarget, setSimTarget] = useState('');
 
+  // ── Real-time monitoring ───────────────────────────────────────────────────
+  const { isConnected: monitorConnected, monitoringError } = useMonitoring();
+  const [liveAlert, setLiveAlert]   = useState<GraphUpdateEvent | null>(null);
+  const alertTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const nodes = graphData?.nodes || [];
 
   const handleContextAction = useCallback((action: string, nodeId: string) => {
@@ -72,6 +78,31 @@ export default function Dashboard() {
       analysis.fetchFullAnalysis();
     }
   }, [summary]);
+
+  // ── Handle real-time graph update events from useMonitoring ──────────────
+  useEffect(() => {
+    const handleGraphUpdate = (e: Event) => {
+      const update = (e as CustomEvent<GraphUpdateEvent>).detail;
+
+      // Show alert banner for 8 seconds
+      setLiveAlert(update);
+      if (alertTimer.current) clearTimeout(alertTimer.current);
+      alertTimer.current = setTimeout(() => setLiveAlert(null), 8000);
+
+      // Auto-reload graph data
+      reload();
+
+      // Jump to diff tab so user sees what changed immediately
+      setActiveTab('diff');
+    };
+
+    window.addEventListener('graphUpdate', handleGraphUpdate);
+    return () => {
+      window.removeEventListener('graphUpdate', handleGraphUpdate);
+      if (alertTimer.current) clearTimeout(alertTimer.current);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="h-screen flex flex-col bg-background overflow-hidden">
@@ -116,6 +147,19 @@ export default function Dashboard() {
             <AlertTriangle className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-orange-400" />
             <span className="hidden sm:inline">CVE Feed</span>
           </button>
+          {/* Real-time monitoring status */}
+          <div
+            className={`hidden sm:flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium border ${
+              monitorConnected
+                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                : 'bg-secondary text-muted-foreground border-border'
+            }`}
+            title={monitorConnected ? 'Real-time monitoring active' : monitoringError || 'Monitoring offline'}
+          >
+            <Radio className={`w-3 h-3 ${monitorConnected ? 'animate-pulse' : 'opacity-40'}`} />
+            <span>{monitorConnected ? 'Monitoring' : 'Monitor off'}</span>
+          </div>
+
           <button
             onClick={() => navigate('/demo')}
             className="flex items-center gap-1 sm:gap-1.5 bg-primary hover:opacity-90 text-primary-foreground px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-medium transition-opacity"
@@ -166,6 +210,36 @@ export default function Dashboard() {
           />
         </div>
       </div>
+
+      {/* ── Live Alert Banner (auto-dismiss after 8s) ──────────────── */}
+      {liveAlert && (
+        <div className="flex-shrink-0 mx-3 sm:mx-6 mt-1 flex items-start gap-3 bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-2.5 text-xs animate-in slide-in-from-top-2 duration-300">
+          <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-red-400">
+              Security Change Detected
+              {liveAlert.diff?.risk_delta?.delta > 0 && (
+                <span className="ml-2 text-red-300">
+                  Risk +{liveAlert.diff.risk_delta.delta.toFixed(1)} ({liveAlert.diff.risk_delta.after.toFixed(1)})
+                </span>
+              )}
+            </p>
+            <p className="text-muted-foreground truncate">
+              {liveAlert.diff?.path_delta?.delta > 0 && (
+                <span className="mr-3">{liveAlert.diff.path_delta.delta} new attack path(s)</span>
+              )}
+              {liveAlert.diff?.cycle_delta?.delta > 0 && (
+                <span className="mr-3">{liveAlert.diff.cycle_delta.delta} new cycle(s)</span>
+              )}
+              {liveAlert.diff?.recommendation?.slice(0, 120)}
+            </p>
+          </div>
+          <button
+            onClick={() => setLiveAlert(null)}
+            className="text-muted-foreground hover:text-foreground flex-shrink-0 text-xs"
+          >✕</button>
+        </div>
+      )}
 
       {/* ── Main Content ────────────────────────────────────────── */}
       <div className="flex-1 flex flex-col md:flex-row min-h-0 px-3 sm:px-6 py-2.5 gap-2.5">
