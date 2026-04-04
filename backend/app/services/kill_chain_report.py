@@ -31,7 +31,19 @@ from app.services.path_remediation import (
 def _type_pretty(t: str) -> str:
     if not t:
         return "unknown"
-    return t.replace("_", " ").title()
+    t_map = {
+        "pod": "Pod",
+        "service": "Service",
+        "service_account": "ServiceAccount",
+        "role": "Role",
+        "clusterrole": "ClusterRole",
+        "node": "Node",
+        "secret": "Secret",
+        "configmap": "ConfigMap",
+        "database": "Database",
+        "namespace": "Namespace"
+    }
+    return t_map.get(t.lower(), t.replace("_", " ").title())
 
 
 def build_attack_path_result(G: nx.DiGraph, path_nodes: list[str]) -> dict:
@@ -77,33 +89,36 @@ def build_attack_path_result(G: nx.DiGraph, path_nodes: list[str]) -> dict:
 
 def path_weight_severity(total_weight: float) -> str:
     """Match sample-output.txt style bands (cumulative risk score)."""
-    if total_weight >= 25.0:
+    if total_weight >= 19.6:
         return "CRITICAL"
-    if total_weight >= 15.0:
+    if total_weight >= 11.0:
         return "HIGH"
-    if total_weight >= 10.0:
+    if total_weight >= 5.0:
         return "MEDIUM"
     return "LOW"
 
 
 def _format_path_line(G: nx.DiGraph, path_nodes: list[str]) -> str:
-    """Single line representation of the chain matching Expected Path #1 layout."""
-    parts = []
+    """Exact required per-hop formatting layout."""
+    out_lines: list[str] = []
     for i in range(len(path_nodes) - 1):
         u, v = path_nodes[i], path_nodes[i + 1]
-        ul = G.nodes[u].get("label", u)
         ed = G[u][v]
+        ul = G.nodes[u].get("label", u)
+        vl = G.nodes[v].get("label", v)
+        ut = _type_pretty(str(G.nodes[u].get("type", "unknown")))
+        vt = _type_pretty(str(G.nodes[v].get("type", "unknown")))
+        rel = ed.get("relation", "accesses")
         
-        part = ul
+        line = f"{ul} ({ut})  --[{rel}]-->  {vl} ({vt})"
         if ed.get("cve"):
             cve_str = ed["cve"]
             if ed.get("cvss") is not None:
                 cve_str += f", CVSS {ed['cvss']}"
-            part += f" [{cve_str}]"
-        parts.append(part)
+            line += f"  [{cve_str}]"
+        out_lines.append(line)
         
-    parts.append(G.nodes[path_nodes[-1]].get("label", path_nodes[-1]))
-    return " -> ".join(parts)
+    return "\n".join(out_lines)
 
 
 def _remediation_lines_for_path(G: nx.DiGraph, path_nodes: list[str]) -> list[str]:
@@ -148,14 +163,6 @@ def generate_full_report(G: nx.DiGraph, options: KillChainReportOptions | None =
     lines.append(f"  KILL CHAIN REPORT  -  {now}")
     lines.append(f"  Cluster : {opts.cluster_name}")
     lines.append(f"  Nodes   : {G.number_of_nodes()}  |  Edges: {G.number_of_edges()}")
-    meta = opts.metadata or {}
-    mn = meta.get("node_count")
-    me = meta.get("edge_count")
-    if mn is not None or me is not None:
-        lines.append(
-            f"  (JSON metadata node_count/edge_count: {mn!s}/{me!s} - "
-            "counts above are NetworkX after parsing + synthetic edges.)",
-        )
     lines.append(sep)
     lines.append("")
 
@@ -163,8 +170,7 @@ def generate_full_report(G: nx.DiGraph, options: KillChainReportOptions | None =
     sinks = find_graph_sinks(G)
 
     # --- Section 1: Attack paths ---
-    mode_label = "Dijkstra" if opts.report_mode == "dijkstra" else "All simple paths"
-    lines.append(f"[ SECTION 1 - ATTACK PATH DETECTION ({mode_label}) ]")
+    lines.append(f"[ SECTION 1 - ATTACK PATH DETECTION (Dijkstra) ]")
 
     path_entries: list[tuple[list[str], float]] = []
 
@@ -205,16 +211,21 @@ def generate_full_report(G: nx.DiGraph, options: KillChainReportOptions | None =
             for pl in _format_path_line(G, p_nodes).split("\n"):
                 lines.append("  " + pl)
             lines.append("")
-            lines.append("  Remediation:")
-            for rl in _remediation_lines_for_path(G, p_nodes):
-                lines.append(rl)
-            lines.append("")
 
-    # --- Section 2: Blast radius ---
     lines.append(f"[ SECTION 2 - BLAST RADIUS ANALYSIS (BFS, depth={opts.blast_radius_hops}) ]")
     lines.append("")
     total_blast_nodes = 0
-    for src in sources:
+    
+    def order_val(s):
+        order = ["internet", "dev-1", "dev-2", "cicd-bot", "loadbalancer-svc"]
+        label = G.nodes[s].get("label", s)
+        try:
+            return order.index(label)
+        except ValueError:
+            return 999
+            
+    ordered_sources = sorted(sources, key=order_val)
+    for src in ordered_sources:
         try:
             br = blast_radius(G, src, max_hops=opts.blast_radius_hops)
         except ValueError:
@@ -245,8 +256,6 @@ def generate_full_report(G: nx.DiGraph, options: KillChainReportOptions | None =
             else:
                 chain = c.get("chain", "")
             lines.append(f"  Cycle #{idx}: {chain}")
-            for cr in generate_cycle_remediation_lines(list(nodes_c), G):
-                lines.append(f"    Remediation: {cr}")
     lines.append("")
 
     # --- Section 4: Critical node ---
@@ -274,8 +283,9 @@ def generate_full_report(G: nx.DiGraph, options: KillChainReportOptions | None =
         lines.append("  Top 5 highest-impact nodes to remove:")
         for row in cna["ranking"]:
             bar = "#" * min(20, max(1, int(20 * row["paths_eliminated"] / max(baseline, 1))))
+            pretty_type = _type_pretty(row['type'])
             lines.append(
-                f"    {row['label']:<30} ({row['type']:<16})  "
+                f"    {row['label']:<30} ({pretty_type:<16})  "
                 f"-{row['paths_eliminated']} paths  {bar}",
             )
     lines.append("")

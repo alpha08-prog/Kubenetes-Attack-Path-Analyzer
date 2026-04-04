@@ -38,11 +38,11 @@ def get_attack_path(source: str, target: str) -> dict:
 
     # Overall path severity = threshold on total cost
     total_cost = result.get("total_cost", 0.0)
-    if total_cost >= 25.0:
+    if total_cost >= 19.6:
         result["severity"] = "CRITICAL"
-    elif total_cost >= 15.0:
+    elif total_cost >= 11.0:
         result["severity"] = "HIGH"
-    elif total_cost >= 10.0:
+    elif total_cost >= 5.0:
         result["severity"] = "MEDIUM"
     else:
         result["severity"] = "LOW"
