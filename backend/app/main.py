@@ -16,6 +16,59 @@ from app.utils.logger import get_logger
 logger = get_logger(__name__)
 
 
+# ─── Background CVE enrichment ────────────────────────────────────────────────
+
+def _start_background_cve_enrichment() -> None:
+    """
+    Launch CVE scoring in a daemon thread so startup is never blocked.
+
+    The NVD API is slow (2-3 s per image) and rate-limits aggressively (429).
+    Running it in the background means the server is ready in ~2 seconds while
+    CVE data populates gradually. Results are written directly into the live
+    NetworkX graph nodes so every subsequent request sees up-to-date scores.
+    """
+    import threading
+
+    def _worker() -> None:
+        import time as _time
+        try:
+            from app.core.graph_builder import get_graph
+            from app.services.cve_service import get_cve_score_for_image
+            G = get_graph()
+            pod_nodes = [(n, d) for n, d in G.nodes(data=True) if d.get("type") == "pod"]
+            logger.info("Background CVE enrichment started (%d pod nodes)", len(pod_nodes))
+            enriched = 0
+            for node_id, attrs in pod_nodes:
+                images = attrs.get("metadata", {}).get("image", [])
+                if not images:
+                    continue
+                cvss_scores: dict = {}
+                max_cve_score = 0.0
+                for img in images:
+                    score = get_cve_score_for_image(img)
+                    cvss_scores[img] = score
+                    if score > max_cve_score:
+                        max_cve_score = score
+                    # Pause between images to stay under NVD's 5 req/30s limit.
+                    _time.sleep(1.5)
+
+                if max_cve_score > 0:
+                    old_risk = attrs.get("risk", 0.0)
+                    G.nodes[node_id]["risk"] = round(min(10.0, old_risk + (max_cve_score * 0.2)), 1)
+                    G.nodes[node_id].setdefault("metadata", {})
+                    G.nodes[node_id]["metadata"]["cve_score"]        = max_cve_score
+                    G.nodes[node_id]["metadata"]["cvss_scores"]      = cvss_scores
+                    G.nodes[node_id]["metadata"]["container_images"] = list(images)
+                    enriched += 1
+
+            logger.info("Background CVE enrichment complete (%d pods enriched)", enriched)
+        except Exception as exc:
+            logger.warning("Background CVE enrichment failed (non-critical): %s", exc)
+
+    t = threading.Thread(target=_worker, name="cve-enrichment", daemon=True)
+    t.start()
+
+
 # ─── Lifespan (startup / shutdown) ────────────────────────────────────────────
 
 @asynccontextmanager
@@ -71,6 +124,11 @@ async def lifespan(app: FastAPI):
             attack_paths=startup_paths,
             cycles=startup_cycles,
         )
+
+        # Start CVE enrichment in the background — avoids blocking startup
+        # with slow sequential NVD API calls (2-5 s each, rate-limited).
+        _start_background_cve_enrichment()
+
     except Exception as e:
         logger.error("Startup graph load failed: %s", e)
         logger.warning("App will start but graph is empty — call POST /api/graph/reload")
@@ -98,7 +156,7 @@ async def lifespan(app: FastAPI):
     else:
         logger.info("ENABLE_WATCH_API=false — real-time monitoring disabled")
 
-    yield  # app runs here
+    yield  # ← app is running and accepting requests
 
     logger.info("Shutting down %s", settings.APP_NAME)
 

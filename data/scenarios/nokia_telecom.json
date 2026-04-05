@@ -21,6 +21,7 @@
       "label": "web-server",
       "type": "pod",
       "risk": 7.5,
+      "is_source": true,
       "namespace": "default",
       "metadata": {
         "image": [
@@ -215,6 +216,7 @@
       "label": "billing-db",
       "type": "database",
       "risk": 9.5,
+      "is_sink": true,
       "namespace": "default",
       "metadata": {
         "engine": "PostgreSQL",
@@ -226,6 +228,7 @@
       "label": "analytics-db",
       "type": "database",
       "risk": 7.0,
+      "is_sink": true,
       "namespace": "default",
       "metadata": {
         "engine": "ClickHouse",
@@ -237,6 +240,7 @@
       "label": "dev-1",
       "type": "user",
       "risk": 6.5,
+      "is_source": true,
       "namespace": "cluster",
       "metadata": {
         "note": "Developer with secret-reader binding \u2014 lateral move risk"
@@ -247,6 +251,7 @@
       "label": "ci-bot",
       "type": "user",
       "risk": 7.5,
+      "is_source": true,
       "namespace": "cluster",
       "metadata": {
         "note": "CI/CD service user bound to cluster-admin \u2014 over-privileged"

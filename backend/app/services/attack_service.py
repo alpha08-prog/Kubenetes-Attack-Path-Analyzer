@@ -108,6 +108,21 @@ def get_auto_attack_path() -> dict:
             if result.get("found") and result.get("hop_count", 0) > 0:
                 result["auto_detected"] = True
                 logger.info("Auto-detected path: %s -> %s", source, target)
+
+                # Also compute blast radius from the same source so the
+                # DemoMode page and the AI report always show the same count.
+                try:
+                    from app.algorithm.bfs import blast_radius as _blast_radius
+                    br = _blast_radius(G, source, max_hops=3)
+                    result["blast_radius"] = {
+                        "source": br["source"],
+                        "source_label": br.get("source_label", source),
+                        "total_reachable": br["total_reachable"],
+                        "zones": br["zones"],
+                    }
+                except Exception:
+                    pass
+
                 return result
 
     return {

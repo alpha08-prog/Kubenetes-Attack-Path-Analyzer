@@ -87,14 +87,21 @@ export default function Dashboard() {
     const handleGraphUpdate = (e: Event) => {
       const update = (e as CustomEvent<GraphUpdateEvent>).detail;
 
-      // Show alert banner for 8 seconds
-      setLiveAlert(update);
-      if (alertTimer.current) clearTimeout(alertTimer.current);
-      alertTimer.current = setTimeout(() => setLiveAlert(null), 8000);
+      // Show alert banner only for real security events (not housekeeping refreshes)
+      if (update.type === 'GRAPH_UPDATE') {
+        setLiveAlert(update);
+        if (alertTimer.current) clearTimeout(alertTimer.current);
+        alertTimer.current = setTimeout(() => setLiveAlert(null), 8000);
+      }
 
-      // Fetch the rebuilt graph. A 500ms delay gives the backend a chance to
-      // finish committing any final write before we read the graph endpoint.
-      setTimeout(() => fetchGraph(), 500);
+      // Fetch the rebuilt graph. For CLEANUP_REFRESH we delay longer (2s already
+      // elapsed in MonitoringPanel) to let K8s finish deleting; for GRAPH_UPDATE
+      // a short 500ms gap is enough.
+      // Guard: don't stack fetches — if already loading, skip to avoid blank flash.
+      const delay = update.type === 'CLEANUP_REFRESH' ? 300 : 500;
+      setTimeout(() => {
+        if (!graphLoading) fetchGraph();
+      }, delay);
     };
 
     window.addEventListener('graphUpdate', handleGraphUpdate);
@@ -103,7 +110,7 @@ export default function Dashboard() {
       if (alertTimer.current) clearTimeout(alertTimer.current);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [graphLoading]);
 
   return (
     <div className="h-screen flex flex-col bg-background overflow-hidden">

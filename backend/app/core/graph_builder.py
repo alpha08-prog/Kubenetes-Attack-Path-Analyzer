@@ -253,8 +253,13 @@ def find_graph_sources(G: nx.DiGraph) -> list:
     if zero_in:
         return zero_in
 
-    # Fallback: any attacker-facing node with meaningful risk
-    return sorted(n for n in G.nodes if _matches_entry_type(n) and _risk(n) >= 3.0)
+    # Fallback: any attacker-facing node with meaningful risk (ignores in-degree)
+    any_entry = sorted(n for n in G.nodes if _matches_entry_type(n) and _risk(n) >= 3.0)
+    if any_entry:
+        return any_entry
+
+    # Last resort: highest-risk node in entire graph
+    return [max(G.nodes, key=_risk, default=None)] if G.nodes else []
 
 
 def find_graph_sinks(G: nx.DiGraph) -> list:
@@ -310,7 +315,23 @@ def find_sensitive_targets(G: nx.DiGraph) -> list:
         key=lambda n: G.nodes[n].get("risk", G.nodes[n].get("risk_score", 0)),
         reverse=True,
     )
-    return leaves[:5]
+    if leaves:
+        return leaves[:5]
+
+    # 4. Any database/secret node regardless of out-degree (live clusters may have outgoing edges)
+    def _risk_t(n: str) -> float:
+        return G.nodes[n].get("risk", G.nodes[n].get("risk_score", 0))
+
+    any_sensitive = sorted(
+        (n for n in G.nodes if G.nodes[n].get("type", "").lower() in {"database", "secret"}),
+        key=_risk_t,
+        reverse=True,
+    )
+    if any_sensitive:
+        return any_sensitive[:5]
+
+    # 5. Last resort: top-5 highest-risk nodes of any type
+    return sorted(G.nodes, key=_risk_t, reverse=True)[:5]
 
 
 def graph_summary(G: nx.DiGraph) -> dict:

@@ -42,9 +42,12 @@ function normalizeAttackPath(raw: any) {
 
 function normalizeBlastRadius(raw: any) {
   if (!raw || raw.error) return null;
+  // Prefer total_reachable from the backend (authoritative BFS count)
+  const reachable = raw.total_reachable ?? raw.total_affected ?? 0;
   return {
     ...raw,
-    total_affected: raw.total_affected ?? raw.total_reachable ?? 0,
+    total_affected: reachable,
+    total_reachable: reachable,
   };
 }
 
@@ -100,9 +103,16 @@ export default function DemoMode() {
           data = normalizeAttackPath((await api.getAutoAttackPath()).data);
           break;
         case 2: {
-          // Use the first hop of the detected attack path as blast-radius source.
-          // If step 1 found no path, fall back to the highest-risk node in the graph.
-          const pathSrc = stepData[1]?.path?.[0]?.from;
+          // PRIORITY 1: Use blast_radius embedded in the auto-attack-path
+          // response — guarantees we show the exact same count as the report.
+          const embeddedBlast = stepData[1]?.blast_radius;
+          if (embeddedBlast) {
+            data = normalizeBlastRadius(embeddedBlast);
+            break;
+          }
+
+          // PRIORITY 2: Use the first hop of the detected attack path as BFS source.
+          const pathSrc = stepData[1]?.path?.[0]?.from ?? stepData[1]?.source;
           const graphNodes: any[] = stepData[0]?.graph?.nodes ?? [];
           const fallbackSrc = graphNodes.length
             ? [...graphNodes].sort((a, b) => {

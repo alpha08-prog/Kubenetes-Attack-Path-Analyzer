@@ -478,23 +478,46 @@ export default function MonitoringPanel({ liveEvents, isConnected, monitoringErr
     key: ActionKey,
     fn: () => Promise<any>,
     label?: string,
-    opts: { awaitUpdate?: boolean } = {},
+    opts: { awaitUpdate?: boolean; reloadGraphAfter?: boolean } = {},
   ) => {
     setAction(key, { loading: true, result: null, error: null });
     if (label) { setTerminalLabel(label); setTerminalOutput(null); }
+
+    // Capture event count BEFORE the API call so SSE events that arrive
+    // DURING the call (e.g., ANALYSIS_TRIGGERED broadcast) are not missed.
+    const preFnEventCount = liveEvents.length;
+
     try {
       const res = await fn();
       const data: ActionResult = res.data;
       setAction(key, { loading: false, result: data, error: null });
       if (data.output) { setTerminalOutput(data.output); setTerminalLabel(label ?? ''); }
-      // Always switch to live events so the user sees the incoming SSE immediately.
+
+      // Always switch to live events so the user sees any incoming SSE immediately.
       setActiveView('live');
       // Notify parent (Dashboard) to switch to the Monitor tab so SSE events are visible.
       onActionSuccess?.();
-      // For Trigger Analysis: flag that the next GRAPH_UPDATE should auto-switch to history.
+
+      // For Trigger Analysis / Deploy: flag that the next GRAPH_UPDATE should
+      // auto-switch to history. Reset seenEventCount HERE (after fn resolves)
+      // so the ANALYSIS_TRIGGERED acknowledgment event that fires during fn
+      // doesn't advance the counter before we start watching.
       if (opts.awaitUpdate) {
-        seenEventCount.current = liveEvents.length;
+        seenEventCount.current = preFnEventCount;
         awaitingGraphUpdate.current = true;
+      }
+
+      // For Cleanup: reload the graph immediately after the API call returns
+      // so the node count drops in one step (instead of relying on Watch API
+      // firing twice — once at 149, once at 148).
+      if (opts.reloadGraphAfter) {
+        // Dispatch a synthetic DOM event so Dashboard.fetchGraph() runs.
+        // Small delay lets K8s finish processing the deletes.
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('graphUpdate', {
+            detail: { type: 'CLEANUP_REFRESH', timestamp: new Date().toISOString() }
+          }));
+        }, 2000);
       }
     } catch (err: any) {
       const msg = err?.response?.data?.detail ?? err?.message ?? 'Request failed';
@@ -550,7 +573,7 @@ export default function MonitoringPanel({ liveEvents, isConnected, monitoringErr
             color="border-orange-500/20 bg-orange-500/5 text-orange-400 hover:bg-orange-500/10"
             loading={actions.deploy.loading}
             disabled={isAnyActionRunning && !actions.deploy.loading}
-            onClick={() => runAction('deploy', monitoringApi.runScenario, 'deploy_vulnerable_scenerio.sh')}
+            onClick={() => runAction('deploy', monitoringApi.runScenario, 'deploy_vulnerable_scenerio.sh', { awaitUpdate: true })}
           />
           <ActionButton
             icon={<Trash2 className="w-3.5 h-3.5" />}
@@ -559,7 +582,7 @@ export default function MonitoringPanel({ liveEvents, isConnected, monitoringErr
             color="border-red-500/20 bg-red-500/5 text-red-400 hover:bg-red-500/10"
             loading={actions.cleanup.loading}
             disabled={isAnyActionRunning && !actions.cleanup.loading}
-            onClick={() => runAction('cleanup', monitoringApi.cleanupScenario, 'deploy_vulnerable_scenerio.sh --cleanup')}
+            onClick={() => runAction('cleanup', monitoringApi.cleanupScenario, 'deploy_vulnerable_scenerio.sh --cleanup', { reloadGraphAfter: true })}
           />
         </div>
 

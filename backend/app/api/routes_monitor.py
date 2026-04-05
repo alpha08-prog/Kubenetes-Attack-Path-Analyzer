@@ -515,6 +515,21 @@ async def run_scenario(cleanup: bool = False):
             # ── Cleanup ───────────────────────────────────────────────────────
             success, output = await loop.run_in_executor(None, _cleanup_scenario_sync)
             logger.info("Scenario cleanup done (success=%s)", success)
+
+            # Rebuild graph once after cleanup so the in-memory graph reflects
+            # removed nodes in a single step.  The Watch API may also fire, but
+            # ingest_and_build is idempotent so concurrent calls are harmless.
+            async def _delayed_cleanup_rebuild():
+                await asyncio.sleep(3)          # let K8s finish deleting resources
+                try:
+                    from app.services.ingestion_service import ingest_and_build
+                    ingest_and_build()
+                    logger.info("Post-cleanup graph rebuild complete")
+                except Exception as _e:
+                    logger.warning("Post-cleanup rebuild failed (non-critical): %s", _e)
+
+            asyncio.create_task(_delayed_cleanup_rebuild(), name="cleanup-rebuild")
+
             return {
                 "status":  "cleanup_done" if success else "cleanup_partial",
                 "output":  output,

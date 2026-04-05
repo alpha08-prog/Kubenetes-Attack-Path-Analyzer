@@ -80,9 +80,10 @@ def ingest_and_build() -> dict:
         "status": "ok",
     }
 
-    # B2: Live CVE Scoring enrichment
-    from app.services.analysis_service import enrich_nodes_with_cves
-    enrich_nodes_with_cves(graph)
+    # NOTE: CVE enrichment (B2) is intentionally NOT called here.
+    # It makes sequential NVD API calls that take 2-5s each and would block
+    # startup. Instead, main.py kicks it off as a non-blocking background
+    # thread via _start_background_cve_enrichment().
 
     if not settings.MOCK_MODE:
         summary["fallback_count"] = fetch_meta["fallback_count"]
