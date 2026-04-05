@@ -299,7 +299,12 @@ class KubernetesWatcher:
         asyncio.get_event_loop() here as worker threads have no event loop.
         """
 
-        for raw_event in w.stream(list_fn, timeout_seconds=30):
+        # Use a long timeout (5 min) rather than 30 s.  With 30 s, every stream
+        # expires, the watcher reconnects, and K8s replays ALL existing resources
+        # as ADDED events — causing a full graph rebuild every 30 s even when
+        # the cluster hasn't changed.  300 s keeps streams alive longer while
+        # still allowing clean reconnection after real API-server restarts.
+        for raw_event in w.stream(list_fn, timeout_seconds=300):
             if not self.watching:
                 w.stop()
                 return

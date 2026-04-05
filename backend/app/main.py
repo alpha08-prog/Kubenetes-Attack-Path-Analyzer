@@ -37,20 +37,29 @@ def _start_background_cve_enrichment() -> None:
             G = get_graph()
             pod_nodes = [(n, d) for n, d in G.nodes(data=True) if d.get("type") == "pod"]
             logger.info("Background CVE enrichment started (%d pod nodes)", len(pod_nodes))
+
+            # Collect every unique image across all pods so each image is scored
+            # only once — avoids redundant NVD API calls when multiple pods
+            # (e.g. etcd, kube-apiserver) share the same container image.
+            image_to_score: dict = {}
+            all_images: list = []
+            for _, attrs in pod_nodes:
+                for img in attrs.get("metadata", {}).get("image", []):
+                    if img and img not in image_to_score:
+                        image_to_score[img] = None   # placeholder
+                        all_images.append(img)
+
+            for img in all_images:
+                image_to_score[img] = get_cve_score_for_image(img)
+                _time.sleep(1.5)  # stay under NVD's 5 req/30s limit
+
             enriched = 0
             for node_id, attrs in pod_nodes:
                 images = attrs.get("metadata", {}).get("image", [])
                 if not images:
                     continue
-                cvss_scores: dict = {}
-                max_cve_score = 0.0
-                for img in images:
-                    score = get_cve_score_for_image(img)
-                    cvss_scores[img] = score
-                    if score > max_cve_score:
-                        max_cve_score = score
-                    # Pause between images to stay under NVD's 5 req/30s limit.
-                    _time.sleep(1.5)
+                cvss_scores = {img: image_to_score.get(img, 0.0) for img in images}
+                max_cve_score = max(cvss_scores.values(), default=0.0)
 
                 if max_cve_score > 0:
                     old_risk = attrs.get("risk", 0.0)

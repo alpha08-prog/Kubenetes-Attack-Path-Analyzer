@@ -136,7 +136,7 @@ def build_report_header(cluster_name: str, finding_count: int, timestamp: str) -
         "report_title": "Attack Path Analysis Report",
         "cluster": cluster_name,
         "generated_at": timestamp,
-        "tool": "Attack Path Analyzer - Nokia Hackathon 2024",
+        "tool": "Attack Path Analyzer",
         "total_findings": finding_count,
         "model_used": "groq",
     }

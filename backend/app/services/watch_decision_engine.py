@@ -19,8 +19,15 @@ On alert:
 from __future__ import annotations
 
 import json
+import time
 from datetime import datetime, timezone
 from typing import Any, Dict, List
+
+# Minimum seconds between full graph rebuilds triggered by the Watch API.
+# Prevents the initial K8s event flood (all resources dumped as ADDED on each
+# watch reconnect) from causing back-to-back rebuilds when nothing changed.
+_MIN_REBUILD_INTERVAL_SEC = 30
+_last_rebuild_time: float = 0.0
 
 from app.config import settings
 from app.core.database import record_monitoring_event
@@ -122,7 +129,20 @@ def _rebuild_and_record() -> str | None:
     which made path_delta and cycle_delta always 0 — so no alert ever fired.
     Now the actual algorithms run before recording so the DB reflects reality.
     """
+    global _last_rebuild_time
     try:
+        now = time.monotonic()
+        elapsed = now - _last_rebuild_time
+        if elapsed < _MIN_REBUILD_INTERVAL_SEC and _last_rebuild_time > 0:
+            # Return the most recent run ID so the caller can still diff/broadcast.
+            history = get_run_history(limit=1, cluster_name=settings.CLUSTER_NAME)
+            if history:
+                logger.debug(
+                    "Skipping rebuild — last rebuild was %.1fs ago (min=%ds)",
+                    elapsed, _MIN_REBUILD_INTERVAL_SEC,
+                )
+                return history[0]["run_id"]
+        _last_rebuild_time = now
         summary = ingest_and_build()
 
         # ── Run real analysis algorithms ──────────────────────────────────────

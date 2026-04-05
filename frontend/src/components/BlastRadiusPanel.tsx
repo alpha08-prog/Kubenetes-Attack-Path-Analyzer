@@ -70,7 +70,7 @@ export default function BlastRadiusPanel({ nodes, blastRadius, loading, onAnalyz
           {blastRadius.zones && Object.entries(blastRadius.zones).map(([hop, nodeIds]: [string, any]) => (
             <details key={hop} className="bg-secondary rounded-md">
               <summary className="px-3 py-2 text-sm font-medium text-foreground cursor-pointer">
-                Zone {hop} ({(nodeIds as string[]).length} nodes)
+                {hop === '0' ? `Source — Compromised Node` : `Zone ${hop}`} ({(nodeIds as string[]).length} node{(nodeIds as string[]).length !== 1 ? 's' : ''})
               </summary>
               <div className="px-3 pb-2 space-y-1">
                 {(nodeIds as string[]).map((id: string) => {

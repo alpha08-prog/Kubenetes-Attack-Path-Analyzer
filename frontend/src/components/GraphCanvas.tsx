@@ -198,8 +198,6 @@ export default function GraphCanvas({
   const buildCy = useCallback(() => {
     if (!containerRef.current || !filteredGraph) return;
 
-    if (cyRef.current) cyRef.current.destroy();
-
     const elements: cytoscape.ElementDefinition[] = [];
     filteredGraph.nodes.forEach((node) => {
       elements.push({
@@ -217,6 +215,20 @@ export default function GraphCanvas({
         },
       });
     });
+
+    // If Cytoscape already exists, update elements in-place to avoid blank flash.
+    // Only do a full destroy+recreate on first mount.
+    if (cyRef.current) {
+      const cy = cyRef.current;
+      // Use cy.batch() so remove + add are applied in a single render pass —
+      // this prevents the canvas from going blank between the two operations.
+      cy.batch(() => {
+        cy.elements().remove();
+        cy.add(elements);
+      });
+      cy.layout(layout).run();
+      return;
+    }
 
     const cy = cytoscape({
       container: containerRef.current,

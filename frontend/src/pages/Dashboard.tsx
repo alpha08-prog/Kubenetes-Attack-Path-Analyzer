@@ -83,6 +83,21 @@ export default function Dashboard() {
   }, [summary]);
 
   // ── Handle real-time graph update events from useMonitoring ──────────────
+  const graphLoadingRef = useRef(graphLoading);
+  useEffect(() => {
+    graphLoadingRef.current = graphLoading;
+    // If a CLEANUP_REFRESH arrived while a fetch was in-flight, it was deferred.
+    // Now that loading has settled to false, fire the guaranteed fetch.
+    if (!graphLoading && cleanupPendingRef.current) {
+      cleanupPendingRef.current = false;
+      fetchGraph();
+    }
+  }, [graphLoading, fetchGraph]);
+
+  const pendingRefreshRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Tracks whether a CLEANUP_REFRESH needs a guaranteed fetch once loading settles.
+  const cleanupPendingRef = useRef(false);
+
   useEffect(() => {
     const handleGraphUpdate = (e: Event) => {
       const update = (e as CustomEvent<GraphUpdateEvent>).detail;
@@ -94,23 +109,39 @@ export default function Dashboard() {
         alertTimer.current = setTimeout(() => setLiveAlert(null), 8000);
       }
 
-      // Fetch the rebuilt graph. For CLEANUP_REFRESH we delay longer (2s already
-      // elapsed in MonitoringPanel) to let K8s finish deleting; for GRAPH_UPDATE
-      // a short 500ms gap is enough.
-      // Guard: don't stack fetches — if already loading, skip to avoid blank flash.
-      const delay = update.type === 'CLEANUP_REFRESH' ? 300 : 500;
-      setTimeout(() => {
-        if (!graphLoading) fetchGraph();
-      }, delay);
+      // Debounce: cancel any pending refresh and schedule a new one.
+      // This batches rapid SSE events (e.g. Watch API firing for each deleted resource)
+      // into a single fetch call so we only ever see the final stable graph state.
+      if (pendingRefreshRef.current) clearTimeout(pendingRefreshRef.current);
+
+      if (update.type === 'CLEANUP_REFRESH') {
+        // Mark that a cleanup fetch is required — don't let it get dropped.
+        // If another fetch is in-flight right now, the useEffect below will
+        // pick this up once loading finishes.
+        cleanupPendingRef.current = true;
+        if (!graphLoadingRef.current) {
+          cleanupPendingRef.current = false;
+          fetchGraph();
+        }
+        return;
+      }
+
+      // GRAPH_UPDATE and other event types: debounce with 500ms.
+      pendingRefreshRef.current = setTimeout(() => {
+        // Read loading state from ref so this closure is never stale.
+        if (!graphLoadingRef.current) fetchGraph();
+      }, 500);
     };
 
     window.addEventListener('graphUpdate', handleGraphUpdate);
     return () => {
       window.removeEventListener('graphUpdate', handleGraphUpdate);
       if (alertTimer.current) clearTimeout(alertTimer.current);
+      if (pendingRefreshRef.current) clearTimeout(pendingRefreshRef.current);
     };
+  // fetchGraph is stable (empty useCallback deps) — safe to omit from deps.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [graphLoading]);
+  }, [fetchGraph]);
 
   return (
     <div className="h-screen flex flex-col bg-background overflow-hidden">

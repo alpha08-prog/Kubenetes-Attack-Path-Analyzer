@@ -519,12 +519,31 @@ async def run_scenario(cleanup: bool = False):
             # Rebuild graph once after cleanup so the in-memory graph reflects
             # removed nodes in a single step.  The Watch API may also fire, but
             # ingest_and_build is idempotent so concurrent calls are harmless.
+            # After the authoritative rebuild we broadcast a CLEANUP_REFRESH event
+            # so the frontend fetches exactly once with the final correct count.
             async def _delayed_cleanup_rebuild():
-                await asyncio.sleep(3)          # let K8s finish deleting resources
+                # 6 s gives K8s time to remove all resources and for any Watch API
+                # interim analyses (which see a partial state) to finish before we
+                # do the single authoritative rebuild.
+                await asyncio.sleep(6)
                 try:
+                    import json
+                    from datetime import datetime, timezone
                     from app.services.ingestion_service import ingest_and_build
-                    ingest_and_build()
-                    logger.info("Post-cleanup graph rebuild complete")
+                    summary = ingest_and_build()
+                    logger.info(
+                        "Post-cleanup graph rebuild complete — nodes=%d edges=%d",
+                        summary.get("node_count", 0),
+                        summary.get("edge_count", 0),
+                    )
+                    # Notify all connected frontends to refetch the graph.
+                    cleanup_msg = json.dumps({
+                        "type":      "CLEANUP_REFRESH",
+                        "timestamp": datetime.now(timezone.utc).isoformat(),
+                        "node_count": summary.get("node_count", 0),
+                        "message":   "Scenario cleanup complete — graph rebuilt",
+                    })
+                    await broadcast_raw(cleanup_msg)
                 except Exception as _e:
                     logger.warning("Post-cleanup rebuild failed (non-critical): %s", _e)
 

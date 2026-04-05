@@ -28,12 +28,12 @@ def get_blast_radius(node_id: str, max_hops: int = 3) -> dict:
 
     result = blast_radius(G, node_id, max_hops)
 
-    # Enrich each node in every zone with severity label
+    # Enrich each node in every zone (including zone 0 = source) with severity label
     for hop, nodes in result["zones"].items():
         for node in nodes:
             node["severity"] = severity_label(node["risk"])
 
-    # Summary stats for dashboard header cards
+    # Summary stats — collect from all zones (zone 0 is the source node itself)
     all_nodes = [n for zone in result["zones"].values() for n in zone]
     critical_count = sum(1 for n in all_nodes if n["risk"] >= 9.0)
     high_count     = sum(1 for n in all_nodes if 7.0 <= n["risk"] < 9.0)
@@ -41,7 +41,7 @@ def get_blast_radius(node_id: str, max_hops: int = 3) -> dict:
     result["stats"] = {
         "critical": critical_count,
         "high":     high_count,
-        "total":    result["total_reachable"],
+        "total":    result["total_reachable"],  # includes source node
     }
 
     # Highest risk node in blast zone (for alert banner)

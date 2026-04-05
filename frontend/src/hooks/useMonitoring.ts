@@ -100,19 +100,24 @@ export function useMonitoring(): UseMonitoringResult {
         if (!event.data || event.data.startsWith(':')) return;
 
         const update: GraphUpdateEvent = JSON.parse(event.data);
+        // Accumulate every event in the session log (keep newest 100)
+        setLiveEvents(prev => [...prev, update].slice(-100));
+
         if (update.type === 'GRAPH_UPDATE') {
           setLastUpdate(update);
-          // Accumulate in session log (keep newest 100)
-          setLiveEvents(prev => [...prev, update].slice(-100));
           // Dispatch a DOM event so Dashboard (and any other consumer) can react
           window.dispatchEvent(
             new CustomEvent<GraphUpdateEvent>('graphUpdate', { detail: update })
           );
-        } else {
-          // All other event types (ANALYSIS_TRIGGERED, NEW_RESOURCES, etc.)
-          // appear in Session Events.
-          setLiveEvents(prev => [...prev, update].slice(-100));
+        } else if (update.type === 'CLEANUP_REFRESH') {
+          // Scenario cleanup finished — backend has rebuilt the graph.
+          // Notify Dashboard to fetch the authoritative final node count.
+          window.dispatchEvent(
+            new CustomEvent<GraphUpdateEvent>('graphUpdate', { detail: update })
+          );
         }
+        // All other event types (ANALYSIS_TRIGGERED, NEW_RESOURCES, etc.)
+        // are already added to liveEvents above and will appear in Session Events.
       } catch {
         // Malformed JSON — ignore quietly
       }

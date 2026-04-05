@@ -544,7 +544,7 @@ export default function MonitoringPanel({ liveEvents, isConnected, monitoringErr
       {/* ── Real action controls ── */}
       <div className="space-y-2">
         <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">
-          Real-time Actions  <span className="normal-case font-normal">(require minikube running + MOCK_MODE=false)</span>
+          Real-time Actions
         </p>
 
         <div className="grid grid-cols-2 gap-2">

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { getGraph, getGraphSummary, reloadGraph } from '@/api/graphApi';
 import { toast } from '@/hooks/use-toast';
 
@@ -86,8 +86,13 @@ export function useGraph() {
   const [graphData, setGraphData] = useState<GraphData | null>(null);
   const [summary, setSummary] = useState<GraphSummary | null>(null);
   const [loading, setLoading] = useState(false);
+  // Tracks an in-flight fetch so concurrent calls are dropped rather than stacked.
+  const inflightRef = useRef(false);
 
   const fetchGraph = useCallback(async () => {
+    // Drop the call if a fetch is already in progress.
+    if (inflightRef.current) return;
+    inflightRef.current = true;
     setLoading(true);
     try {
       const [graphRes, summaryRes] = await Promise.all([getGraph(), getGraphSummary()]);
@@ -102,6 +107,7 @@ export function useGraph() {
     } catch (e: unknown) {
       toast({ title: 'Error loading graph', description: getErrorMessage(e), variant: 'destructive' });
     } finally {
+      inflightRef.current = false;
       setLoading(false);
     }
   }, []);
