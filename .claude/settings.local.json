@@ -76,7 +76,11 @@
       "Bash(taskkill /PID 217256 /F)",
       "Bash(cmd /c \"taskkill /PID 217256 /F\")",
       "Bash(cmd /c \"netstat -ano | findstr :5173\")",
-      "Bash(cmd /c \"netstat -aon | findstr 5173\")"
+      "Bash(cmd /c \"netstat -aon | findstr 5173\")",
+      "Bash(git rm:*)",
+      "Bash(.gitignore:*)",
+      "Bash(python -m pytest tests/ -v)",
+      "Bash(python -m pytest tests/ -v --ignore=tests/test_cve_and_diff.py)"
     ]
   }
 }
