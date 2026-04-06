@@ -1,2 +1,0 @@
-﻿C:\Users\agraw\Attack_path_analyzer\backend\app\data\scenarios\nokia_telecom.json
-C:\Users\agraw\Attack_path_analyzer\data\scenarios\nokia_telecom.json
