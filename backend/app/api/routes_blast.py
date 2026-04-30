@@ -25,7 +25,7 @@ def blast_radius(body: NodeIdRequest):
     try:
         result = get_blast_radius(body.node_id, body.max_hops)
         if result.get("error"):
-            raise HTTPException(status_code=404, detail=result["message"])
+            raise HTTPException(status_code=400, detail=result["message"])
         return result
     except RuntimeError as e:
         raise HTTPException(status_code=503, detail=str(e))

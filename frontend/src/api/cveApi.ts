@@ -33,7 +33,7 @@ export interface CveSummaryResponse {
   fetched_at: string;
 }
 
-export const getCves = () => client.get<CveFeedResponse>('/api/cves/');
+export const getCves = () => client.get<CveFeedResponse>('/api/cves');
 
 export const searchCves = (query: string) =>
   client.get<CveFeedResponse>('/api/cves/search', { params: { q: query } });

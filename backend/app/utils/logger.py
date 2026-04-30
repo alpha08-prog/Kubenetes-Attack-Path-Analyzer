@@ -7,6 +7,7 @@ All modules import from here — never use print() in production code.
 import logging
 import sys
 from datetime import datetime
+from logging.handlers import RotatingFileHandler
 
 
 LOG_FORMAT = "%(asctime)s | %(levelname)-8s | %(name)-25s | %(message)s"
@@ -38,7 +39,12 @@ def get_logger(name: str) -> logging.Logger:
 
     # File handler — DEBUG and above (full trace for debugging)
     try:
-        file_handler = logging.FileHandler("logs/app.log", encoding="utf-8")
+        file_handler = RotatingFileHandler(
+            "logs/app.log",
+            maxBytes=10_485_760,    # 10 MB
+            backupCount=5,
+            encoding="utf-8",
+        )
         file_handler.setLevel(logging.DEBUG)
         file_handler.setFormatter(logging.Formatter(LOG_FORMAT, datefmt=DATE_FORMAT))
         logger.addHandler(file_handler)

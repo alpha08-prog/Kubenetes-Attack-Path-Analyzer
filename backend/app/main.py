@@ -116,14 +116,14 @@ async def lifespan(app: FastAPI):
             from app.services.attack_service import get_auto_attack_path
             _ap = get_auto_attack_path()
             startup_paths = 1 if _ap.get("found") else 0
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning("Startup baseline (attack path) failed: %s", exc)
         try:
             from app.services.analysis_service import get_cycles
             _cy = get_cycles()
             startup_cycles = _cy.get("cycle_count", 0)
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning("Startup baseline (cycles) failed: %s", exc)
 
         from app.services.history_service import record_analysis_run
         record_analysis_run(

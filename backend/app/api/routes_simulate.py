@@ -35,10 +35,10 @@ def simulate_node_removal(body: SimulateRequest):
     try:
         result = simulate_removal(body.node_id, body.source, body.target)
         if result.get("error"):
-            raise HTTPException(status_code=404, detail=result["message"])
+            raise HTTPException(status_code=400, detail=result["message"])
         return result
     except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e))
     except RuntimeError as e:
         raise HTTPException(status_code=503, detail=str(e))
 

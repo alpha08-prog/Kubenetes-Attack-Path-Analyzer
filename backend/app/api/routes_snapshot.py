@@ -20,7 +20,7 @@ logger = get_logger(__name__)
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("")
 def list_snapshots(
     limit:  int = Query(default=20, ge=1, le=100),
     offset: int = Query(default=0,  ge=0),
@@ -43,7 +43,7 @@ def list_snapshots(
         raise HTTPException(status_code=500, detail=str(exc))
 
 
-@router.post("/")
+@router.post("")
 def create_snapshot(body: CreateSnapshotRequest = None):
     """
     Manually create a graph snapshot of the current in-memory graph.

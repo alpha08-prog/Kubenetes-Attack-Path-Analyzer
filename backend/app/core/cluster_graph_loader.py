@@ -103,6 +103,7 @@ def parse_cluster_graph_document(raw: dict[str, Any]) -> dict[str, Any]:
             continue
 
         relationship = edge.get("relationship") or edge.get("relation") or "accesses"
+        # weight == exploitability cost (Dijkstra optimizes this); risk is a display value (defaults to weight)
         weight = float(edge.get("weight", 5.0))
         risk = float(edge.get("risk", weight))
 

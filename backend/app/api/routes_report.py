@@ -17,7 +17,7 @@ logger = get_logger(__name__)
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("")
 def get_report(
     cluster_name: str = Query(
         default=None,

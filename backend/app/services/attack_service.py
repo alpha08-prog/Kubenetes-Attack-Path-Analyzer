@@ -10,6 +10,7 @@ from app.core.graph_builder import get_graph, find_entry_points, find_sensitive_
 from app.utils.helpers import severity_label, timed
 from app.utils.logger import get_logger, log_algorithm_run
 from app.services.remediation_service import analyze_attack_path_for_remediation
+from app.services.slack_service import send_attack_path_alert
 
 logger = get_logger(__name__)
 
@@ -52,8 +53,10 @@ def get_attack_path(source: str, target: str) -> dict:
     result["remediations"] = [r.to_dict() for r in remediations]
 
     if result.get("found"):
-        from app.services.slack_service import send_attack_path_alert
-        send_attack_path_alert(result, cluster_name=settings.CLUSTER_NAME)
+        try:
+            send_attack_path_alert(result, cluster_name=settings.CLUSTER_NAME)
+        except Exception as exc:
+            logger.warning("Slack attack-path alert failed (non-critical): %s", exc)
 
     return result
 

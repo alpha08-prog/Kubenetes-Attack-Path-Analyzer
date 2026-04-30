@@ -12,6 +12,7 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 from app.config import settings
 from app.services.analysis_service import get_full_analysis
 from app.services.history_service import record_analysis_run
+from app.services.slack_service import send_critical_alert
 from app.utils.helpers import utc_now
 from app.utils.logger import get_logger
 from app.utils.prompt_templates import (
@@ -158,9 +159,11 @@ def generate_report(cluster_name: str = "nokia-telecom-cluster") -> dict:
     header = build_report_header(cluster_name, len(findings), timestamp)
 
     logger.info("Report generated: %d findings", len(findings))
-     
-    from app.services.slack_service import send_critical_alert
-    send_critical_alert(findings, cluster_name=cluster_name)
+
+    try:
+        send_critical_alert(findings, cluster_name=cluster_name)
+    except Exception as exc:
+        logger.warning("Slack critical-findings alert failed (non-critical): %s", exc)
     return {**header, "findings": findings}
 
 

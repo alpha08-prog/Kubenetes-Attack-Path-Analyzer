@@ -313,7 +313,10 @@ def _send_risk_slack(diff: Dict[str, Any], severity: str) -> None:
             "effort": "medium",
         }
     ]
-    send_critical_alert(findings, settings.CLUSTER_NAME)
+    try:
+        send_critical_alert(findings, settings.CLUSTER_NAME)
+    except Exception as exc:
+        logger.warning("Slack risk-increase alert failed (non-critical): %s", exc)
 
 
 def _send_path_slack(diff: Dict[str, Any]) -> None:
@@ -332,7 +335,10 @@ def _send_path_slack(diff: Dict[str, Any]) -> None:
     top = diff.get("top_new_risks") or []
     if top:
         path_result["source_label"] = top[0].get("label", "attacker")
-    send_attack_path_alert(path_result, settings.CLUSTER_NAME)
+    try:
+        send_attack_path_alert(path_result, settings.CLUSTER_NAME)
+    except Exception as exc:
+        logger.warning("Slack new-attack-path alert failed (non-critical): %s", exc)
 
 
 def _send_cycle_slack_from_diff(diff: Dict[str, Any]) -> None:
@@ -342,4 +348,7 @@ def _send_cycle_slack_from_diff(diff: Dict[str, Any]) -> None:
         "cycle_count": cd.get("after", 0),
         "cycles": [],
     }
-    send_cycle_alert(cycles_result, settings.CLUSTER_NAME)
+    try:
+        send_cycle_alert(cycles_result, settings.CLUSTER_NAME)
+    except Exception as exc:
+        logger.warning("Slack new-cycle alert failed (non-critical): %s", exc)

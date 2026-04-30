@@ -67,7 +67,8 @@ RUN { \
     echo '}'; \
 } > /etc/nginx/conf.d/default.conf
 
-RUN chown -R nginx:nginx /usr/share/nginx/html /var/cache/nginx /var/run /etc/nginx/conf.d
+RUN touch /run/nginx.pid && \
+    chown -R nginx:nginx /usr/share/nginx/html /var/cache/nginx /run/nginx.pid /etc/nginx/conf.d
 USER nginx
 
 EXPOSE 3000

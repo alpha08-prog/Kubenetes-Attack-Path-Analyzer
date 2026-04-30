@@ -12,8 +12,12 @@ def shortest_attack_path(G: nx.DiGraph, source: str, target: str) -> dict | None
     Find the lowest-cost attack path from source to target.
 
     Edge weights represent exploitability cost (lower = easier to exploit).
-    This is computed as: weight = 10 - risk_score
-    So a highly risky edge (risk=9) gets weight=1 → Dijkstra prefers it.
+    Input files specify `weight` directly. If only `risk` is provided, it is
+    used as the weight (assumes risk is already an exploitability cost
+    metric, not a 0-10 severity score).
+
+    total_cost in the response is the sum of edge `weight` values along the
+    path — the same quantity Dijkstra minimized. See docs/CLUSTER_GRAPH_SCHEMA.md.
 
     Returns:
         {
@@ -44,7 +48,9 @@ def shortest_attack_path(G: nx.DiGraph, source: str, target: str) -> dict | None
 
     try:
         path = nx.dijkstra_path(G, source, target, weight="weight")
-        cost = sum(G[path[i]][path[i + 1]].get("risk", 0.0) for i in range(len(path) - 1))
+        # total_cost mirrors the quantity Dijkstra minimized (sum of edge weights),
+        # not the per-edge `risk` display value. See docs/CLUSTER_GRAPH_SCHEMA.md.
+        cost = sum(G[path[i]][path[i + 1]].get("weight", 0.0) for i in range(len(path) - 1))
     except nx.NetworkXNoPath:
         return {
             "source": source,

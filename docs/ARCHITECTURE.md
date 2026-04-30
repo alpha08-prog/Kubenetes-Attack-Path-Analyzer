@@ -283,7 +283,7 @@ JSON Response
 **graph_builder.py**
 - Constructs graph from normalized node/edge lists
 - Assigns risk scores (based on CVE data or heuristics)
-- Computes edge weights (10 - risk_score)
+- Reads edge weights from the input (no inversion — `weight` is the literal exploitability cost; see [CLUSTER_GRAPH_SCHEMA.md](CLUSTER_GRAPH_SCHEMA.md))
 - Creates bidirectional mappings (ID ↔ label)
 
 **risk_engine.py**
@@ -327,7 +327,7 @@ snapshot.py    → Graph snapshot for history
 **Rationale:**
 - Kubernetes RBAC is directional (role binding = one-way permission)
 - Weight models exploitability (lower cost = easier path)
-- Weight inversion (10 - risk) makes Dijkstra find high-risk paths naturally
+- Edges carry `weight` as exploitability cost (lower = easier); Dijkstra minimizes the sum, so it naturally finds the easiest attacker path
 - DiGraph naturally represents attack flow direction
 
 **Alternative considered:** Undirected graph
@@ -523,6 +523,6 @@ else:
 
 ## See Also
 - [README.md](../README.md) — Project overview
-- [algorithms.md](../algorithms.md) — Algorithm deep-dive
+- [algorithms.md](algorithms.md) — Algorithm deep-dive
 - [CLUSTER_GRAPH_SCHEMA.md](CLUSTER_GRAPH_SCHEMA.md) — Data format
 - [CLI_COMMAND_REFERENCE.md](CLI_COMMAND_REFERENCE.md) — CLI usage

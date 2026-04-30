@@ -181,7 +181,7 @@ curl -X POST http://localhost:8000/api/graph/reload
 
 1. **Run full analysis:** `python main.py --full-report`
 2. **Try all commands:** See [CLI_COMMAND_REFERENCE.md](CLI_COMMAND_REFERENCE.md)
-3. **Understand algorithms:** Read [algorithms.md](../algorithms.md)
+3. **Understand algorithms:** Read [algorithms.md](algorithms.md)
 4. **Integrate API:** See [API_DOCUMENTATION.md](API_DOCUMENTATION.md)
 
 ---
@@ -194,7 +194,7 @@ curl -X POST http://localhost:8000/api/graph/reload
 - **[API_DOCUMENTATION.md](API_DOCUMENTATION.md)** — REST API endpoints
 - **[ARCHITECTURE.md](ARCHITECTURE.md)** — System design
 - **[CLUSTER_GRAPH_SCHEMA.md](CLUSTER_GRAPH_SCHEMA.md)** — Data format
-- **[algorithms.md](../algorithms.md)** — Algorithm deep-dive
+- **[algorithms.md](algorithms.md)** — Algorithm deep-dive
 - **[TESTING.md](TESTING.md)** — Test strategy
 
 ---

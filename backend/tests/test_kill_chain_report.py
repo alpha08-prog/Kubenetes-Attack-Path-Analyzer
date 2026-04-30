@@ -18,11 +18,11 @@ def test_full_report_sections(mock_graph_path) -> None:
             metadata=meta,
         ),
     )
-    assert "[ SECTION 1 - ATTACK PATH DETECTION" in text
-    assert "[ SECTION 2 - BLAST RADIUS" in text
-    assert "[ SECTION 3 - CIRCULAR PERMISSION" in text
-    assert "[ SECTION 4 - CRITICAL NODE" in text
+    assert "[ SECTION 1 — ATTACK PATH DETECTION" in text
+    assert "[ SECTION 2 — BLAST RADIUS" in text
+    assert "[ SECTION 3 — CIRCULAR PERMISSION" in text
+    assert "[ SECTION 4 — CRITICAL NODE" in text
     assert "SUMMARY" in text
     assert "web-frontend" in text
-    assert "JSON metadata node_count/edge_count" in text
+    assert "Nodes" in text and "Edges" in text  # node/edge counts surfaced in header
     assert "Patch CVE-2024-1234" in text or "Remove RoleBinding" in text

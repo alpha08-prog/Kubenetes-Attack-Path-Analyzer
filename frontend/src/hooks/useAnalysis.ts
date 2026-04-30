@@ -56,7 +56,7 @@ function normalizeBlastRadius(raw: any) {
 
   return {
     ...raw,
-    total_affected: raw.total_affected ?? raw.total_reachable ?? 0,
+    total_reachable: raw.total_reachable ?? 0,
     zones: normalizedZones,
   };
 }

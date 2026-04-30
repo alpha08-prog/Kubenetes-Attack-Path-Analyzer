@@ -13,7 +13,7 @@ logger = get_logger(__name__)
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("")
 def get_full_graph():
     """
     Returns the full graph in Cytoscape.js format.

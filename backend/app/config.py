@@ -24,12 +24,12 @@ class Settings(BaseSettings):
     # Groq API
     GROQ_API_KEY: str = Field(
         default="",
-        validation_alias=AliasChoices("GROQ_API_KEY", "Groq_API_KEY", "GROK_API_KEY", "Grok_API_KEY"),
+        validation_alias=AliasChoices("GROQ_API_KEY", "Groq_API_KEY"),
         description="API key from https://console.groq.com",
     )
     GROQ_MODEL: str = Field(
         default="llama-3.3-70b-versatile",
-        validation_alias=AliasChoices("GROQ_MODEL", "Groq_MODEL", "GROK_MODEL", "Grok_MODEL"),
+        validation_alias=AliasChoices("GROQ_MODEL", "Groq_MODEL"),
         description="Groq model used for narration",
     )
 

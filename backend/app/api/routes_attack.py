@@ -30,7 +30,7 @@ def attack_path(body: AttackPathRequest):
         result = get_attack_path(body.source, body.target)
         return result
     except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e))
     except RuntimeError as e:
         raise HTTPException(status_code=503, detail=str(e))
 

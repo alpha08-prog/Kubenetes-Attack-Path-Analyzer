@@ -42,12 +42,10 @@ function normalizeAttackPath(raw: any) {
 
 function normalizeBlastRadius(raw: any) {
   if (!raw || raw.error) return null;
-  // Prefer total_reachable from the backend (authoritative BFS count)
-  const reachable = raw.total_reachable ?? raw.total_affected ?? 0;
+  // Backend contract: total_reachable is the authoritative BFS count.
   return {
     ...raw,
-    total_affected: reachable,
-    total_reachable: reachable,
+    total_reachable: raw.total_reachable ?? 0,
   };
 }
 
@@ -272,7 +270,7 @@ export default function DemoMode() {
           <div className="animate-slide-in-right bg-card border border-border rounded-lg p-6">
             <h3 className="font-semibold mb-3">Blast Radius Analysis</h3>
             {blastRadius ? (
-              <p className="text-2xl font-bold text-severity-high">{blastRadius.total_affected ?? 0} nodes at risk</p>
+              <p className="text-2xl font-bold text-severity-high">{blastRadius.total_reachable ?? 0} nodes at risk</p>
             ) : (
               <p className="text-sm text-muted-foreground">Blast radius could not be computed — no reachable source node found.</p>
             )}

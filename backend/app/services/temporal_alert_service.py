@@ -9,6 +9,7 @@ import uuid
 
 from app.config import settings
 from app.models.snapshot import SnapshotDiff
+from app.services.slack_service import send_temporal_alert
 from app.utils.logger import get_logger
 from app.core import database as db
 
@@ -107,81 +108,23 @@ def _persist_alert(diff: SnapshotDiff) -> None:
 
 def _send_slack_alert(diff: SnapshotDiff) -> None:
     """Send a Slack notification for the temporal alert (if Slack is configured)."""
-    if not settings.SLACK_WEBHOOK_URL:
-        return
-
-    # Only send for alerts at or above the minimum severity
+    # Domain filter: only send for alerts at or above the minimum severity.
     sev_order = {"critical": 4, "high": 3, "medium": 2, "low": 1}
     if sev_order.get(diff.severity, 0) < sev_order.get(ALERT_SEVERITY_MINIMUM, 0):
         return
 
-    severity_emoji = {
-        "critical": ":red_circle:",
-        "high": ":large_orange_circle:",
-        "medium": ":large_blue_circle:",
-        "low": ":large_green_circle:",
-    }
-    emoji = severity_emoji.get(diff.severity, ":white_circle:")
-    reasons_text = "\n".join(f"• {r}" for r in diff.alert_reasons)
-
-    payload = {
-        "text": f"{emoji} *Temporal Security Alert* — {settings.CLUSTER_NAME}",
-        "attachments": [
-            {
-                "color": {"critical": "#E24B4A", "high": "#EF9F27",
-                          "medium": "#378ADD", "low": "#1D9E75"}.get(diff.severity, "#888780"),
-                "blocks": [
-                    {
-                        "type": "section",
-                        "text": {
-                            "type": "mrkdwn",
-                            "text": (
-                                f"{emoji} *Graph Change Detected* in `{settings.CLUSTER_NAME}`\n"
-                                f"*Severity:* {diff.severity.upper()}\n"
-                                f"*Changes:*\n{reasons_text}"
-                            ),
-                        },
-                    },
-                    {
-                        "type": "section",
-                        "fields": [
-                            {"type": "mrkdwn", "text": f"*Nodes Added*\n{diff.nodes_added_count}"},
-                            {"type": "mrkdwn", "text": f"*Nodes Removed*\n{diff.nodes_removed_count}"},
-                            {"type": "mrkdwn", "text": f"*New Attack Paths*\n{diff.new_attack_paths_count}"},
-                            {"type": "mrkdwn", "text": f"*Risk Δ*\n{diff.overall_risk_delta:+.1f}"},
-                        ],
-                    },
-                    {
-                        "type": "context",
-                        "elements": [
-                            {
-                                "type": "mrkdwn",
-                                "text": (
-                                    f":clock1: {diff.timestamp_after}  |  "
-                                    "Attack Path Analyzer — Temporal Analysis"
-                                ),
-                            }
-                        ],
-                    },
-                ],
-            }
-        ],
-    }
-
     try:
-        import httpx
-        with httpx.Client(timeout=10) as client:
-            resp = client.post(
-                settings.SLACK_WEBHOOK_URL,
-                json=payload,
-                headers={"Content-Type": "application/json"},
-            )
-        if resp.status_code == 200:
-            logger.info("Temporal alert sent to Slack [%s]", diff.severity)
-        else:
-            logger.warning("Slack temporal alert returned %d", resp.status_code)
+        send_temporal_alert(
+            severity=diff.severity,
+            reasons=diff.alert_reasons,
+            nodes_added=diff.nodes_added_count,
+            nodes_removed=diff.nodes_removed_count,
+            new_attack_paths_count=diff.new_attack_paths_count,
+            overall_risk_delta=diff.overall_risk_delta,
+            timestamp_after=diff.timestamp_after,
+        )
     except Exception as exc:
-        logger.error("Slack temporal alert failed: %s", exc)
+        logger.warning("Slack temporal alert failed (non-critical): %s", exc)
 
 
 def _alert_title(diff: SnapshotDiff) -> str:

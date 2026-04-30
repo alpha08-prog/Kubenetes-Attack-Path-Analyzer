@@ -151,7 +151,7 @@ def send_attack_path_alert(path_result: dict, cluster_name: str = None) -> dict:
                                 "type": "mrkdwn",
                                 "text": (
                                     f":clock1: {_now()}  |  "
-                                    f"Attack Path Analyzer — Nokia Hackathon 2024"
+                                    f"Attack Path Analyzer"
                                 ),
                             }
                         ],
@@ -216,6 +216,77 @@ def send_cycle_alert(cycles_result: dict, cluster_name: str = None) -> dict:
 
     success = _post_to_slack(payload)
     return {"sent": success, "cycle_count": cycle_count}
+
+
+def send_temporal_alert(
+    severity: str,
+    reasons: list,
+    nodes_added: int,
+    nodes_removed: int,
+    new_attack_paths_count: int,
+    overall_risk_delta: float,
+    timestamp_after: str,
+    cluster_name: str = None,
+) -> dict:
+    """
+    Send a Slack alert for a temporal graph-change event.
+    Called by temporal_alert_service when a SnapshotDiff exceeds thresholds.
+    """
+    if not settings.SLACK_WEBHOOK_URL:
+        return {"sent": False, "reason": "SLACK_WEBHOOK_URL not configured"}
+
+    cluster       = cluster_name or settings.CLUSTER_NAME
+    emoji         = SEVERITY_EMOJI.get(severity, ":white_circle:")
+    color         = SEVERITY_COLORS.get(severity, "#888780")
+    reasons_text  = "\n".join(f"• {r}" for r in reasons)
+
+    payload = {
+        "text": f"{emoji} *Temporal Security Alert* — {cluster}",
+        "attachments": [
+            {
+                "color": color,
+                "blocks": [
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": (
+                                f"{emoji} *Graph Change Detected* in `{cluster}`\n"
+                                f"*Severity:* {severity.upper()}\n"
+                                f"*Changes:*\n{reasons_text}"
+                            ),
+                        },
+                    },
+                    {
+                        "type": "section",
+                        "fields": [
+                            {"type": "mrkdwn", "text": f"*Nodes Added*\n{nodes_added}"},
+                            {"type": "mrkdwn", "text": f"*Nodes Removed*\n{nodes_removed}"},
+                            {"type": "mrkdwn", "text": f"*New Attack Paths*\n{new_attack_paths_count}"},
+                            {"type": "mrkdwn", "text": f"*Risk Δ*\n{overall_risk_delta:+.1f}"},
+                        ],
+                    },
+                    {
+                        "type": "context",
+                        "elements": [
+                            {
+                                "type": "mrkdwn",
+                                "text": (
+                                    f":clock1: {timestamp_after}  |  "
+                                    "Attack Path Analyzer — Temporal Analysis"
+                                ),
+                            }
+                        ],
+                    },
+                ],
+            }
+        ],
+    }
+
+    success = _post_to_slack(payload)
+    if success:
+        logger.info("Temporal alert sent to Slack [%s]", severity)
+    return {"sent": success, "severity": severity}
 
 
 def send_test_alert(cluster_name: str = None) -> dict:
@@ -315,7 +386,7 @@ def _send_summary_block(findings: list, cluster: str) -> None:
                                 "type": "mrkdwn",
                                 "text": (
                                     f":clock1: {_now()}  |  "
-                                    "Attack Path Analyzer — Nokia Hackathon 2024"
+                                    "Attack Path Analyzer"
                                 ),
                             }
                         ],

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Loader2, Play, Trash2, ArrowRight } from 'lucide-react';
+import { Loader2, Play, Trash2 } from 'lucide-react';
 import SeverityBadge from './SeverityBadge';
 import type { GraphNode } from '@/hooks/useGraph';
 

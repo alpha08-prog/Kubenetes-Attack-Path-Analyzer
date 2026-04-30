@@ -12,13 +12,22 @@ services:
   backend:
     build:
       context: .
-      dockerfile: docker/backend.DockerFile
+      dockerfile: docker/backend.Dockerfile
     container_name: attack-path-backend
     restart: unless-stopped
 
     environment:
       # AI narration — get free key at aistudio.google.com
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+
+      # Groq narration — get free key at console.groq.com
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+
+      # Slack alerts — Incoming Webhook URL from https://api.slack.com/apps
+      SLACK_WEBHOOK_URL: ${SLACK_WEBHOOK_URL:-}
+
+      # NVD CVE lookups — optional API key from https://nvd.nist.gov/developers
+      NVD_API_KEY: ${NVD_API_KEY:-}
 
       # App config
       MOCK_MODE:    ${MOCK_MODE:-true}
@@ -56,7 +65,7 @@ services:
   frontend:
     build:
       context: .
-      dockerfile: docker/frontend.DockerFile
+      dockerfile: docker/frontend.Dockerfile
       args:
         # During build, Vite bakes this URL into the JS bundle
         # nginx proxy rewrites /api/* → backend:8000 at runtime

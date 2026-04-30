@@ -58,6 +58,7 @@ def create_graph(parsed_data: dict) -> nx.DiGraph:
             continue
 
         rel = edge.get("relation") or edge.get("relationship") or "accesses"
+        # weight == exploitability cost (Dijkstra optimizes this); risk is a display value (defaults to weight)
         eattrs: dict = {
             "relation": rel,
             "relationship": edge.get("relationship", rel),

@@ -1,6 +1,6 @@
 import client from './client';
 
-export const getGraph = () => client.get('/api/graph/');
+export const getGraph = () => client.get('/api/graph');
 export const getGraphSummary = () => client.get('/api/graph/summary');
 export const reloadGraph = () => client.post('/api/graph/reload');
 
@@ -11,7 +11,7 @@ export const getAutoAttackPath = () => client.get('/api/attack/auto');
 export const getBlastRadius = (nodeId: string, maxHops: number) =>
   client.post('/api/blast/radius', { node_id: nodeId, max_hops: maxHops });
 
-export const getCycles = () => client.get('/api/cycles/');
+export const getCycles = () => client.get('/api/cycles');
 export const getCriticalNodes = (topN = 10) =>
   client.get('/api/critical/nodes', { params: { top_n: topN } });
 export const getRemovalCandidates = (source: string, target: string) =>
@@ -22,7 +22,7 @@ export const simulateRemoval = (nodeId: string, source: string, target: string) 
 export const getAutoSimulation = () => client.get('/api/simulate/auto');
 
 export const getReport = (clusterName = 'nokia-telecom-cluster') =>
-  client.get('/api/report/', { params: { cluster_name: clusterName } });
+  client.get('/api/report', { params: { cluster_name: clusterName } });
 
 export const getReportPdf = (clusterName = 'nokia-telecom-cluster') =>
   client.get('/api/report/pdf', {
@@ -30,11 +30,11 @@ export const getReportPdf = (clusterName = 'nokia-telecom-cluster') =>
     responseType: 'blob',
   });
 
-export const getFullAnalysis = () => client.get('/api/analysis/');
+export const getFullAnalysis = () => client.get('/api/analysis');
 
 // History
 export const getRunHistory = (limit = 20) =>
-  client.get('/api/history/', { params: { limit } });
+  client.get('/api/history', { params: { limit } });
 
 // Diff
 export const getDiffLatest = () => client.get('/api/diff/latest');

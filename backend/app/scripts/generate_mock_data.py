@@ -247,7 +247,11 @@ NODES = [
 
 
 # ─── Edges ────────────────────────────────────────────────────────────────────
-# weight = 10 - risk  (lower weight = easier for attacker = Dijkstra prefers it)
+# Edge `weight` is exploitability cost (lower = easier to exploit, see
+# docs/CLUSTER_GRAPH_SCHEMA.md). This generator derives it from `risk` so that
+# high-risk edges become low-cost — letting Dijkstra (which minimizes sum of
+# weights) naturally prefer the attacker's easiest path. Hand-authored
+# scenarios can set `weight` directly under the same convention.
 
 def w(risk: float) -> float:
     return round(10.0 - risk, 1)

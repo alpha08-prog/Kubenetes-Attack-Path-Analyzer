@@ -480,5 +480,5 @@ pytest tests/test_name.py::test_function -vv
 
 ## See Also
 - [README.md](../README.md) — Project overview
-- [algorithms.md](../algorithms.md) — Algorithm documentation
+- [algorithms.md](algorithms.md) — Algorithm documentation
 - [ARCHITECTURE.md](ARCHITECTURE.md) — System design

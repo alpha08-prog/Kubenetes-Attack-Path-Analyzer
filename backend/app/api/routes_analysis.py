@@ -11,7 +11,7 @@ logger = get_logger(__name__)
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("")
 def full_analysis():
     """
     Run all algorithms in one call and return combined analysis with threat score.

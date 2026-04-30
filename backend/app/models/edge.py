@@ -24,7 +24,7 @@ class EdgeModel(BaseModel):
     target:   str   = Field(..., description="Target node ID")
     relation: str   = Field(..., description="Type of access relationship")
     risk:     float = Field(..., ge=0.0, le=10.0, description="Risk score of this edge")
-    weight:   float = Field(..., description="Dijkstra weight = 10 - risk (lower = easier)")
+    weight:   float = Field(..., description="Exploitability cost on a 0-10 scale; lower = easier to exploit. Dijkstra minimizes sum of weights along a path.")
 
     class Config:
         json_schema_extra = {

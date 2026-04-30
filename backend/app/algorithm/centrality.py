@@ -46,7 +46,8 @@ def find_critical_nodes(G: nx.DiGraph, top_n: int = 10) -> dict:
         risk = node_data.get("risk", 0.0)
 
         # Combined score weights centrality (structural importance) + risk (exploitability)
-        combined = round((score * 0.6) + ((risk / 10.0) * 0.4), 4)
+        # Defensive clamp: risk is capped at 10.0 upstream, but enforce here to guarantee combined <= 1.0
+        combined = round((score * 0.6) + ((min(risk, 10.0) / 10.0) * 0.4), 4)
 
         ranked.append({
             "id": node_id,

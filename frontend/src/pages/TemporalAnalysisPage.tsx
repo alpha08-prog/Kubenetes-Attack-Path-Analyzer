@@ -33,7 +33,7 @@ export default function TemporalAnalysisPage() {
 
       // Auto-run demo if no snapshots exist
       setTimeout(async () => {
-        const res = await client.get('/api/snapshots/?limit=1');
+        const res = await client.get('/api/snapshots?limit=1');
         if (res.data.total === 0) {
           // No snapshots yet, run demo automatically
           setDemoMsg('Starting automatic demo...');

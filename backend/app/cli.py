@@ -54,6 +54,13 @@ def _die(msg: str, code: int = 2) -> None:
     raise SystemExit(code)
 
 
+def _positive_int(s: str) -> int:
+    n = int(s)
+    if n < 1 or n > 50:
+        raise argparse.ArgumentTypeError("--hops must be 1..50")
+    return n
+
+
 def _print_utf8(text: str) -> None:
     sys.stdout.buffer.write(text.encode("utf-8", errors="replace"))
     sys.stdout.buffer.write(b"\n")
@@ -105,10 +112,10 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument(
         "--hops",
-        type=int,
+        type=_positive_int,
         default=3,
         metavar="N",
-        help="Blast-radius max depth (default: 3). Also used for blast section in --full-report.",
+        help="Blast-radius max depth (default: 3, range 1..50). Also used for blast section in --full-report.",
     )
     parser.add_argument("--cycles", action="store_true", help="Detect and print privilege cycles (JSON)")
     parser.add_argument(
@@ -189,15 +196,16 @@ def main(argv: list[str] | None = None) -> int:
     exit_code = 0
 
     out_file = args.output
+    _first_write = True
     def _write_output(content: str) -> None:
+        nonlocal _first_write
         if out_file:
-            with out_file.open("a", encoding="utf-8") as f:
+            mode = "w" if _first_write else "a"
+            with out_file.open(mode, encoding="utf-8") as f:
                 f.write(content + "\n")
+            _first_write = False
         else:
             _print_utf8(content)
-
-    if out_file and out_file.exists():
-        out_file.unlink()
 
     if args.blast_radius:
         assert args.source is not None

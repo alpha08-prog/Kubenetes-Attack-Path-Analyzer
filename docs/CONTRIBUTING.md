@@ -541,4 +541,4 @@ git push origin main --tags
 - [README.md](../README.md) — Project overview
 - [TESTING.md](TESTING.md) — Test guidelines
 - [ARCHITECTURE.md](ARCHITECTURE.md) — System design
-- [algorithms.md](../algorithms.md) — Algorithm documentation
+- [algorithms.md](algorithms.md) — Algorithm documentation

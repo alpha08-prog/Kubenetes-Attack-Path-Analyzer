@@ -204,7 +204,7 @@ Content-Type: application/json
 
 ### POST /api/blast/radius
 
-**Description:** Find all nodes reachable from a source within N hops (BFS)
+**Description:** Find all nodes reachable from a single source within N hops (BFS), enriched with severity labels and a risk summary.
 
 **Request:**
 ```json
@@ -218,6 +218,7 @@ Content-Type: application/json
 ```json
 {
   "source": "pod-webfront",
+  "source_label": "web-frontend",
   "max_hops": 3,
   "total_reachable": 13,
   "zones": {
@@ -226,7 +227,9 @@ Content-Type: application/json
         "id": "pod-webfront",
         "label": "web-frontend",
         "type": "pod",
-        "risk": 7.5
+        "risk": 7.5,
+        "namespace": "default",
+        "severity": "HIGH"
       }
     ],
     "1": [
@@ -234,7 +237,9 @@ Content-Type: application/json
         "id": "sa-webapp",
         "label": "backend-sa",
         "type": "service_account",
-        "risk": 6.8
+        "risk": 6.8,
+        "namespace": "default",
+        "severity": "MEDIUM"
       }
     ],
     "2": [
@@ -242,7 +247,9 @@ Content-Type: application/json
         "id": "secret-db-creds",
         "label": "db-credentials",
         "type": "secret",
-        "risk": 9.0
+        "risk": 9.0,
+        "namespace": "default",
+        "severity": "CRITICAL"
       }
     ],
     "3": [
@@ -250,16 +257,99 @@ Content-Type: application/json
         "id": "db-production",
         "label": "production-db",
         "type": "database",
-        "risk": 9.5
+        "risk": 9.5,
+        "namespace": "default",
+        "severity": "CRITICAL"
       }
     ]
   },
-  "all_reachable": ["pod-webfront", "sa-webapp", "secret-db-creds", "db-production", ...]
+  "all_reachable": ["pod-webfront", "sa-webapp", "secret-db-creds", "db-production"],
+  "stats": {
+    "critical": 2,
+    "high": 1,
+    "total": 13
+  },
+  "highest_risk_node": {
+    "id": "db-production",
+    "label": "production-db",
+    "risk": 9.5
+  }
 }
 ```
 
+**Response Fields:**
+
+| Field | Type | Meaning |
+|-------|------|---------|
+| `source` | string | Source node ID (echoed from request) |
+| `source_label` | string | Human-readable label of the source node |
+| `max_hops` | integer | Maximum hop distance used for the BFS |
+| `total_reachable` | integer | **Canonical** count of reachable nodes, excluding the source itself |
+| `zones` | object\<int, BlastZoneNode[]\> | Reachable nodes grouped by hop distance. Key `"0"` is always the source itself; keys `"1".."max_hops"` are subsequent rings. Each node has `id`, `label`, `type`, `risk`, `namespace`, and a derived `severity` label |
+| `all_reachable` | string[] | Flat list of every reachable node ID (includes the source) |
+| `stats.critical` | integer | Count of reachable nodes with `risk >= 9.0` |
+| `stats.high` | integer | Count of reachable nodes with `7.0 <= risk < 9.0` |
+| `stats.total` | integer | Mirrors `total_reachable` (same value, kept for convenience inside the stats block) |
+| `highest_risk_node` | object \| null | The single highest-risk node inside the blast zone (used by the alert banner) |
+
+**Canonical field — important for clients:**
+
+- `total_reachable` is the **canonical** field for the blast-zone size. `stats.total` mirrors it byte-for-byte; either is safe to consume but they are guaranteed to agree, so clients should not treat them as independent signals.
+- `total_affected` is **NOT** part of this contract and has never been emitted by the backend. Any frontend code that falls back to `total_affected` is reading a field that does not exist; treat `total_reachable` as the single source of truth.
+
 **Parameters:**
 - `source` (string, required) — Starting node ID or label
+- `max_hops` (integer, optional) — Maximum hop distance (default: 3, min: 1, max: 10)
+
+---
+
+### POST /api/blast/multi-radius
+
+**Description:** Run BFS from several compromised sources at once and return the *combined* blast zone — useful for modelling an attacker who already controls multiple entry points.
+
+**Request:**
+```json
+{
+  "sources": ["pod-webfront", "user-dev1"],
+  "max_hops": 3
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "sources": ["pod-webfront", "user-dev1"],
+  "combined_reachable": ["sa-webapp", "secret-db-creds", "db-production"],
+  "total_reachable": 17,
+  "per_node": {
+    "pod-webfront": { "...single-source response shape...": "" },
+    "user-dev1":    { "...single-source response shape...": "" }
+  }
+}
+```
+
+**Response Fields:**
+
+| Field | Type | Meaning |
+|-------|------|---------|
+| `sources` | string[] | The list of source node IDs from the request (echoed verbatim, including any IDs that were not found in the graph and therefore contributed nothing) |
+| `combined_reachable` | string[] | Union of every reachable node across all sources, with the source nodes themselves removed |
+| `total_reachable` | integer | **Canonical** size of `combined_reachable`. As with the single-source endpoint, `total_affected` is not part of the contract |
+| `per_node` | object\<string, SingleBlastResponse\> | Per-source breakdown. Each value is the raw BFS result for that source (it does **not** include the `stats`, `severity` enrichment, or `highest_risk_node` fields that the single-source endpoint adds) |
+
+**Asymmetry with `/api/blast/radius` — note for clients:**
+
+The multi-source response intentionally returns a leaner shape than the single-source endpoint:
+
+- No top-level `zones` (each source's zones live under `per_node[*].zones`).
+- No top-level `stats` block — clients that need critical/high counts must aggregate them from `per_node`.
+- No `highest_risk_node`.
+- `per_node[*]` entries are the raw BFS output (no severity labels, no stats).
+
+`total_reachable` remains the canonical reachable-count field on both endpoints.
+
+**Parameters:**
+- `sources` (string[], required) — One or more starting node IDs
 - `max_hops` (integer, optional) — Maximum hop distance (default: 3, min: 1, max: 10)
 
 ---

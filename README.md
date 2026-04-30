@@ -198,7 +198,7 @@ Action: HIGH PRIORITY remediation
 
 **Complexity:** O(VE) | **Demo graph:** < 2ms | **500-node graph:** < 200ms
 
-See [docs/algorithms.md](docs/algorithms.md) or [algorithms.md](algorithms.md) for full deep-dive.
+See [docs/algorithms.md](docs/algorithms.md) for the full deep-dive.
 
 ---
 
@@ -209,12 +209,11 @@ We provide **comprehensive documentation** for every stakeholder:
 ### 📖 Getting Started
 - **[QUICK_START.md](docs/QUICK_START.md)** — 5-minute setup (3 options: Docker, CLI, Local Dev)
 - **[README.md](README.md)** — This file! Project overview
-- **[docs/DOCUMENTATION_SUMMARY.md](docs/DOCUMENTATION_SUMMARY.md)** — Overview for judges
 
 ### 🎯 Using the Tool
 - **[docs/CLI_COMMAND_REFERENCE.md](docs/CLI_COMMAND_REFERENCE.md)** — All CLI commands + expected outputs
 - **[docs/API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md)** — Complete REST API reference
-- **[algorithms.md](algorithms.md)** — Algorithm explanations + design rationale
+- **[docs/algorithms.md](docs/algorithms.md)** — Algorithm explanations + design rationale
 
 ### 🏛️ System Understanding
 - **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — System design + component details
@@ -223,13 +222,8 @@ We provide **comprehensive documentation** for every stakeholder:
 
 ### 🚀 Operations & Development
 - **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** — Docker, Kubernetes, local deployment
-- **[docs/TESTING.md](docs/TESTING.md)** — Test strategy + rubric compliance mapping
+- **[docs/TESTING.md](docs/TESTING.md)** — Test strategy + coverage details
 - **[docs/CONTRIBUTING.md](docs/CONTRIBUTING.md)** — Development guide for contributors
-
-### 📋 Evaluation
-- **[DOCUMENTATION_CHECKLIST.md](DOCUMENTATION_CHECKLIST.md)** — Checklist for judges
-
-**Total:** 10 comprehensive documentation files | 3,750+ lines | 232+ code examples | 35+ tables
 
 See [docs/INDEX.md](docs/INDEX.md) for complete navigation.
 
@@ -240,11 +234,9 @@ See [docs/INDEX.md](docs/INDEX.md) for complete navigation.
 ```
 attack-path-analyzer/
 ├── 📄 README.md                         # This file
-├── 📄 algorithms.md                     # Algorithm deep-dive
-├── 📄 DOCUMENTATION_CHECKLIST.md        # Judges' checklist
 │
 ├── backend/
-│   ├── main.py                          # CLI entrypoint (rubric-compliant)
+│   ├── main.py                          # CLI entrypoint
 │   ├── requirements.txt
 │   └── app/
 │       ├── cli.py                       # Argument parsing + validation
@@ -283,7 +275,7 @@ attack-path-analyzer/
 │   │   └── hooks/                       # Custom React hooks
 │
 ├── tests/
-│   ├── test_rubric_algorithms.py        # Algorithm correctness (rubric-mapped)
+│   ├── test_rubric_algorithms.py        # Algorithm correctness
 │   ├── test_cluster_graph_loader.py     # Data loading validation
 │   ├── test_kill_chain_report.py        # Report generation
 │   ├── test_cve_and_diff.py             # CVE integration
@@ -298,7 +290,8 @@ attack-path-analyzer/
 │   ├── DEPLOYMENT.md                    # Deployment guide
 │   ├── CONTRIBUTING.md                  # Development guide
 │   ├── INDEX.md                         # Navigation
-│   └── CLUSTER_GRAPH_SCHEMA.md          # Data schema
+│   ├── CLUSTER_GRAPH_SCHEMA.md          # Data schema
+│   └── algorithms.md                    # Algorithm deep-dive
 │
 ├── docker/
 │   ├── backend.Dockerfile
@@ -312,7 +305,7 @@ attack-path-analyzer/
 
 ---
 
-## 🔧 CLI Commands (Rubric-Compliant)
+## 🔧 CLI Commands
 
 All commands run from `backend/` after `pip install -r requirements.txt`:
 
@@ -382,7 +375,7 @@ Interactive Swagger UI: `http://localhost:8000/docs`
 ## 🧪 Testing & Validation
 
 ### Test Coverage
-- ✅ **Algorithm Correctness:** 10 test cases (BFS-1-3, DIJK-1-3, DFS-1-2, CNA-1-2)
+- ✅ **Algorithm Correctness:** 10 test cases covering BFS, Dijkstra, DFS, and Centrality
 - ✅ **Data Loading:** Schema validation, normalization
 - ✅ **Integration:** End-to-end CLI + API tests
 - ✅ **Performance:** Algorithm benchmarks on 500-node graphs
@@ -448,36 +441,34 @@ See [docs/DEPLOYMENT.md#kubernetes-deployment](docs/DEPLOYMENT.md#kubernetes-dep
 
 ---
 
-## 🎯 Rubric Compliance
+## 🎯 Capabilities
 
-### ✅ Deliverable 1 — Working CLI Tool (30 marks)
-- ✅ Data ingestion & graph construction
-- ✅ CLI interface with named flags
-- ✅ End-to-end integration test
+### Working CLI Tool
+- Data ingestion & graph construction
+- CLI interface with named flags
+- End-to-end integration tests
 
-### ✅ Deliverable 2 — Kill Chain Report (25 marks)
-- ✅ Attack path accuracy (exact node sequences, costs)
-- ✅ Report readability & structure
-- ✅ Remediation advice (specific actions, not generic)
+### Kill Chain Report
+- Attack path accuracy (exact node sequences, costs)
+- Structured, readable report output
+- Remediation advice (specific actions, not generic)
 
-### ✅ Deliverable 3 — Algorithm Correctness (20 marks)
-- ✅ BFS: Layer-by-layer blast radius
-- ✅ Dijkstra: Weighted shortest path
-- ✅ DFS: Cycle detection with no duplicates
+### Algorithm Correctness
+- BFS: Layer-by-layer blast radius
+- Dijkstra: Weighted shortest path
+- DFS: Cycle detection with no duplicates
 
-### ✅ Deliverable 4 — Critical Node Analysis (15 marks)
-- ✅ Correct node identification (betweenness + risk)
-- ✅ Path elimination accuracy
-- ✅ Methodology correctness (no graph mutation)
+### Critical Node Analysis
+- Node identification (betweenness + risk)
+- Path elimination accuracy
+- Methodology correctness (no graph mutation)
 
-### ✅ Deliverable 5 — Code Quality & Docs (10 marks)
-- ✅ README with setup, CLI examples, algorithms, structure
-- ✅ Schema documentation (all fields explained)
-- ✅ Code readability (docstrings, naming, PEP-8)
+### Code Quality & Docs
+- README with setup, CLI examples, algorithm overview, structure
+- Schema documentation (all fields explained)
+- Code readability (docstrings, naming, PEP-8)
 
-**Total: 100/100 marks** + **Bonus documentation** (7 additional guides)
-
-See [DOCUMENTATION_CHECKLIST.md](DOCUMENTATION_CHECKLIST.md) for detailed mapping.
+Additional documentation guides are available under `docs/`.
 
 ---
 
@@ -490,11 +481,10 @@ Kubernetes RBAC is fundamentally a **directed graph** of permissions. Using clas
 - **Detect loops** (DFS) → Can they escalate infinitely?
 - **Identify bottlenecks** (Centrality) → What breaks the most paths?
 
-### Why Weight Inversion?
-```
-weight = 10 - risk_score
-```
-High-risk edges get LOW weight, so Dijkstra naturally finds the attacker's preferred path (highest risk = easiest to exploit).
+### Edge Weight Semantics
+Edge `weight` is **exploitability cost on a 0–10 scale; lower means easier to exploit**. Authors pre-compute this from CVSS / risk data and put it directly on the edge — Dijkstra minimizes the sum of `weight` along a path. There is no `10 - risk` inversion in the loader; the input value is used as-is.
+
+See [docs/CLUSTER_GRAPH_SCHEMA.md](docs/CLUSTER_GRAPH_SCHEMA.md) for the full input schema and the `weight` vs `risk` distinction.
 
 ### Why Betweenness Centrality?
 A node is "critical" if many paths route through it. Removing it has maximum impact. Combined 60% centrality + 40% risk ensures we catch both structural chokepoints AND risky nodes.
@@ -524,19 +514,18 @@ Want to extend the tool? [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) explains:
 | **Critical Nodes** | O(VE) | O(V+E) | 10-20ms | 100-200ms |
 
 ✅ **All operations < 1 second on 500-node graph**
-✅ **Meets "< 60 seconds on 40-node graph" requirement**
+✅ **Comfortably under 60 seconds on a 40-node graph**
 
 ---
 
-## 🏆 What Makes This Special
+## 🏆 Project Highlights
 
 1. **Comprehensive** — Every feature has expected outputs documented
-2. **Professional** — Architecture is production-ready
+2. **Production-ready architecture** — Clean separation between CLI, API, services, and algorithms
 3. **Accessible** — Works for non-security experts (AI narration)
 4. **Explainable** — Shows exact attack paths, not just risk scores
-5. **Tested** — Rubric test cases mapped to actual tests
-6. **Documented** — 3,750+ lines across 10 guides
-7. **Hackathon-Ready** — All rubric requirements + bonuses
+5. **Tested** — Algorithm correctness covered by dedicated test cases
+6. **Documented** — Multiple guides under `docs/` covering setup, API, architecture, and testing
 
 ---
 
@@ -550,7 +539,6 @@ Want to extend the tool? [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) explains:
 - 🧪 **Testing Guide:** [docs/TESTING.md](docs/TESTING.md)
 - 🔧 **Deployment Guide:** [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
 - 👥 **Contributing:** [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md)
-- 📋 **Judges' Checklist:** [DOCUMENTATION_CHECKLIST.md](DOCUMENTATION_CHECKLIST.md)
 
 ---
 
@@ -562,17 +550,15 @@ MIT License — See LICENSE file
 
 ## 🏅 Status
 
-✅ **All rubric requirements (100/100 marks)**
-✅ **Bonus documentation (7 guides)**
+✅ **All four required graph algorithms implemented and tested**
 ✅ **Production-ready deployment**
 ✅ **Comprehensive test coverage**
-✅ **Ready for evaluation**
 
 ---
 
 <div align="center">
 
-**Built for Hack2Future 2.0 **
+**Production-ready Kubernetes attack path analyzer**
 
 [Questions?](docs/INDEX.md) • [Setup Help?](docs/QUICK_START.md) • [See Docs](docs/INDEX.md)
 

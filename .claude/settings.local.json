@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m pytest backend/tests/test_rubric_algorithms.py::test_bfs_isolated_empty -xvs)",
+      "Bash(git mv *)",
+      "Bash(python -m pytest tests/test_rubric_algorithms.py -k bfs -v)"
+    ]
+  }
+}

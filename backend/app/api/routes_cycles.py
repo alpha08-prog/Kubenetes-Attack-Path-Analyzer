@@ -14,7 +14,7 @@ logger = get_logger(__name__)
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("")
 def get_all_cycles():
     """
     Detect all privilege escalation loops in the graph using DFS.

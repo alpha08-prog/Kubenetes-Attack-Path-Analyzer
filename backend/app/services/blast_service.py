@@ -41,7 +41,7 @@ def get_blast_radius(node_id: str, max_hops: int = 3) -> dict:
     result["stats"] = {
         "critical": critical_count,
         "high":     high_count,
-        "total":    result["total_reachable"],  # includes source node
+        "total":    result["total_reachable"],  # excludes source node
     }
 
     # Highest risk node in blast zone (for alert banner)
@@ -65,6 +65,7 @@ def get_multi_blast_radius(node_ids: list[str], max_hops: int = 3) -> dict:
     G = get_graph()
     combined_reachable = set()
     per_node = {}
+    valid_sources = set()
 
     for node_id in node_ids:
         if node_id not in G:
@@ -72,10 +73,13 @@ def get_multi_blast_radius(node_ids: list[str], max_hops: int = 3) -> dict:
         result = blast_radius(G, node_id, max_hops)
         combined_reachable.update(result["all_reachable"])
         per_node[node_id] = result
+        valid_sources.add(node_id)
+
+    reachable_excluding_sources = combined_reachable - valid_sources
 
     return {
         "sources":            node_ids,
-        "combined_reachable": list(combined_reachable),
-        "total_reachable":    len(combined_reachable),
+        "combined_reachable": list(reachable_excluding_sources),
+        "total_reachable":    len(reachable_excluding_sources),
         "per_node":           per_node,
     }

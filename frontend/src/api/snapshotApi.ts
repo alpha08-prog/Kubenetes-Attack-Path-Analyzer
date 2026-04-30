@@ -83,7 +83,7 @@ export interface TemporalAlert {
 
 export const listSnapshots = (limit = 20, offset = 0) =>
   client.get<{ snapshots: GraphSnapshot[]; total: number; limit: number; offset: number }>(
-    '/api/snapshots/',
+    '/api/snapshots',
     { params: { limit, offset } }
   );
 
@@ -91,7 +91,7 @@ export const getSnapshot = (snapshotId: string) =>
   client.get<GraphSnapshotFull>(`/api/snapshots/${snapshotId}`);
 
 export const createSnapshot = (triggerSource = 'manual', description = 'Manual snapshot') =>
-  client.post<GraphSnapshot & { diff?: Partial<SnapshotDiff> }>('/api/snapshots/', {
+  client.post<GraphSnapshot & { diff?: Partial<SnapshotDiff> }>('/api/snapshots', {
     trigger_source: triggerSource,
     description,
   });

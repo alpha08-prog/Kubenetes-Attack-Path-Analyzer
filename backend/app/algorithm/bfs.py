@@ -16,7 +16,7 @@ def blast_radius(G: nx.DiGraph, source: str, max_hops: int = 3) -> dict:
         {
             "source": "pod-api",
             "max_hops": 3,
-            "total_reachable": 4,   # includes source node
+            "total_reachable": 3,   # excludes source node
             "zones": {
                 0: [{"id": "pod-api", ...}],                       # the compromised source
                 1: [{"id": "sa-backend", "type": "service_account", "risk": 6.5}],
@@ -46,8 +46,8 @@ def blast_radius(G: nx.DiGraph, source: str, max_hops: int = 3) -> dict:
 
     # Group by hop distance into zones.
     # Zone 0 is the source node itself (the compromised node), zones 1..N are
-    # reachable neighbours.  Including the source makes "total_reachable" match
-    # what the report and critical-nodes list count (they include the source).
+    # reachable neighbours.  "total_reachable" counts only the reachable
+    # neighbours (excluding the source) so an isolated node reports 0.
     zones: dict = {}
     for node_id, hop in visited.items():
         if hop not in zones:
@@ -69,7 +69,7 @@ def blast_radius(G: nx.DiGraph, source: str, max_hops: int = 3) -> dict:
         "source": source,
         "source_label": G.nodes[source].get("label", source),
         "max_hops": max_hops,
-        "total_reachable": len(visited),   # now includes source node
+        "total_reachable": max(0, len(visited) - 1),  # exclude source
         "zones": zones,
         "all_reachable": list(visited.keys()),
     }
@@ -84,7 +84,7 @@ def blast_radius_summary(G: nx.DiGraph, source: str, max_hops: int = 3) -> str:
 
     lines = [
         f"Blast radius from '{result['source_label']}':",
-        f"  Total nodes at risk: {result['total_reachable']} (including source)",
+        f"  Total nodes at risk: {result['total_reachable']}",
     ]
     for hop, nodes in sorted(result["zones"].items()):
         node_names = [n["label"] for n in nodes]

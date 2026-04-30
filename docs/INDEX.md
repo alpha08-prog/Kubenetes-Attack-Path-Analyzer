@@ -21,7 +21,7 @@
 **Want to evaluate the tool?**
 - Start: [QUICK_START.md](QUICK_START.md)
 - Then: [CLI_COMMAND_REFERENCE.md](CLI_COMMAND_REFERENCE.md)
-- Deep dive: [algorithms.md](../algorithms.md)
+- Deep dive: [algorithms.md](algorithms.md)
 
 **Running for the first time?**
 ```bash
@@ -32,7 +32,7 @@ python main.py --full-report       # Run complete analysis
 
 **Want to understand results?**
 - [CLI_COMMAND_REFERENCE.md](CLI_COMMAND_REFERENCE.md) — Expected output for each command
-- [algorithms.md](../algorithms.md) — Why each algorithm is used
+- [algorithms.md](algorithms.md) — Why each algorithm is used
 - [ARCHITECTURE.md](ARCHITECTURE.md) — How results are generated
 
 ### 🔧 Developers
@@ -44,12 +44,11 @@ python main.py --full-report       # Run complete analysis
 
 **Adding new features?**
 - [ARCHITECTURE.md](ARCHITECTURE.md) — System design and layers
-- [algorithms.md](../algorithms.md) — Algorithm design patterns
+- [algorithms.md](algorithms.md) — Algorithm design patterns
 - [CONTRIBUTING.md](CONTRIBUTING.md) — How to add algorithms/endpoints
 
 **Running tests?**
 - [TESTING.md](TESTING.md) — Full testing guide
-- [TESTING.md#rubric-test-mapping](TESTING.md#rubric-test-mapping) — Rubric compliance tests
 
 ### DevOps / System Administrators
 
@@ -71,7 +70,7 @@ python main.py --full-report       # Run complete analysis
 **Understanding system design?**
 - [ARCHITECTURE.md](ARCHITECTURE.md) — Full system architecture
 - [ARCHITECTURE.md#design-decisions](ARCHITECTURE.md#design-decisions) — Why decisions were made
-- [algorithms.md](../algorithms.md) — Algorithm selection rationale
+- [algorithms.md](algorithms.md) — Algorithm selection rationale
 
 **Planning scale-up?**
 - [ARCHITECTURE.md#scalability](ARCHITECTURE.md#scalability) — Current limits and strategies
@@ -99,7 +98,7 @@ python main.py --full-report       # Run complete analysis
 | Document | Purpose | Audience | Read Time |
 |----------|---------|----------|-----------|
 | [ARCHITECTURE.md](ARCHITECTURE.md) | System design and components | Architects, Developers | 25 min |
-| [algorithms.md](../algorithms.md) | Algorithm deep-dive | Developers, Evaluators | 30 min |
+| [algorithms.md](algorithms.md) | Algorithm deep-dive | Developers, Evaluators | 30 min |
 | [CLUSTER_GRAPH_SCHEMA.md](CLUSTER_GRAPH_SCHEMA.md) | Data format specification | Developers, DevOps | 10 min |
 
 ### Operational Documentation
@@ -123,7 +122,7 @@ python main.py --full-report       # Run complete analysis
 → [CLI_COMMAND_REFERENCE.md](CLI_COMMAND_REFERENCE.md)
 
 **...understand what an algorithm does?**
-→ [algorithms.md](../algorithms.md)
+→ [algorithms.md](algorithms.md)
 
 **...deploy to Kubernetes?**
 → [DEPLOYMENT.md#kubernetes-deployment](DEPLOYMENT.md#kubernetes-deployment)
@@ -147,28 +146,27 @@ python main.py --full-report       # Run complete analysis
 
 ## Documentation Coverage
 
-### Rubric Requirements (Deliverable 5)
+### Core Reference
 
-| Requirement | Document(s) | Status |
-|-------------|-------------|--------|
-| README with installation steps | [QUICK_START.md](QUICK_START.md), [README.md](../README.md) | Done |
-| README with CLI usage examples | [CLI_COMMAND_REFERENCE.md](CLI_COMMAND_REFERENCE.md) | Done |
-| README with algorithm descriptions | [algorithms.md](../algorithms.md) | Done |
-| README with project structure | [ARCHITECTURE.md](ARCHITECTURE.md) | Done |
-| Schema documentation | [CLUSTER_GRAPH_SCHEMA.md](CLUSTER_GRAPH_SCHEMA.md) | Done |
-| Code readability (docstrings) | Backend code | Done |
-| Setup in < 5 minutes | [QUICK_START.md](QUICK_START.md) | Done |
+| Topic | Document(s) |
+|-------|-------------|
+| Installation steps | [QUICK_START.md](QUICK_START.md), [README.md](../README.md) |
+| CLI usage examples | [CLI_COMMAND_REFERENCE.md](CLI_COMMAND_REFERENCE.md) |
+| Algorithm descriptions | [algorithms.md](algorithms.md) |
+| Project structure | [ARCHITECTURE.md](ARCHITECTURE.md) |
+| Input schema | [CLUSTER_GRAPH_SCHEMA.md](CLUSTER_GRAPH_SCHEMA.md) |
+| Setup in under 5 minutes | [QUICK_START.md](QUICK_START.md) |
 
-### Bonus Documentation
+### Supplementary
 
-| Document | Bonus Value | Status |
-|----------|-------------|--------|
-| Architecture & Design | Shows deep understanding | Done |
-| API Documentation | Makes integration easy | Done |
-| Testing & Coverage | Shows reliability | Done |
-| Deployment Guide | Shows production-readiness | Done |
-| Contributing Guidelines | Shows team scalability | Done |
-| This Index | Shows organization | Done |
+| Document | Purpose |
+|----------|---------|
+| Architecture & Design | System design and component layering |
+| API Documentation | HTTP endpoint reference |
+| Testing & Coverage | Test strategy and how to run the suite |
+| Deployment Guide | Docker / Kubernetes / local setup |
+| Contributing Guidelines | How to add algorithms or endpoints |
+| This Index | Discoverability across the docs set |
 
 ---
 
@@ -184,12 +182,12 @@ python main.py --full-report       # Run complete analysis
 **Using the Tool:**
 - [CLI_COMMAND_REFERENCE.md](CLI_COMMAND_REFERENCE.md) — Command-line interface
 - [API_DOCUMENTATION.md](API_DOCUMENTATION.md) — REST API
-- [algorithms.md](../algorithms.md) — Understanding results
+- [algorithms.md](algorithms.md) — Understanding results
 
 **Understanding the System:**
 - [ARCHITECTURE.md](ARCHITECTURE.md) — System design
 - [CLUSTER_GRAPH_SCHEMA.md](CLUSTER_GRAPH_SCHEMA.md) — Data format
-- [algorithms.md](../algorithms.md) — Algorithm details
+- [algorithms.md](algorithms.md) — Algorithm details
 
 **Development:**
 - [CONTRIBUTING.md](CONTRIBUTING.md) — How to contribute
@@ -204,7 +202,7 @@ python main.py --full-report       # Run complete analysis
 
 1. [QUICK_START.md](QUICK_START.md) (5 min) — Get it running
 2. [CLI_COMMAND_REFERENCE.md](CLI_COMMAND_REFERENCE.md) (15 min) — See what it does
-3. [algorithms.md](../algorithms.md) (10 min) — Understand the science
+3. [algorithms.md](algorithms.md) (10 min) — Understand the science
 
 ### Goal: Deploy to Production (1 hour)
 
@@ -216,7 +214,7 @@ python main.py --full-report       # Run complete analysis
 
 1. [CONTRIBUTING.md](CONTRIBUTING.md) (15 min) — Understand contribution process
 2. [ARCHITECTURE.md](ARCHITECTURE.md) (30 min) — Learn system layers
-3. [algorithms.md](../algorithms.md) (20 min) — Study existing algorithms
+3. [algorithms.md](algorithms.md) (20 min) — Study existing algorithms
 4. [TESTING.md](TESTING.md) (20 min) — Set up testing
 5. Code implementation (remaining time)
 
@@ -237,7 +235,7 @@ python main.py --full-report       # Run complete analysis
 - [CLI_COMMAND_REFERENCE.md](CLI_COMMAND_REFERENCE.md)
 
 **Intermediate:**
-- [algorithms.md](../algorithms.md)
+- [algorithms.md](algorithms.md)
 - [ARCHITECTURE.md](ARCHITECTURE.md)
 - [API_DOCUMENTATION.md](API_DOCUMENTATION.md)
 
@@ -260,7 +258,7 @@ python main.py --full-report       # Run complete analysis
 | [TESTING.md](TESTING.md) | 550 | 13 | 30 |
 | [DEPLOYMENT.md](DEPLOYMENT.md) | 500 | 14 | 45 |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | 450 | 12 | 25 |
-| [algorithms.md](../algorithms.md) | 550 | 15 | 25 |
+| [algorithms.md](algorithms.md) | 550 | 15 | 25 |
 | **Total** | **3,750** | **103** | **232** |
 
 ---

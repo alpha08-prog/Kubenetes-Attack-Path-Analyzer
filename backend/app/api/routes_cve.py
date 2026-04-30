@@ -22,7 +22,7 @@ logger = get_logger(__name__)
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("")
 def recent_cves(
     keyword:  str = Query(default="kubernetes", description="Search keyword"),
     limit:    int = Query(default=15, ge=1, le=50),

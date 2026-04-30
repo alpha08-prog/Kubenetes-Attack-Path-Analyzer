@@ -26,7 +26,7 @@ logger = get_logger(__name__)
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("")
 def list_runs(
     limit:        int = Query(default=20, ge=1, le=100),
     cluster_name: str = Query(default=None),

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Loader2, Play, Target } from 'lucide-react';
+import { Loader2, Target } from 'lucide-react';
 import SeverityBadge from './SeverityBadge';
 import NodeTypeBadge from './NodeTypeBadge';
 import type { GraphNode } from '@/hooks/useGraph';
@@ -55,7 +55,7 @@ export default function BlastRadiusPanel({ nodes, blastRadius, loading, onAnalyz
       {!loading && blastRadius && (
         <div className="space-y-3 mt-4">
           <p className="text-sm font-medium text-foreground">
-            {blastRadius.total_affected || 0} nodes reachable within {blastRadius.max_hops || hops} hops
+            {blastRadius.total_reachable || 0} nodes reachable within {blastRadius.max_hops || hops} hops
           </p>
 
           {blastRadius.stats && (
