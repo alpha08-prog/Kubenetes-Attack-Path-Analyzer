@@ -7,24 +7,29 @@ import DemoMode from "./pages/DemoMode";
 import LiveCveFeedPage from "./pages/LiveCveFeedPage";
 import TemporalAnalysisPage from "./pages/TemporalAnalysisPage";
 import NotFound from "./pages/NotFound";
+import MockModeBanner from "@/components/MockModeBanner";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/demo" element={<DemoMode />} />
-          <Route path="/cve-feed" element={<LiveCveFeedPage />} />
-          <Route path="/temporal" element={<TemporalAnalysisPage />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <MockModeBanner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/demo" element={<DemoMode />} />
+            <Route path="/cve-feed" element={<LiveCveFeedPage />} />
+            <Route path="/temporal" element={<TemporalAnalysisPage />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;

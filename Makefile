@@ -18,11 +18,7 @@
 # ── Docker commands ────────────────────────────────────────────────────────────
 
 demo:
-	@echo "Generating mock data..."
-	python scripts/generate_mock_data.py
-	@echo "Seeding processed artifacts..."
-	python scripts/seed_graph.py
-	@echo "Starting all services..."
+	@echo "Starting all services (bundled nokia_telecom.json scenario)..."
 	docker-compose up --build
 
 build:
@@ -59,16 +55,16 @@ dev:
 # ── Data ──────────────────────────────────────────────────────────────────────
 
 mock:
-	python scripts/generate_mock_data.py
+	python backend/app/scripts/generate_mock_data.py
 
 seed:
-	python scripts/seed_graph.py
+	python backend/app/scripts/seed_graph.py
 
 fetch:
-	bash scripts/fetch_k8s_data.sh
+	bash backend/app/scripts/fetch_k8s_data.sh
 
 fetch-full:
-	bash scripts/fetch_k8s_data.sh --mode full
+	bash backend/app/scripts/fetch_k8s_data.sh --mode full
 
 # ── Tests ─────────────────────────────────────────────────────────────────────
 

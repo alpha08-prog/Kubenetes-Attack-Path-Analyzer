@@ -197,10 +197,16 @@ app = FastAPI(
 
 # ─── CORS ─────────────────────────────────────────────────────────────────────
 
+# A wildcard origin and credentials are mutually exclusive per the CORS spec, so
+# auto-adapt: explicit origins (local dev) keep credentials on; a "*" wildcard
+# (public no-auth deploy) turns credentials off. The app has no auth/cookies, so
+# disabling credentials in the wildcard case loses nothing.
+_cors_allow_all = "*" in settings.CORS_ORIGINS
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins     = settings.CORS_ORIGINS,
-    allow_credentials = True,
+    allow_credentials = not _cors_allow_all,
     allow_methods     = ["*"],
     allow_headers     = ["*"],
 )
