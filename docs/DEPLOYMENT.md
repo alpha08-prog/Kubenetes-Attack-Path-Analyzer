@@ -6,11 +6,119 @@
 
 ## Table of Contents
 
-1. [Docker Deployment (Recommended)](#docker-deployment-recommended)
-2. [Local Development Setup](#local-development-setup)
-3. [Kubernetes Deployment](#kubernetes-deployment-deployment)
+1. [Hosted: Render (backend) + Vercel (frontend)](#hosted-render-backend--vercel-frontend)
+2. [Docker Deployment (Recommended)](#docker-deployment-recommended)
+3. [Local Development Setup](#local-development-setup)
 4. [Environment Configuration](#environment-configuration)
 5. [Troubleshooting](#troubleshooting)
+
+---
+
+## Hosted: Render (backend) + Vercel (frontend)
+
+The fastest way to get a public, HTTPS demo. The FastAPI backend runs on **Render**
+(from the Docker image) and the React/Vite frontend runs on **Vercel** (static build).
+The backend allows all CORS origins (it has no auth), so no cross-wiring is required —
+the only link is the frontend knowing the backend's URL.
+
+```
+ Browser ──► Vercel (static React)  ──HTTPS──►  Render (FastAPI / Docker)
+             VITE_API_BASE_URL = https://apa-backend.onrender.com
+```
+
+### Prerequisites
+- Code pushed to a GitHub repo.
+- A [Render](https://render.com) account and a [Vercel](https://vercel.com) account (both free).
+- A **Groq API key** from <https://console.groq.com> (required for AI narration).
+
+---
+
+### Part A — Backend on Render
+
+**A1. Push your branch to GitHub**
+```bash
+git push -u origin production-ready-render-deploy   # or merge to main first
+```
+
+**A2. Create the service from the blueprint**
+1. Render Dashboard → **New** → **Blueprint**.
+2. Connect the repo. Render detects [`render.yaml`](../render.yaml) and shows one
+   service: **apa-backend** (Docker, free plan).
+3. Click **Apply**.
+
+**A3. Set the secret**
+- When prompted (or in the service's **Environment** tab), set `GROQ_API_KEY` to your
+  Groq key. Optionally set `NVD_API_KEY` and `SLACK_WEBHOOK_URL`.
+- `MOCK_MODE=true`, `DEBUG=false`, `CLUSTER_NAME`, and `CORS_ORIGINS=["*"]` are already
+  defined by the blueprint.
+
+**A4. Deploy & grab the URL**
+- Render builds the Docker image and deploys. First build ~3–5 min.
+- The container binds to Render's injected `$PORT` automatically (no change needed).
+- Copy the public URL, e.g. **`https://apa-backend.onrender.com`**.
+
+**A5. Verify the backend**
+```bash
+curl https://apa-backend.onrender.com/health     # → {"status":"ok"} (200)
+curl https://apa-backend.onrender.com/ready       # → 200 once the graph has loaded
+# Open the interactive docs:
+#   https://apa-backend.onrender.com/docs
+```
+> Free-plan note: the service sleeps after ~15 min idle; the next request cold-starts
+> in ~30–60 s. The frontend shows a "mock mode" banner and synthetic data while the
+> backend wakes, so the UI never hard-fails.
+
+---
+
+### Part B — Frontend on Vercel
+
+**B1. Import the project**
+1. Vercel Dashboard → **Add New…** → **Project** → import the same GitHub repo.
+2. **Root Directory:** set to `frontend` (click *Edit* and pick the folder). This is
+   essential — the app is not at the repo root.
+3. Framework Preset: **Vite** (auto-detected). Build command `npm run build`,
+   output `dist`, install `npm ci` — all already declared in
+   [`frontend/vercel.json`](../frontend/vercel.json), including the SPA rewrite so deep
+   links like `/demo` don't 404.
+
+**B2. Set the API URL env var**
+- In **Environment Variables**, add:
+  - **Name:** `VITE_API_BASE_URL`
+  - **Value:** your Render backend URL, e.g. `https://apa-backend.onrender.com`
+    (no trailing slash)
+  - Apply to **Production** (and Preview if you want PR deploys to work).
+- ⚠️ Vite bakes this in at **build time**. If you change it later, you must
+  **redeploy** the frontend for it to take effect.
+
+**B3. Deploy**
+- Click **Deploy**. Vercel builds and serves the static bundle, e.g.
+  **`https://attack-path-analyzer.vercel.app`**.
+
+**B4. Verify end to end**
+1. Open the Vercel URL.
+2. The graph should render with live data and **no** "mock mode" banner — that banner
+   only appears when the backend is unreachable, so its absence confirms the frontend
+   reached Render.
+3. Open browser DevTools → **Network**: API calls should hit
+   `https://apa-backend.onrender.com/api/...` with `200`s and no CORS errors.
+4. Trigger an AI narrative (report/analysis) → confirm a real narrative renders
+   (validates the `GROQ_API_KEY`).
+
+---
+
+### Updating after first deploy
+- **Backend:** push to the connected branch → Render auto-deploys (`autoDeploy: true`).
+- **Frontend:** push → Vercel auto-deploys. If you only changed `VITE_API_BASE_URL`,
+  trigger a **Redeploy** from the Vercel dashboard (env changes need a rebuild).
+
+### Common pitfalls
+| Symptom | Cause | Fix |
+|---|---|---|
+| Frontend shows mock-mode banner in prod | `VITE_API_BASE_URL` unset/wrong, or backend asleep | Set the env var to the exact Render URL and redeploy; retry once backend wakes |
+| `404` on `/demo` refresh | SPA fallback missing | Ensure `frontend/vercel.json` rewrite is present (it is, by default) |
+| CORS error in console | Backend `CORS_ORIGINS` not `["*"]` | Confirm the blueprint value; redeploy backend |
+| AI narration shows fallback text | `GROQ_API_KEY` missing/invalid on Render | Set it in Render → Environment, redeploy |
+| Backend build fails on Dockerfile path | Case mismatch | Already fixed — paths are lowercase `docker/backend.Dockerfile` |
 
 ---
 
@@ -168,86 +276,11 @@ make dev
 
 ## Kubernetes Deployment
 
-### Helm Chart Structure
-
-```
-deployment/
-├── Chart.yaml
-├── values.yaml
-├── templates/
-│   ├── deployment.yaml
-│   ├── service.yaml
-│   ├── configmap.yaml
-│   └── ingress.yaml
-```
-
-### Installation
-
-```bash
-# Add helm repo (if applicable)
-helm repo add your-team https://charts.example.com
-
-# Install release
-helm install attack-path-analyzer your-team/attack-path-analyzer \
-  --namespace security \
-  --values deployment/values.yaml
-```
-
-### values.yaml Example
-
-```yaml
-replicaCount: 2
-
-image:
-  repository: your-registry/attack-path-analyzer
-  tag: "1.0.0"
-  pullPolicy: IfNotPresent
-
-service:
-  type: LoadBalancer
-  port: 80
-
-ingress:
-  enabled: true
-  host: analyzer.example.com
-  tls:
-    enabled: true
-
-resources:
-  limits:
-    cpu: 500m
-    memory: 512Mi
-  requests:
-    cpu: 250m
-    memory: 256Mi
-
-env:
-  MOCK_MODE: "false"
-  CLUSTER_NAME: "production"
-
-# Persistent storage for graph data
-persistence:
-  enabled: true
-  size: 10Gi
-```
-
-### Deploy to Kubernetes
-
-```bash
-# Create namespace
-kubectl create namespace security
-
-# Deploy using Helm
-helm install attack-path-analyzer ./deployment \
-  -n security
-
-# Verify deployment
-kubectl get pods -n security
-kubectl logs -n security <pod-name>
-
-# Port forward for testing
-kubectl port-forward -n security svc/attack-path-analyzer 8000:8000
-```
+> **Not included.** This repo does **not** ship a Helm chart or K8s manifests — the
+> supported deploy paths are **Render + Vercel** (above) and **Docker Compose**. If you
+> want to run it on a cluster, the backend (`docker/backend.Dockerfile`) and frontend
+> are plain containers, so a standard `Deployment` + `Service` + `Ingress` per service
+> works; author those manifests for your environment. Contributions welcome.
 
 ---
 

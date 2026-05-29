@@ -43,8 +43,11 @@ USER appuser
 
 EXPOSE 8000
 
-# Healthcheck — used by docker-compose depends_on
+# Healthcheck — used by docker-compose depends_on (local). Render uses its own
+# healthCheckPath probe, so the hardcoded 8000 here only matters for compose.
 HEALTHCHECK --interval=10s --timeout=5s --start-period=15s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Bind to $PORT when the platform injects one (Render sets PORT=10000), else
+# default to 8000 for local docker-compose. Shell form so ${PORT} expands.
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
