@@ -434,15 +434,17 @@ See [docs/DEPLOYMENT.md#docker-deployment-recommended](docs/DEPLOYMENT.md#docker
 ```
 See [docs/QUICK_START.md](docs/QUICK_START.md)
 
-### 3️⃣ Render (hosted, auto-TLS)
-A [`render.yaml`](render.yaml) blueprint deploys both services in one click:
-- **apa-backend** — FastAPI on Docker (`MOCK_MODE=true`, bundled scenario)
-- **apa-frontend** — React/Vite static site, auto-wired to the backend URL
+### 3️⃣ Hosted: Render (backend) + Vercel (frontend)
+Split deploy with auto-TLS on both:
+- **Backend → Render** via the [`render.yaml`](render.yaml) blueprint — FastAPI on
+  Docker, `MOCK_MODE=true`, bundled scenario, `GROQ_API_KEY` as a secret.
+- **Frontend → Vercel** — Vite static build (root dir `frontend/`), with
+  `VITE_API_BASE_URL` pointed at the Render backend URL.
 
-Steps: push to GitHub → Render Dashboard → **New → Blueprint** → select the repo →
-paste your `GROQ_API_KEY` when prompted → Deploy. Render provisions HTTPS for both
-services automatically. (Free plan cold-starts after ~15 min idle; the frontend's
-mock-mode banner covers a cold backend.)
+Because the backend allows all CORS origins (no auth), the two sides need no
+cross-wiring. Full walkthrough: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+(Render free plan cold-starts after ~15 min idle; the frontend's mock-mode banner
+covers a cold backend.)
 
 ---
 

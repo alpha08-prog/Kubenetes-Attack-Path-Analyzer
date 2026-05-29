@@ -1,17 +1,18 @@
-# ── Render Blueprint — Attack Path Analyzer ───────────────────────────────────
-# Deploys two services from this repo:
-#   1. apa-backend   — FastAPI (Docker), public API + Swagger at /docs
-#   2. apa-frontend  — React/Vite static site, talks to the backend's public URL
+# ── Render Blueprint — Attack Path Analyzer (backend only) ────────────────────
+# The frontend is deployed separately on Vercel, so this blueprint provisions
+# only the FastAPI backend. CORS is wide-open ("*") since the app has no auth,
+# so the Vercel frontend can call it with no extra wiring.
 #
 # Setup:
 #   1. Push this repo to GitHub.
 #   2. Render Dashboard → New → Blueprint → pick this repo (uses render.yaml).
 #   3. When prompted, paste your GROQ_API_KEY (required for AI narration).
 #      Optionally set NVD_API_KEY / SLACK_WEBHOOK_URL.
-#   4. Deploy. Render provisions auto-TLS (https) for both services.
+#   4. Deploy. Render provisions auto-TLS (https) and a public URL.
 #
 # Notes:
-#   - The free plan cold-starts after ~15 min idle (first request ~30-60s). The
+#   - The container binds to Render's injected $PORT automatically.
+#   - Free plan cold-starts after ~15 min idle (first request ~30-60s); the
 #     frontend's offline mock-mode banner covers a cold/unreachable backend.
 #   - History (SQLite) is ephemeral on the free plan — it rebuilds on each boot.
 
@@ -34,8 +35,8 @@ services:
         value: "false"
       - key: CLUSTER_NAME
         value: nokia-telecom-cluster
-      # Public, no-auth demo: allow all origins. The backend has no cookies/auth,
-      # so the CORS layer drops credentials automatically when this is "*".
+      # Public, no-auth demo: allow all origins (incl. the Vercel frontend). The
+      # backend has no cookies/auth, so the CORS layer drops credentials when "*".
       - key: CORS_ORIGINS
         value: '["*"]'
       # Required for AI kill-chain narration — paste in the dashboard at deploy.
@@ -46,25 +47,3 @@ services:
         sync: false
       - key: SLACK_WEBHOOK_URL
         sync: false
-
-  # ── Frontend — React/Vite static site ───────────────────────────────────────
-  - type: web
-    name: apa-frontend
-    runtime: static
-    buildCommand: cd frontend && npm ci && VITE_API_BASE_URL="https://$BACKEND_HOST" npm run build
-    staticPublishPath: frontend/dist
-    pullRequestPreviewsEnabled: false
-    autoDeploy: true
-    envVars:
-      # Render exposes the backend's hostname (no scheme); the build command
-      # prefixes https:// and bakes it into the Vite bundle as VITE_API_BASE_URL.
-      - key: BACKEND_HOST
-        fromService:
-          type: web
-          name: apa-backend
-          property: host
-    routes:
-      # SPA fallback — every path serves index.html so client-side routing works.
-      - type: rewrite
-        source: /*
-        destination: /index.html
