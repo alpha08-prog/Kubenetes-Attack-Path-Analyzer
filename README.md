@@ -86,7 +86,7 @@ $ python main.py --full-report
 | **🔁 Privilege Escalation Detection** | DFS | Detects circular permission loops that allow unlimited privilege gain |
 | **🎯 Critical Node Identification** | Betweenness Centrality | Ranks chokepoints by how many attack paths depend on them (60% centrality + 40% risk) |
 | **📊 Node Removal Simulation** | Graph Surgery | Shows exact impact of hardening/removing any node |
-| **🤖 AI Kill Chain Narratives** | Gemini 2.0 Flash | Translates raw graph results into executive-friendly security findings |
+| **🤖 AI Kill Chain Narratives** | Groq (Llama 3.3 70B) | Translates raw graph results into executive-friendly security findings |
 
 ---
 
@@ -110,7 +110,7 @@ $ python main.py --full-report
 │  └────────┬─────────────────────────────────────┬─────────┘  │
 │           │                                    │             │
 │  ┌────────▼──────────┐         ┌───────────────▼──────────┐  │
-│  │ Service Layer     │         │ Gemini AI Narrator       │  │
+│  │ Service Layer     │         │ Groq AI Narrator         │  │
 │  │ (Business Logic)  │         │ (NLG Reports)           │  │
 │  └────────┬──────────┘         └───────────────┬──────────┘  │
 └───────────┼────────────────────────────────────┼──────────────┘
@@ -133,7 +133,7 @@ $ python main.py --full-report
 - ✅ **Directed Weighted Graph** — K8s RBAC is directional; weights model exploitability
 - ✅ **NetworkX** — All 4 required algorithms built-in, pure Python, cross-platform
 - ✅ **In-Memory** — Fast analysis on 500-node graphs (< 500ms full analysis)
-- ✅ **Pluggable AI** — Gemini for narratives, fallback to structured JSON
+- ✅ **Pluggable AI** — Groq for narratives, fallback to structured JSON
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for full system design.
 
@@ -254,7 +254,7 @@ attack-path-analyzer/
 │       │   ├── analysis_service.py      # Orchestrates algorithms
 │       │   ├── kill_chain_report.py     # Report generation
 │       │   ├── remediation_service.py   # Fix recommendations
-│       │   ├── narrator_service.py      # AI narration (Gemini)
+│       │   ├── narrator_service.py      # AI narration (Groq)
 │       │   └── ... (10+ services)
 │       ├── api/                         # FastAPI routes
 │       │   ├── routes_graph.py          # /api/graph/*
@@ -295,8 +295,7 @@ attack-path-analyzer/
 │
 ├── docker/
 │   ├── backend.Dockerfile
-│   ├── frontend.Dockerfile
-│   └── nginx.conf
+│   └── frontend.Dockerfile
 │
 ├── docker-compose.yml                   # Full stack in one file
 ├── Makefile                             # Convenient commands
@@ -405,7 +404,7 @@ pytest tests/test_rubric_algorithms.py -v
 - NetworkX (graph algorithms)
 - FastAPI (REST framework)
 - Pydantic v2 (data validation)
-- Google Generative AI SDK (Gemini narration)
+- Groq API (Llama 3.3 70B narration)
 
 **Frontend:**
 - Node.js 20+
@@ -422,7 +421,7 @@ pytest tests/test_rubric_algorithms.py -v
 
 ## 🚀 Deployment Options
 
-### 1️⃣ Docker Compose (Production-Ready)
+### 1️⃣ Docker Compose (local / single host)
 ```bash
 docker-compose up --build
 ```
@@ -435,9 +434,15 @@ See [docs/DEPLOYMENT.md#docker-deployment-recommended](docs/DEPLOYMENT.md#docker
 ```
 See [docs/QUICK_START.md](docs/QUICK_START.md)
 
-### 3️⃣ Kubernetes
-Helm chart and manifests provided.
-See [docs/DEPLOYMENT.md#kubernetes-deployment](docs/DEPLOYMENT.md#kubernetes-deployment)
+### 3️⃣ Render (hosted, auto-TLS)
+A [`render.yaml`](render.yaml) blueprint deploys both services in one click:
+- **apa-backend** — FastAPI on Docker (`MOCK_MODE=true`, bundled scenario)
+- **apa-frontend** — React/Vite static site, auto-wired to the backend URL
+
+Steps: push to GitHub → Render Dashboard → **New → Blueprint** → select the repo →
+paste your `GROQ_API_KEY` when prompted → Deploy. Render provisions HTTPS for both
+services automatically. (Free plan cold-starts after ~15 min idle; the frontend's
+mock-mode banner covers a cold backend.)
 
 ---
 

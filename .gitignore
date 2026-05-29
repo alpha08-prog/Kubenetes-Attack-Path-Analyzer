@@ -11,6 +11,16 @@ __pycache__/
 venv/
 env/
 .env
+.venv/
+
+# Build output
+dist/
+*/dist/
+
+# Runtime artifacts (regenerated on startup)
+logs/
+*.log
+backend/data/history.db
 
 # OS files
 .DS_Store

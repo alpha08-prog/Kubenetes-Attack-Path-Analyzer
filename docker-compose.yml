@@ -17,10 +17,7 @@ services:
     restart: unless-stopped
 
     environment:
-      # AI narration — get free key at aistudio.google.com
-      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
-
-      # Groq narration — get free key at console.groq.com
+      # Groq narration — get free key at console.groq.com (required for AI kill-chain narratives)
       GROQ_API_KEY: ${GROQ_API_KEY:-}
 
       # Slack alerts — Incoming Webhook URL from https://api.slack.com/apps
@@ -38,8 +35,8 @@ services:
       BFS_MAX_HOPS:     3
       CENTRALITY_TOP_N: 10
 
-      # Allow requests from nginx frontend container
-      CORS_ORIGINS: '["http://localhost:3000","http://frontend:3000"]'
+      # Allow requests from nginx frontend container, plus host vite dev (5173) / preview (4173)
+      CORS_ORIGINS: '["http://localhost:3000","http://127.0.0.1:3000","http://frontend:3000","http://localhost:5173","http://127.0.0.1:5173","http://localhost:4173","http://127.0.0.1:4173"]'
 
     volumes:
       # Mount data directory so scenarios persist across rebuilds
